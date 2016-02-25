@@ -141,7 +141,7 @@ int main() {
  * Cabeçalhos necessários numa CGI
  */
 	printf("Content-Type: text/html; charset=utf-8\n\n");
-	printf("<header><title>Exemplo</title><meta charset=\"UTF-8\"></header>\n");
+	printf("<head><title>Exemplo</title></head>\n");
 	printf("<body>\n");
 
 	printf("<h1>Exemplo de utilização</h1>\n");
