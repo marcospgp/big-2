@@ -5,11 +5,11 @@
 /**
 URL da CGI
 */
-#define SCRIPT		"http://127.0.0.1/cgi-bin/cartas"
+#define SCRIPT		"http://127.0.0.1/cgi-bin/big2"
 /**
 URL da pasta com as cartas
 */
-#define BARALHO		"http://127.0.0.1/cards"
+#define BARALHO		"http://127.0.0.1/card-images"
 
 /**
 Ordem dos naipes
