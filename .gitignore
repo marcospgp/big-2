@@ -48,3 +48,6 @@ Temporary Items
 
 # Codeblocks project files
 cb-project-ignored/
+
+# Doxygen
+Doxyfile
