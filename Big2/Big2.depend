@@ -1,0 +1,10 @@
+# depslib dependency file v1.0
+1456418037 source:c:\users\marco\desktop\marcos\projects\big-2\big2\cartas.c
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+
+1456418820 source:c:\users\marco\desktop\marcos\projects\big-2\big2\main.c
+	<stdio.h>
+	<stdlib.h>
+
