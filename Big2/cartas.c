@@ -104,6 +104,7 @@ void imprime(char *path, long long int ESTADO) {
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
+	// Nestes for loops, x e y referem-se às coordenadas onde vai ser imprimida a próxima carta
 	for(y = 10, n = 0; n < 4; n++, y += 120) {
 		for(x = 10, v = 0; v < 13; v++)
 			if(carta_existe(ESTADO, n, v)) {
@@ -114,6 +115,8 @@ void imprime(char *path, long long int ESTADO) {
 	printf("</svg>\n");
 }
 
+
+
 /** \brief Trata os argumentos da CGI
 
 Esta função recebe a query que é passada à cgi-bin e trata-a.
@@ -123,7 +126,9 @@ Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão prese
 @param query A query que é passada à cgi-bin
  */
 void parse(char *query) {
+
 	long long int ESTADO;
+
 	if(sscanf(query, "q=%lld", &ESTADO) == 1) {
 		imprime(BARALHO, ESTADO);
 	} else {
