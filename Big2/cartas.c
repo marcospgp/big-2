@@ -124,13 +124,6 @@ void imprime (bool firstPlay, long long int *estados) {
         distributeCards(); // Preenche o array global hands
 
         estados = hands;
-
-        int z;
-        for (z = 0; z < 4; z++) {
-
-            printf("<!-- A %lld -->\n", hands[z]);
-            printf("<!-- B %lld -->\n", estados[z]);
-        }
 	}
 
 	printf("<svg height = \"800\" width = \"800\">\n");
@@ -174,7 +167,12 @@ void distributeCards () {
     // char currentSuit, currentValue, currentCardIndex;
 
     // Mantém a conta de quantas cartas já foram para cada mão
-    int cardsInEachHand[4] = {0, 0, 0, 0};
+    int cardsInEachHand[4] = {0};
+
+    int z;
+    for (z = 0; z < 4; z++) {
+        printf("<!-- %d -->", cardsInEachHand[z]);
+    }
 
     for (i = 0; i < 4; i++) { // Percorrer naipes
 
