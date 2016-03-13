@@ -11,17 +11,22 @@
 /**
     URL da pasta com as cartas
 */
-#define BARALHO		"http://127.0.0.1/card-images"
+#define DECK		"http://127.0.0.1/card-images"
 
 /**
     Ordem dos naipes
 */
-#define NAIPES		"DCHS"
+#define SUITS		"DCHS"
 
 /**
     Ordem das cartas
 */
-#define VALORES		"3456789TJQKA2"
+#define VALUES		"3456789TJQKA2"
+
+/**
+    Formato da string passada como parâmetro entre jogadas
+*/
+#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
 
 /**
     Definir o tipo bool
@@ -31,22 +36,51 @@ typedef int bool;
 #define false 0
 
 /**
+    Definir a estrutura que contém o estado do jogo num dado momento
+*/
+typedef struct State {
+	MAO mao[4];
+	int cartas[4];
+	MAO selecao;
+
+	int passar, jogar, selecionar; //se 1 exectua funcao
+
+} state;
+
+/**
 	Estado inicial com todas as 52 cartas do baralho
 	Cada carta é representada por um bit que está
 	a 1 caso ela pertença à mão ou 0 caso contrário
 */
 const long long int ESTADO_INICIAL = 0xfffffffffffff;
 
-/**
-    Array global que contém as 4 mãos
+/** \brief Processa a string recebida como parâmetro e retorna o estado atual do jogo
+
+    @param stateString  A string que contém a informação sobre o atual estado de jgoo
+    @return     A informação contida na string recebida num formato utilizável em código
 */
-static long long int hands[4];
+state stringToState (char* str) {
+	state e;
+	sscanf(str, PARAMETER_STRING_FORMAT, &e.hand[0], &e.hand[1], &e.hand[2], &e.hand[3], &e.cards[0], &e.cards[1], &e.cards[2],&e.cards[3], &e.selection, &e.pass, &e.select, &e.play);
+	return e;
+}
+
+/** \brief Codifica o estado atual do jogo numa string
+
+    @param gameState    O estado de jogo atual
+    @return     Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro
+*/
+char* stateToString (state gameState) {
+	static char res[10240];
+	sprintf(res, PARAMETER_STRING_FORMAT, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.passar, e.selecionar, e.jogar);
+	return res;
+}
 
 /** \brief Devolve o índice da carta
 
-@param naipe	O naipe da carta (inteiro entre 0 e 3)
-@param valor	O valor da carta (inteiro entre 0 e 12)
-@return		O índice correspondente à carta
+    @param naipe	O naipe da carta (inteiro entre 0 e 3)
+    @param valor	O valor da carta (inteiro entre 0 e 12)
+    @return		O índice correspondente à carta
 */
 int indice (int naipe, int valor) {
 	return naipe * 13 + valor;
@@ -54,10 +88,10 @@ int indice (int naipe, int valor) {
 
 /** \brief Adiciona uma carta ao estado
 
-@param ESTADO	O estado atual
-@param naipe	O naipe da carta (inteiro entre 0 e 3)
-@param valor	O valor da carta (inteiro entre 0 e 12)
-@return		O novo estado
+    @param ESTADO	O estado atual
+    @param naipe	O naipe da carta (inteiro entre 0 e 3)
+    @param valor	O valor da carta (inteiro entre 0 e 12)
+    @return		O novo estado
 */
 long long int add_carta (long long int ESTADO, int naipe, int valor) {
 	int idx = indice(naipe, valor);
@@ -66,10 +100,10 @@ long long int add_carta (long long int ESTADO, int naipe, int valor) {
 
 /** \brief Remove uma carta do estado
 
-@param ESTADO	O estado atual
-@param naipe	O naipe da carta (inteiro entre 0 e 3)
-@param valor	O valor da carta (inteiro entre 0 e 12)
-@return		O novo estado
+    @param ESTADO	O estado atual
+    @param naipe	O naipe da carta (inteiro entre 0 e 3)
+    @param valor	O valor da carta (inteiro entre 0 e 12)
+    @return		O novo estado
 */
 long long int rem_carta (long long int ESTADO, int naipe, int valor) {
 	int idx = indice(naipe, valor);
@@ -78,10 +112,10 @@ long long int rem_carta (long long int ESTADO, int naipe, int valor) {
 
 /** \brief Verifica se uma carta pertence ao estado
 
-@param ESTADO	O estado atual
-@param naipe	O naipe da carta (inteiro entre 0 e 3)
-@param valor	O valor da carta (inteiro entre 0 e 12)
-@return		1 se a carta existe e 0 caso contrário
+    @param ESTADO	O estado atual
+    @param naipe	O naipe da carta (inteiro entre 0 e 3)
+    @param valor	O valor da carta (inteiro entre 0 e 12)
+    @return		1 se a carta existe e 0 caso contrário
 */
 int carta_existe (long long int ESTADO, int naipe, int valor) {
 	int idx = indice(naipe, valor);
@@ -90,16 +124,16 @@ int carta_existe (long long int ESTADO, int naipe, int valor) {
 
 /** \brief Imprime o html correspondente a uma carta
 
-@param path	o URL correspondente à pasta que contém todas as cartas
-@param x A coordenada x da carta
-@param y A coordenada y da carta
-@param estados	As 4 mãos atuais
-@param naipe	O naipe da carta (inteiro entre 0 e 3)
-@param valor	O valor da carta (inteiro entre 0 e 12)
+    @param path	o URL correspondente à pasta que contém todas as cartas
+    @param x A coordenada x da carta
+    @param y A coordenada y da carta
+    @param estados	As 4 mãos atuais
+    @param naipe	O naipe da carta (inteiro entre 0 e 3)
+    @param valor	O valor da carta (inteiro entre 0 e 12)
 */
 void imprime_carta (char *path, int x, int y, long long int *estados, int naipe, int valor) {
-	char *suit = NAIPES;
-	char *rank = VALORES;
+	char *suit = SUITS;
+	char *rank = VALUES;
 	char script[10240];
 	sprintf(script, "%s?q1=%lld&q2=%lldq3=%lld&q4=%lld", SCRIPT, estados[0], estados[1], estados[2], estados[3]);
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
@@ -107,17 +141,17 @@ void imprime_carta (char *path, int x, int y, long long int *estados, int naipe,
 
 /** \brief Imprime o estado
 
-Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
+    Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
 
-@param firstPlay	true se esta for a primeira jogada
-@param estados      As 4 mãos caso esta não seja a primeira jogada (pointer para um array). Este paramêtro não deve existir se o primeiro argumento for true
+    @param firstPlay	true se esta for a primeira jogada
+    @param estados      As 4 mãos caso esta não seja a primeira jogada (pointer para um array). Este paramêtro não deve existir se o primeiro argumento for true
 */
 void imprime (bool firstPlay, long long int *estados) {
 
 	int i, j, k;
 	int x, y;
 
-	char *path = BARALHO;
+	char *path = DECK;
 
 	if (firstPlay) {
 
@@ -176,11 +210,11 @@ void distributeCards () {
 
     for (i = 0; i < 4; i++) { // Percorrer naipes
 
-            // currentSuit = NAIPES[i];
+            // currentSuit = SUITS[i];
 
         for (j = 0; j < 13; j++) { // Percorrer cartas
 
-            // currentValue = VALORES[j];
+            // currentValue = VALUES[j];
 
             // currentCardIndex = indice(i, j);
 
@@ -203,11 +237,11 @@ void distributeCards () {
 
 /** \brief Trata os argumentos da CGI
 
-Esta função recebe a query que é passada à cgi-bin e trata-a.
-Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
-Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
-Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
-@param query A query que é passada à cgi-bin
+    Esta função recebe a query que é passada à cgi-bin e trata-a.
+    Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
+    Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
+    Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
+    @param query A query que é passada à cgi-bin
  */
 void parse (char *query) {
 
@@ -227,8 +261,8 @@ void parse (char *query) {
 
 /** \brief Função principal
 
-Função principal do programa que imprime os cabeçalhos necessários e depois disso invoca
-a função que vai imprimir o código html para desenhar as cartas
+    Função principal do programa que imprime os cabeçalhos necessários e de seguida
+    invoca a função que vai imprimir o código html para desenhar as cartas
  */
 int main () {
 
