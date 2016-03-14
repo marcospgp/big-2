@@ -54,7 +54,7 @@ typedef struct State {
 */
 state stringToState (char* str) {
 	state e;
-	sscanf(str, PARAMETER_STRING_FORMAT, &e.hand[0], &e.hand[1], &e.hand[2], &e.hand[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.selection, &e.pass, &e.play);
+	sscanf(str, PARAMETER_STRING_FORMAT, &e.hands[0], &e.hands[1], &e.hands[2], &e.hands[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.selection, &e.pass, &e.play);
 	return e;
 }
 
@@ -63,9 +63,9 @@ state stringToState (char* str) {
     @param gameState    O estado de jogo atual
     @return     Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro
 */
-char* stateToString (state gameState) {
+char* stateToString (state e) {
 	static char res[10240];
-	sprintf(res, PARAMETER_STRING_FORMAT, e.hand[0], e.hand[1], e.hand[2], e.hand[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.selection, e.pass, e.play);
+	sprintf(res, PARAMETER_STRING_FORMAT, e.hands[0], e.hands[1], e.hands[2], e.hands[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.selection, e.pass, e.play);
 	return res;
 }
 
@@ -117,19 +117,20 @@ int cardExists (long long int ESTADO, int naipe, int valor) {
 
 /** \brief Imprime o html correspondente a uma carta
 
-    @param path	o URL correspondente à pasta que contém todas as cartas
-    @param x A coordenada x da carta
-    @param y A coordenada y da carta
-    @param estados	As 4 mãos atuais
-    @param naipe	O naipe da carta (inteiro entre 0 e 3)
-    @param valor	O valor da carta (inteiro entre 0 e 12)
+    @param path	        O URL correspondente à pasta que contém todas as cartas
+    @param x            A coordenada x da carta
+    @param y            A coordenada y da carta
+    @param naipe	    O naipe da carta (inteiro entre 0 e 3)
+    @param valor	    O valor da carta (inteiro entre 0 e 12)
+    @param gameState    The current game state
 */
-void printCard (char *path, int x, int y, long long int *estados, int naipe, int valor) {
-	char *suit = SUITS;
-	char *rank = VALUES;
+void printCard (char *path, int x, int y, int suit, int value, state gameState) {
+
 	char script[10240];
-	sprintf(script, "%s?q1=%lld&q2=%lldq3=%lld&q4=%lld", SCRIPT, estados[0], estados[1], estados[2], estados[3]);
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
+
+	sprintf(script, "%s?q=%s", SCRIPT, stateToString(gameState));
+
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, VALUES[value], SUITS[suit]);
 }
 
 /** \brief Imprime um estado de jogo
@@ -155,14 +156,14 @@ void render (state gameState) {
 
         x = 10; // Coordenada x inicial
 
-		for (j = 0; j < 4; j++) {
+		for (j = 0; j < 4; j++) { // Percorrer naipes
 
-            for (k = 0; k < 13; k++) {
+            for (k = 0; k < 13; k++) { // Percorrer valores
 
-                if (cardExists(estados[i], j, k)) {
+                if (cardExists(gameState.hands[i], j, k)) { // Se a carta estiver na mão
 
-                    x += 20;
-                    printCard(path, x, y, estados, j, k);
+                    x += 30;
+                    printCard(path, x, y, j, k, gameState);
 
                 }
             }
@@ -171,20 +172,19 @@ void render (state gameState) {
 	printf("</svg>\n");
 }
 
-/** \brief Distribui cartas pelas 4 mãos aleatoriamente
+/** \brief Distribui cartas por 4 mãos aleatoriamente
 
-    Esta função preenche as mãos de um estado de jogo com cartas selecionadas aleatoriamente
+    Esta função preenche um array com mãos selecionadas aleatoriamente
+
+    @param hands     Array que vai ser preenchido com as mãos geradas aleatoriamente
 */
-void distributeCards (state gameState) {
+void distributeCards (long long int *hands) {
 
-
-
-
-    // TODO
-
-
-
-
+    // Ter a certeza que as hands estão a zero
+    int m;
+    for (m = 0; m < 4; m++) {
+        hands[m] = 0;
+    }
 
     // Percorrer todos os naipes e cartas e atribuí-las a uma mão aleatória
 
@@ -219,6 +219,14 @@ void distributeCards (state gameState) {
             hands[handSelected] = addCard(hands[handSelected], i, j);
         }
     }
+
+    printf("<!-- About to print cards -->\n");
+
+    int z;
+    for (z = 0; z < 4; z++) {
+        printf("<!-- Hand %d cards: %d -->\n", z, hands[z]);
+        printf("<!-- Cards in that hand: %d -->\n", cardsInEachHand[z]);
+    }
 }
 
 /** \brief Cria um estado de jogo inicial e retorna-o
@@ -227,8 +235,19 @@ void distributeCards (state gameState) {
 */
 state getInitialGameState () {
 
-    // TODO
+    state e;
 
+    distributeCards(e.hands);
+
+    // Tem-se de usar um for loop para se reinicializar um array
+    int i;
+    for (i = 0; i < 4; i++) {
+        e.cardCount[i] = 13; // Atribuir uma contagem de 13 cartas a cada jogador
+    }
+
+    e.selection = 0;
+    e.pass = false;
+    e.play = false;
 }
 
 /** \brief Trata os argumentos da CGI
@@ -239,19 +258,19 @@ state getInitialGameState () {
  */
 void parse (char *query) {
 
-	char state[1024];
+	char stateString[1024];
 
 	// const long long int ESTADO_INICIAL = 0xfffffffffffff;
 
-	if(sscanf(query, "q=%s", &state) == 1) {
+	if(sscanf(query, "q=%s", &stateString) == 1) {
 
-        state gameState = stringToState(state);
+        state gameState = stringToState(stateString);
 
 		render(gameState);
 
 	} else {
 
-		imprime(getInitialGameState());
+		render(getInitialGameState());
 	}
 }
 
