@@ -26,7 +26,7 @@
 /**
     Formato da string passada como parâmetro entre jogadas
 */
-#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d_%d"
+#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d"
 
 /**
     Definir o tipo bool
@@ -36,23 +36,16 @@ typedef int bool;
 #define false 0
 
 /**
-    Definir a estrutura que contém o estado do jogo num dado momento
+    Estrutura que contém o estado do jogo num dado momento
 */
 typedef struct State {
-	MAO mao[4];
-	int cartas[4];
-	MAO selecao;
 
-	int passar, jogar, selecionar; //se 1 exectua funcao
+	long long int hands[4];  // Mãos dos 4 jogadores
+	int cardCount[4];        // Número de cartas de cada jogador, na mesma ordem de hands[]
+	long long int selection; // Cartas selecionadas atualmente pelo utilizador
+	bool pass, play;         // Se o útlimo clique do utilizador representa uma ação
 
 } state;
-
-/**
-	Estado inicial com todas as 52 cartas do baralho
-	Cada carta é representada por um bit que está
-	a 1 caso ela pertença à mão ou 0 caso contrário
-*/
-const long long int ESTADO_INICIAL = 0xfffffffffffff;
 
 /** \brief Processa a string recebida como parâmetro e retorna o estado atual do jogo
 
@@ -61,7 +54,7 @@ const long long int ESTADO_INICIAL = 0xfffffffffffff;
 */
 state stringToState (char* str) {
 	state e;
-	sscanf(str, PARAMETER_STRING_FORMAT, &e.hand[0], &e.hand[1], &e.hand[2], &e.hand[3], &e.cards[0], &e.cards[1], &e.cards[2],&e.cards[3], &e.selection, &e.pass, &e.select, &e.play);
+	sscanf(str, PARAMETER_STRING_FORMAT, &e.hand[0], &e.hand[1], &e.hand[2], &e.hand[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.selection, &e.pass, &e.play);
 	return e;
 }
 
@@ -72,7 +65,7 @@ state stringToState (char* str) {
 */
 char* stateToString (state gameState) {
 	static char res[10240];
-	sprintf(res, PARAMETER_STRING_FORMAT, e.mao[0], e.mao[1], e.mao[2], e.mao[3], e.cartas[0],e.cartas[1],e.cartas[2],e.cartas[3], e.selecao, e.passar, e.selecionar, e.jogar);
+	sprintf(res, PARAMETER_STRING_FORMAT, e.hand[0], e.hand[1], e.hand[2], e.hand[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.selection, e.pass, e.play);
 	return res;
 }
 
@@ -82,7 +75,7 @@ char* stateToString (state gameState) {
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		O índice correspondente à carta
 */
-int indice (int naipe, int valor) {
+int getCardIndex (int naipe, int valor) {
 	return naipe * 13 + valor;
 }
 
@@ -93,8 +86,8 @@ int indice (int naipe, int valor) {
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		O novo estado
 */
-long long int add_carta (long long int ESTADO, int naipe, int valor) {
-	int idx = indice(naipe, valor);
+long long int addCard (long long int ESTADO, int naipe, int valor) {
+	int idx = getCardIndex(naipe, valor);
 	return ESTADO | ((long long int) 1 << idx);
 }
 
@@ -105,8 +98,8 @@ long long int add_carta (long long int ESTADO, int naipe, int valor) {
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		O novo estado
 */
-long long int rem_carta (long long int ESTADO, int naipe, int valor) {
-	int idx = indice(naipe, valor);
+long long int removeCard (long long int ESTADO, int naipe, int valor) {
+	int idx = getCardIndex(naipe, valor);
 	return ESTADO & ~((long long int) 1 << idx);
 }
 
@@ -117,8 +110,8 @@ long long int rem_carta (long long int ESTADO, int naipe, int valor) {
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		1 se a carta existe e 0 caso contrário
 */
-int carta_existe (long long int ESTADO, int naipe, int valor) {
-	int idx = indice(naipe, valor);
+int cardExists (long long int ESTADO, int naipe, int valor) {
+	int idx = getCardIndex(naipe, valor);
 	return (ESTADO >> idx) & 1;
 }
 
@@ -131,7 +124,7 @@ int carta_existe (long long int ESTADO, int naipe, int valor) {
     @param naipe	O naipe da carta (inteiro entre 0 e 3)
     @param valor	O valor da carta (inteiro entre 0 e 12)
 */
-void imprime_carta (char *path, int x, int y, long long int *estados, int naipe, int valor) {
+void printCard (char *path, int x, int y, long long int *estados, int naipe, int valor) {
 	char *suit = SUITS;
 	char *rank = VALUES;
 	char script[10240];
@@ -139,31 +132,22 @@ void imprime_carta (char *path, int x, int y, long long int *estados, int naipe,
 	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, rank[valor], suit[naipe]);
 }
 
-/** \brief Imprime o estado
+/** \brief Imprime um estado de jogo
 
-    Esta função está a imprimir o estado em quatro colunas: uma para cada naipe
+    Esta função imprime o estado atual do jogo
 
-    @param firstPlay	true se esta for a primeira jogada
-    @param estados      As 4 mãos caso esta não seja a primeira jogada (pointer para um array). Este paramêtro não deve existir se o primeiro argumento for true
+    @param gameState    estado atual do jogo
 */
-void imprime (bool firstPlay, long long int *estados) {
-
-	int i, j, k;
-	int x, y;
+void render (state gameState) {
 
 	char *path = DECK;
-
-	if (firstPlay) {
-
-        distributeCards(); // Preenche o array global hands
-
-        estados = hands;
-	}
 
 	printf("<svg height = \"800\" width = \"800\">\n");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
 	// Nestes for loops, x e y referem-se às coordenadas onde vai ser imprimida a próxima carta
+
+	int i, j, k, x, y;
 
 	for (y = 10, i = 0; i < 4; i++, y += 120) { // Percorrer mãos pelo eixo y
 
@@ -175,10 +159,10 @@ void imprime (bool firstPlay, long long int *estados) {
 
             for (k = 0; k < 13; k++) {
 
-                if (carta_existe(estados[i], j, k)) {
+                if (cardExists(estados[i], j, k)) {
 
                     x += 20;
-                    imprime_carta(path, x, y, estados, j, k);
+                    printCard(path, x, y, estados, j, k);
 
                 }
             }
@@ -189,10 +173,18 @@ void imprime (bool firstPlay, long long int *estados) {
 
 /** \brief Distribui cartas pelas 4 mãos aleatoriamente
 
-    Esta função preenche o array global que contém as mãos com cartas aleatórias,
-    e deve ser normalmente chamada no início de cada jogo.
+    Esta função preenche as mãos de um estado de jogo com cartas selecionadas aleatoriamente
 */
-void distributeCards () {
+void distributeCards (state gameState) {
+
+
+
+
+    // TODO
+
+
+
+
 
     // Percorrer todos os naipes e cartas e atribuí-las a uma mão aleatória
 
@@ -203,11 +195,6 @@ void distributeCards () {
     // Mantém a conta de quantas cartas já foram para cada mão
     int cardsInEachHand[4] = {0};
 
-    int z;
-    for (z = 0; z < 4; z++) {
-        printf("<!-- %d -->", cardsInEachHand[z]);
-    }
-
     for (i = 0; i < 4; i++) { // Percorrer naipes
 
             // currentSuit = SUITS[i];
@@ -216,7 +203,7 @@ void distributeCards () {
 
             // currentValue = VALUES[j];
 
-            // currentCardIndex = indice(i, j);
+            // currentCardIndex = getCardIndex(i, j);
 
             // Repetir a escolha da mão até sair uma que não esteja completa
             do {
@@ -229,58 +216,67 @@ void distributeCards () {
             cardsInEachHand[handSelected] += 1;
 
             // Adicionar a carta à mao selecionada (hands é um array global)
-            hands[handSelected] = add_carta(hands[handSelected], i, j);
+            hands[handSelected] = addCard(hands[handSelected], i, j);
         }
     }
 }
 
+/** \brief Cria um estado de jogo inicial e retorna-o
+
+    Esta função é normalmente usada no início de um jogo para criar um estado inicial
+*/
+state getInitialGameState () {
+
+    // TODO
+
+}
 
 /** \brief Trata os argumentos da CGI
 
     Esta função recebe a query que é passada à cgi-bin e trata-a.
-    Neste momento, a query contém o estado que é um inteiro que representa um conjunto de cartas.
-    Cada carta corresponde a um bit que está a 1 se essa carta está no conjunto e a 0 caso contrário.
-    Caso não seja passado nada à cgi-bin, ela assume que todas as cartas estão presentes.
+
     @param query A query que é passada à cgi-bin
  */
 void parse (char *query) {
 
-	long long int estado1, estado2, estado3, estado4;
+	char state[1024];
 
-	if(sscanf(query, "q1=%lld&q2=%lld&q3=%lld&q4=%lld", &estado1, &estado2, &estado3, &estado4) == 4) {
+	// const long long int ESTADO_INICIAL = 0xfffffffffffff;
 
-		long long int estados[] = {estado1, estado2, estado3, estado4};
+	if(sscanf(query, "q=%s", &state) == 1) {
 
-		imprime(false, estados);
+        state gameState = stringToState(state);
+
+		render(gameState);
 
 	} else {
 
-		imprime(true, NULL);
+		imprime(getInitialGameState());
 	}
 }
 
 /** \brief Função principal
 
     Função principal do programa que imprime os cabeçalhos necessários e de seguida
-    invoca a função que vai imprimir o código html para desenhar as cartas
+    invoca a função que imprime o código html para desenhar as cartas
  */
 int main () {
 
     // Fornecer uma seed ao rand()
     srand(time(NULL));
 
-/*
- * Cabeçalhos necessários numa CGI
- */
+    /*
+     * Cabeçalhos necessários numa CGI
+     */
 	printf("Content-Type: text/html; charset=iso-8859-1\n\n");
 	printf("<head><title>Exemplo</title></head>\n");
 	printf("<body style=\"background-color: #007700; color: #ffffff;\">\n");
 
 	printf("<h1>Exemplo de utilização</h1>\n");
 
-/*
- * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
- */
+    /*
+     * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
+     */
 	parse(getenv("QUERY_STRING"));
 
 	printf("</body>\n");
