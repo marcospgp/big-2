@@ -171,7 +171,7 @@ void render (state gameState) {
 
 	int i, j, k, x, y;
 
-	for (y = 10, i = 0; i < 4; i++, y += 120) { // Percorrer mãos pelo eixo y
+	for (y = 50, i = 0; i < 4; i++, y += 120) { // Percorrer mãos pelo eixo y
 
         // Percorrer todas as cartas e imprimir as que estiverem na mão
 
