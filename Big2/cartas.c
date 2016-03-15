@@ -40,7 +40,7 @@ typedef int bool;
 */
 typedef struct State {
 
-	long long int hands[4];  // Mãos dos 4 jogadores
+	long long int hands[4];  // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
 	int cardCount[4];        // Número de cartas de cada jogador, na mesma ordem de hands[]
 	long long int selection; // Cartas selecionadas atualmente pelo utilizador
 	bool pass, play;         // Se o útlimo clique do utilizador representa uma ação
@@ -81,38 +81,38 @@ int getCardIndex (int naipe, int valor) {
 
 /** \brief Adiciona uma carta ao estado
 
-    @param ESTADO	O estado atual
+    @param hand     A mão a ser modificada
     @param naipe	O naipe da carta (inteiro entre 0 e 3)
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		O novo estado
 */
-long long int addCard (long long int ESTADO, int naipe, int valor) {
+long long int addCard (long long int hand, int naipe, int valor) {
 	int idx = getCardIndex(naipe, valor);
-	return ESTADO | ((long long int) 1 << idx);
+	return hand | ((long long int) 1 << idx);
 }
 
 /** \brief Remove uma carta do estado
 
-    @param ESTADO	O estado atual
+    @param hand     A mão a ser modificada
     @param naipe	O naipe da carta (inteiro entre 0 e 3)
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		O novo estado
 */
-long long int removeCard (long long int ESTADO, int naipe, int valor) {
+long long int removeCard (long long int hand, int naipe, int valor) {
 	int idx = getCardIndex(naipe, valor);
-	return ESTADO & ~((long long int) 1 << idx);
+	return hand & ~((long long int) 1 << idx);
 }
 
 /** \brief Verifica se uma carta pertence ao estado
 
-    @param ESTADO	O estado atual
+    @param hand     A mão a ser verificada
     @param naipe	O naipe da carta (inteiro entre 0 e 3)
     @param valor	O valor da carta (inteiro entre 0 e 12)
     @return		1 se a carta existe e 0 caso contrário
 */
-int cardExists (long long int ESTADO, int naipe, int valor) {
+int cardExists (long long int hand, int naipe, int valor) {
 	int idx = getCardIndex(naipe, valor);
-	return (ESTADO >> idx) & 1;
+	return (hand >> idx) & 1;
 }
 
 /** \brief Imprime o html correspondente a uma carta
@@ -122,15 +122,36 @@ int cardExists (long long int ESTADO, int naipe, int valor) {
     @param y            A coordenada y da carta
     @param naipe	    O naipe da carta (inteiro entre 0 e 3)
     @param valor	    O valor da carta (inteiro entre 0 e 12)
-    @param gameState    The current game state
+    @param gameState    O estado de jogo atual
 */
 void printCard (char *path, int x, int y, int suit, int value, state gameState) {
 
-	char script[10240];
+	// Criar um estado que será usado se o utilizador clicar nesta carta
 
-	sprintf(script, "%s?q=%s", SCRIPT, stateToString(gameState));
+	state stateAfterClick = gameState;
 
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", script, x, y, path, VALUES[value], SUITS[suit]);
+    // Se a carta for do utilizador
+    if (cardExists(gameState.hands[0], suit, value)) {
+
+        // Se a carta já está selecionada
+        if (cardExists(gameState.selection, suit, value)) {
+
+            // Ao clicar nela será descelecionada
+            stateAfterClick.selection = removeCard(stateAfterClick.selection, suit, value);
+
+        } else {
+
+            // Ao clicar nela será selecioanda
+             stateAfterClick.selection = addCard(stateAfterClick.selection, suit, value);
+        }
+    } // Else, clicar na carta não faz nada
+
+	// Criar url que será usado se esta carta for clicada, usando o estado que já foi criado acima
+	char onClickUrl[10240];
+
+	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
+
+	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, x, y, path, VALUES[value], SUITS[suit]);
 }
 
 /** \brief Imprime um estado de jogo
@@ -163,8 +184,18 @@ void render (state gameState) {
                 if (cardExists(gameState.hands[i], j, k)) { // Se a carta estiver na mão
 
                     x += 30;
-                    printCard(path, x, y, j, k, gameState);
 
+                    // Se a carta for do utilizador e estiver selecionada
+                    // (bastava verificar se a carta está selecionada, mas assim se a mão a ser imprimida
+                    // não for a do jogador passamos logo à frente)
+                    if ((i == 0) && (cardExists(gameState.selection, j, k))) {
+
+                        printCard(path, x, (y - 20), j, k, gameState);
+
+                    } else {
+
+                        printCard(path, x, y, j, k, gameState);
+                    }
                 }
             }
         }
@@ -219,14 +250,6 @@ void distributeCards (long long int *hands) {
             hands[handSelected] = addCard(hands[handSelected], i, j);
         }
     }
-
-    printf("<!-- About to print cards -->\n");
-
-    int z;
-    for (z = 0; z < 4; z++) {
-        printf("<!-- Hand %d cards: %d -->\n", z, hands[z]);
-        printf("<!-- Cards in that hand: %d -->\n", cardsInEachHand[z]);
-    }
 }
 
 /** \brief Cria um estado de jogo inicial e retorna-o
@@ -248,6 +271,8 @@ state getInitialGameState () {
     e.selection = 0;
     e.pass = false;
     e.play = false;
+
+    return e;
 }
 
 /** \brief Trata os argumentos da CGI
