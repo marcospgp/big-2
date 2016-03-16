@@ -11,7 +11,7 @@
 /**
     URL da pasta com as cartas
 */
-#define DECK		"http://127.0.0.1/card-images"
+#define DECK		"http://127.0.0.1/big-2/card-images"
 
 /**
     Ordem dos naipes
@@ -130,8 +130,17 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState) 
 
 	state stateAfterClick = gameState;
 
+	// Se a carta pertence ao utilizador
+	bool isUserCard = cardExists(gameState.hands[0], suit, value);
+
+    // Classes html desta carta
+	char cardElementClasses[256] = "card";
+
     // Se a carta for do utilizador
-    if (cardExists(gameState.hands[0], suit, value)) {
+    if (isUserCard) {
+
+        // Mudar as classes html desta carta (para aplicar estilos personalizados)
+        strcpy(cardElementClasses, "card user-card");
 
         // Se a carta já está selecionada
         if (cardExists(gameState.selection, suit, value)) {
@@ -151,7 +160,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState) 
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
 
-	printf("<a xlink:href = \"%s\"><image x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, x, y, path, VALUES[value], SUITS[suit]);
+	printf("<a xlink:href = \"%s\"><image class=\"%s\" x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, x, y, path, VALUES[value], SUITS[suit]);
 }
 
 /** \brief Imprime um estado de jogo
@@ -165,6 +174,7 @@ void render (state gameState) {
 	char *path = DECK;
 
 	printf("<svg height = \"800\" width = \"800\">\n");
+    printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"2.2\"/>\n<feOffset dx=\"1\" dy=\"4\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.3)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
 	// Nestes for loops, x e y referem-se às coordenadas onde vai ser imprimida a próxima carta
@@ -313,7 +323,7 @@ int main () {
      * Cabeçalhos necessários numa CGI
      */
 	printf("Content-Type: text/html; charset=iso-8859-1\n\n");
-	printf("<head><title>Exemplo</title></head>\n");
+	printf("<head><title>Exemplo</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../big-2/style.css\">\n</head>\n");
 	printf("<body style=\"background-color: #007700; color: #ffffff;\">\n");
 
 	printf("<h1>Exemplo de utilização</h1>\n");
