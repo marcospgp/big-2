@@ -510,7 +510,7 @@ void parse (char *query) {
 
         state gameState = stringToState(stateString);
 
-        if (gameState.userTurn)
+        /*if (gameState.userTurn)
 
             render(gameState);
 
@@ -519,9 +519,9 @@ void parse (char *query) {
         if (newGameState.pass) {
 
 
-        }
+        }*/
 
-		render(newGameState);
+		render(gameState);
 
 	} else {
 
