@@ -26,7 +26,7 @@
 /**
     Formato da string passada como parâmetro entre jogadas
 */
-#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d"
+#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d"
 
 /**
     Definir o tipo bool
@@ -40,10 +40,11 @@ typedef int bool;
 */
 typedef struct State {
 
-	long long int hands[4];  // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	int cardCount[4];        // Número de cartas de cada jogador, na mesma ordem de hands[]
-	long long int selection; // Cartas selecionadas atualmente pelo utilizador
-	bool pass, play;         // Se o útlimo clique do utilizador representa uma ação
+	long long int hands[4];   // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
+	long long int onTable[4]; // Cartas de cada jogador que estão na mesa num dado momento
+	int cardCount[4];         // Número de cartas de cada jogador, na mesma ordem de hands[]
+	long long int selection;  // Cartas selecionadas atualmente pelo utilizador
+	bool pass, play;          // Se o útlimo clique do utilizador representa uma ação
 
 } state;
 
@@ -54,7 +55,7 @@ typedef struct State {
 */
 state stringToState (char* str) {
 	state e;
-	sscanf(str, PARAMETER_STRING_FORMAT, &e.hands[0], &e.hands[1], &e.hands[2], &e.hands[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.selection, &e.pass, &e.play);
+	sscanf(str, PARAMETER_STRING_FORMAT, &e.hands[0], &e.hands[1], &e.hands[2], &e.hands[3], &e.onTable[0], &e.onTable[1], &e.onTable[2], &e.onTable[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.selection, &e.pass, &e.play);
 	return e;
 }
 
@@ -65,7 +66,7 @@ state stringToState (char* str) {
 */
 char* stateToString (state e) {
 	static char res[10240];
-	sprintf(res, PARAMETER_STRING_FORMAT, e.hands[0], e.hands[1], e.hands[2], e.hands[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.selection, e.pass, e.play);
+	sprintf(res, PARAMETER_STRING_FORMAT, e.hands[0], e.hands[1], e.hands[2], e.hands[3], e.onTable[0], e.onTable[1], e.onTable[2], e.onTable[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.selection, e.pass, e.play);
 	return res;
 }
 
@@ -175,7 +176,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 
 /** \brief Imprime um estado de jogo
 
-    Esta função imprime o estado atual do jogo
+    Esta função imprime o estado atual do jogo no browser
 
     @param gameState    estado atual do jogo
 */
@@ -186,32 +187,6 @@ void render (state gameState) {
 	printf("<svg width = \"1280\" height = \"800\">\n");
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
-
-	// Nestes for loops, x e y referem-se às coordenadas onde vai ser imprimida a próxima carta
-
-	/*
-	int i, j, k, x, y;
-
-	for (y = 410, i = 0; i < 4; i++, y += 120) { // Percorrer mãos pelo eixo y
-
-        // Percorrer todas as cartas e imprimir as que estiverem na mão
-
-        x = 10; // Coordenada x inicial
-
-		for (j = 0; j < 4; j++) { // Percorrer naipes
-
-            for (k = 0; k < 13; k++) { // Percorrer valores
-
-                if (cardExists(gameState.hands[i], j, k)) { // Se a carta estiver na mão
-
-                    x += 30;
-
-
-                }
-            }
-        }
-	}
-	*/
 
 	// Espaço entre cartas
 	int spaceBetweenCards = 30;
@@ -227,9 +202,9 @@ void render (state gameState) {
 
     int i, j, k;
 
-	for (i = 0; i < 4; i++) { // Percorrer naipes
+    for (j = 0; j < 13; j++) { // Percorrer valores
 
-        for (j = 0; j < 13; j++) { // Percorrer valores
+        for (i = 0; i < 4; i++) { // Percorrer naipes
 
             for (k = 0; k < 4; k++) { // Percorrer todas as mãos e descobrir se a carta pertence a uma delas
 
@@ -280,6 +255,7 @@ void render (state gameState) {
 	}
 
 	printf("</svg>\n");
+
 }
 
 /** \brief Distribui cartas por 4 mãos aleatoriamente
@@ -329,6 +305,30 @@ void distributeCards (long long int *hands) {
             hands[handSelected] = addCard(hands[handSelected], i, j);
         }
     }
+}
+
+/** \brief Decide se a seleção atual do jogador é jogável
+
+    @param gameState    O estado de jogo atual
+*/
+bool isSelectionPlayable (state gameState) {
+
+    /* Inserir código aqui
+
+        Formato do estado de jogo:
+
+        typedef struct State {
+
+            long long int hands[4];   // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
+            long long int onTable[4]; // Cartas de cada jogador que estão na mesa num dado momento
+            int cardCount[4];         // Número de cartas de cada jogador, na mesma ordem de hands[]
+            long long int selection;  // Cartas selecionadas atualmente pelo utilizador
+            bool pass, play;          // Se o útlimo clique do utilizador representa uma ação
+
+        } state;
+
+    */
+
 }
 
 /** \brief Cria um estado de jogo inicial e retorna-o
