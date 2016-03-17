@@ -179,9 +179,10 @@ void render (state gameState) {
 
 	// Nestes for loops, x e y referem-se às coordenadas onde vai ser imprimida a próxima carta
 
+	/*
 	int i, j, k, x, y;
 
-	for (y = 50, i = 0; i < 4; i++, y += 120) { // Percorrer mãos pelo eixo y
+	for (y = 410, i = 0; i < 4; i++, y += 120) { // Percorrer mãos pelo eixo y
 
         // Percorrer todas as cartas e imprimir as que estiverem na mão
 
@@ -210,6 +211,18 @@ void render (state gameState) {
             }
         }
 	}
+	*/
+
+	// Posições para cada mão
+	hand1x = ;
+
+	for (j = 0; j < 4; j++) { // Percorrer naipes
+
+        for (k = 0; k < 13; k++) { // Percorrer valores
+
+        }
+	}
+
 	printf("</svg>\n");
 }
 

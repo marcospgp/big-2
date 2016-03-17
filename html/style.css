@@ -3,6 +3,6 @@
     transition: all 300ms;
 }
 
-.card-hover {
-	box-shadow: 0 0 10px #9ecaed;
+.card.user-card:hover {
+	filter: url(#drop-shadow);
 }
