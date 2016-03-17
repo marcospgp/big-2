@@ -122,12 +122,13 @@ int cardExists (long long int hand, int suit, int value) {
     @param path	        O URL correspondente à pasta que contém todas as cartas
     @param x            A coordenada x da carta
     @param y            A coordenada y da carta
-    @param naipe	    O naipe da carta (inteiro entre 0 e 3)
-    @param valor	    O valor da carta (inteiro entre 0 e 12)
+    @param suit	        O naipe da carta (inteiro entre 0 e 3)
+    @param value	    O valor da carta (inteiro entre 0 e 12)
     @param gameState    O estado de jogo atual
-    @param rotate       Se a carta deve ser imprimida rodada
+    @param rotate90     Se a carta deve ser imprimida rodada 90 graus
+    @param rotate180    Se a carta deve ser imprimida rodada 180 graus
 */
-void printCard (char *path, int x, int y, int suit, int value, state gameState, bool rotate) {
+void printCard (char *path, int x, int y, int suit, int value, state gameState, bool rotate90, bool rotate180) {
 
 	// Criar um estado que será usado se o utilizador clicar nesta carta
 
@@ -140,14 +141,21 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 	char cardElementClasses[256] = "card";
 
 	// Rotação da carta
-	char cardRotationClass[32] = "card-rotate";
+	char cardRotationClass[32] = "card-rotate-90";
 
 	// Classe que desativa cliques na carta
 	char cardDisableClass[32] = "disabled";
 
-	if (!rotate) {
+	if (!rotate90) {
 
-        cardRotationClass[0] = '\0';
+        if (rotate180) {
+
+            strcpy(cardRotationClass, "card-rotate-180");
+
+        } else {
+
+            cardRotationClass[0] = '\0';
+        }
 	}
 
     // Se a carta for do utilizador
@@ -164,7 +172,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 
         } else {
 
-            // Ao clicar nela será selecioanda
+            // Ao clicar nela será selecionada
              stateAfterClick.selection = addCard(stateAfterClick.selection, suit, value);
         }
 
@@ -220,7 +228,7 @@ void render (state gameState) {
                     if (k == 1 || k == 3) { // Se esta carta pertence a uma mão lateral, temos de a imprimir rodada
 
                         // Devido à forma como a carta é rodada, temos de trocar as coordenadas e inverter a coordenada y
-                        printCard(path, handx[k], handy[k], i, j, gameState, true);
+                        printCard(path, handx[k], handy[k], i, j, gameState, true, false);
 
                         // Incrementar ou diminuir o y para a próxima carta nas mãos imprimidas verticalmente
                         if (k == 1) {
@@ -236,22 +244,26 @@ void render (state gameState) {
                         // a ser imprimida não for a do jogador passamos logo à frente)
                         if ((k == 0) && (cardExists(gameState.selection, i, j))) {
 
-                            printCard(path, handx[k], (handy[k] - 20), i, j, gameState, false);
+                            printCard(path, handx[k], (handy[k] - 20), i, j, gameState, false, false);
+
+                        } else if (k == 0) {
+
+                            // Imprimir a carta sem rotação
+                            printCard(path, handx[k], handy[k], i, j, gameState, false, false);
 
                         } else {
 
-                            printCard(path, handx[k], handy[k], i, j, gameState, false);
+                            // Imprimir a carta rodada 180 graus
+                            printCard(path, handx[k], handy[k], i, j, gameState, false, true);
                         }
 
                         if (k == 0) {
 
-                            // Incrementar o x para a próxima carta na mão de baixo
-                            handx[k] += 30;
+                            handx[k] += 30; // Incrementar o x para a próxima carta na mão de baixo
 
                         } else {
 
-                            // Decrementar o x para a próxima carta na mão de cima
-                            handx[k] -= 30;
+                            handx[k] -= 30; // Decrementar o x para a próxima carta na mão de cima
                         }
                     }
                 }
@@ -267,15 +279,23 @@ void render (state gameState) {
 
 	// Botão de jogar
 
-	state stateAfterPlay = gameState;
-
-	stateAfterPlay.play = true;
-
 	char playStateString[10240];
 
-	sprintf(playStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPlay));
+	// Se a seleção atual for jogável
+	if (isSelectionPlayable(gameState)) {
 
-	printf("<a href=\"%s\" class=\"btn green\">Jogar</a>", playStateString);
+        state stateAfterPlay = gameState;
+
+        stateAfterPlay.play = true;
+
+        sprintf(playStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPlay));
+
+        printf("<a href=\"%s\" class=\"btn green\">Jogar</a>", playStateString);
+
+	} else {
+
+        printf("<a href=\"#\" class=\"btn green disabled\">Jogar</a>");
+	}
 
 	// Botão de passar
 
@@ -360,7 +380,7 @@ void distributeCards (long long int *hands) {
 /** \brief Decide se a seleção atual do jogador é jogável
 
     @param gameState    O estado de jogo atual
-    @return             True a seleção for jogável
+    @return             True se a seleção for jogável
 */
 bool isSelectionPlayable (state gameState) {
 
@@ -381,11 +401,15 @@ bool isSelectionPlayable (state gameState) {
 
     */
 
+    return true;
+
 }
 
 /** \brief Cria um estado de jogo inicial e retorna-o
 
     Esta função é normalmente usada no início de um jogo para criar um estado inicial
+
+    @return     Um estado de jogo inicial
 */
 state getInitialGameState () {
 
@@ -422,7 +446,14 @@ void parse (char *query) {
 
         state gameState = stringToState(stateString);
 
-		render(gameState);
+        state newGameState = gameState;
+
+        if (newGameState.pass) {
+
+
+        }
+
+		render(newGameState);
 
 	} else {
 
