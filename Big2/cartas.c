@@ -40,12 +40,13 @@ typedef int bool;
 */
 typedef struct State {
 
-	long long int hands[4];   // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	int cardCount[4];         // Número de cartas de cada jogador, na mesma ordem de hands[]
-	int consecutivePasses;    // Número de passes consecutivos que foram realizados
-	long long int selection;  // Cartas selecionadas atualmente pelo utilizador
-	long long int lastPlay;   // Cartas na última jogada (sem contar passes. se houveram 3 passes seguidos, lastPlay = 0)
-	bool pass, play;          // Se o útlimo clique do utilizador representa uma ação
+	long long int hands[4];     // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
+	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa
+	int cardCount[4];           // Número de cartas de cada jogador, na mesma ordem de hands[]
+	int consecutivePasses;      // Número de passes consecutivos que foram realizados
+	long long int selection;    // Cartas selecionadas atualmente pelo utilizador
+	long long int lastPlay;     // Cartas na última jogada (sem contar passes. se houveram 3 passes seguidos, lastPlay = 0)
+	bool pass, play;            // Se o útlimo clique do utilizador representa uma ação
 
 } state;
 
@@ -56,7 +57,24 @@ typedef struct State {
 */
 state stringToState (char* str) {
 	state e;
-	sscanf(str, PARAMETER_STRING_FORMAT, &e.hands[0], &e.hands[1], &e.hands[2], &e.hands[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.consecutivePasses, &e.selection, &e.lastPlay, &e.pass, &e.play);
+	sscanf(
+        str,
+        PARAMETER_STRING_FORMAT,
+        &e.hands[0],
+        &e.hands[1],
+        &e.hands[2],
+        &e.hands[3],
+        &e.cardCount[0],
+        &e.cardCount[1],
+        &e.cardCount[2],
+        &e.cardCount[3],
+        &e.consecutivePasses,
+        &e.selection,
+        &e.lastPlay,
+        &e.pass,
+        &e.play
+    );
+
 	return e;
 }
 
@@ -67,7 +85,24 @@ state stringToState (char* str) {
 */
 char* stateToString (state e) {
 	static char res[10240];
-	sprintf(res, PARAMETER_STRING_FORMAT, e.hands[0], e.hands[1], e.hands[2], e.hands[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.consecutivePasses, e.selection, e.lastPlay, e.pass, e.play);
+	sprintf(
+         res,
+         PARAMETER_STRING_FORMAT,
+         e.hands[0],
+         e.hands[1],
+         e.hands[2],
+         e.hands[3],
+         e.cardCount[0],
+         e.cardCount[1],
+         e.cardCount[2],
+         e.cardCount[3],
+         e.consecutivePasses,
+         e.selection,
+         e.lastPlay,
+         e.pass,
+         e.play
+    );
+
 	return res;
 }
 
@@ -79,6 +114,28 @@ char* stateToString (state e) {
 */
 int getCardIndex (int naipe, int valor) {
 	return naipe * 13 + valor;
+}
+
+/** \brief Devolve o número de cartas numa mão
+
+    @param hand     A mão a ser contada
+    @return         Número de cartas na mão
+*/
+int getHandLength (long long int hand) {
+
+    int cardCount = 0;
+    long long int number = hand;
+
+    while (number != 0) {
+
+        if ((number % 2) == 1) {
+            cardCount++;
+        }
+
+        number /= 2;
+    }
+
+    return cardCount;
 }
 
 /** \brief Adiciona uma carta ao estado
@@ -207,7 +264,7 @@ void render (state gameState) {
 	int spaceBetweenCards = 30;
 
 	// Posições iniciais para cada mão
-	int hand1x = 185, hand1y = 650;
+	int hand1x = 180, hand1y = 650;
 	int hand2x = 685, hand2y = 520;
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
 	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
@@ -401,7 +458,14 @@ bool isSelectionPlayable (state gameState) {
 
     */
 
-    return true;
+    if (getHandLength(gameState.selection) == 0) {
+
+        return false;
+
+    } else {
+
+        return true;
+    }
 
 }
 
@@ -446,7 +510,11 @@ void parse (char *query) {
 
         state gameState = stringToState(stateString);
 
-        state newGameState = gameState;
+        if (gameState.userTurn)
+
+            render(gameState);
+
+            state newGameState = gameState;
 
         if (newGameState.pass) {
 
