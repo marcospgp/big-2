@@ -140,8 +140,10 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 	char cardElementClasses[256] = "card";
 
 	// Rotação da carta
-
 	char cardRotationClass[32] = "card-rotate";
+
+	// Classe que desativa cliques na carta
+	char cardDisableClass[32] = "disabled";
 
 	if (!rotate) {
 
@@ -165,6 +167,10 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
             // Ao clicar nela será selecioanda
              stateAfterClick.selection = addCard(stateAfterClick.selection, suit, value);
         }
+
+        // Não adicionar à carta a classe que a desativa
+        cardDisableClass[0] = '\0';
+
     } // Else, clicar na carta não faz nada
 
 	// Criar url que será usado se esta carta for clicada, usando o estado que já foi criado acima
@@ -172,7 +178,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
 
-	printf("<a xlink:href = \"%s\"><image class=\"%s %s\" x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, x, y, path, VALUES[value], SUITS[suit]);
+	printf("<a xlink:href = \"%s\"><image class=\"%s %s %s\" x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, cardDisableClass, x, y, path, VALUES[value], SUITS[suit]);
 }
 
 /** \brief Imprime um estado de jogo
@@ -185,7 +191,7 @@ void render (state gameState) {
 
 	char *path = DECK;
 
-	printf("<svg width = \"1280\" height = \"800\">\n");
+	printf("<svg width = \"800\" height = \"800\">\n");
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
@@ -193,10 +199,10 @@ void render (state gameState) {
 	int spaceBetweenCards = 30;
 
 	// Posições iniciais para cada mão
-	int hand1x = 200, hand1y = 650;
-	int hand2x = 700, hand2y = 520;
+	int hand1x = 185, hand1y = 650;
+	int hand2x = 685, hand2y = 520;
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
-	int hand4x = 50, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
+	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
 
 	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
 	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
@@ -211,7 +217,6 @@ void render (state gameState) {
 
                 if (cardExists(gameState.hands[k], i, j)) {
 
-
                     if (k == 1 || k == 3) { // Se esta carta pertence a uma mão lateral, temos de a imprimir rodada
 
                         // Devido à forma como a carta é rodada, temos de trocar as coordenadas e inverter a coordenada y
@@ -223,7 +228,6 @@ void render (state gameState) {
                         } else {
                             handy[k] += 30;
                         }
-
 
                     } else {
 
@@ -257,6 +261,51 @@ void render (state gameState) {
 
 	printf("</svg>\n");
 
+	// Imprimir botões
+
+	printf("<div id=\"button-container\">");
+
+	// Botão de jogar
+
+	state stateAfterPlay = gameState;
+
+	stateAfterPlay.play = true;
+
+	char playStateString[10240];
+
+	sprintf(playStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPlay));
+
+	printf("<a href=\"%s\" class=\"btn green\">Jogar</a>", playStateString);
+
+	// Botão de passar
+
+	state stateAfterPass = gameState;
+
+	stateAfterPass.pass = true;
+
+	char passStateString[10240];
+
+	sprintf(passStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPass));
+
+	printf("<a href=\"%s\" class=\"btn orange\">Passar</a>", passStateString);
+
+	// Botão de limpar
+
+	state stateAfterClear = gameState;
+
+	stateAfterClear.selection = 0;
+
+	char clearStateString[10240];
+
+	sprintf(clearStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterClear));
+
+	printf("<a href=\"%s\" class=\"btn purple\">Limpar</a>", clearStateString);
+
+	// Botão de recomeçar
+
+	printf("<a href=\"%s\" class=\"btn red\">Recomeçar</a>", SCRIPT);
+
+	printf("</div>");
 }
 
 /** \brief Distribui cartas por 4 mãos aleatoriamente
@@ -311,6 +360,7 @@ void distributeCards (long long int *hands) {
 /** \brief Decide se a seleção atual do jogador é jogável
 
     @param gameState    O estado de jogo atual
+    @return             True a seleção for jogável
 */
 bool isSelectionPlayable (state gameState) {
 
@@ -368,7 +418,7 @@ void parse (char *query) {
 
 	// const long long int ESTADO_INICIAL = 0xfffffffffffff;
 
-	if(sscanf(query, "q=%s", &stateString) == 1) {
+	if(sscanf(query, "q=%s", stateString) == 1) {
 
         state gameState = stringToState(stateString);
 
@@ -395,9 +445,7 @@ int main () {
      */
 	printf("Content-Type: text/html; charset=iso-8859-1\n\n");
 	printf("<head><title>Exemplo</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../big-2/style.css\">\n</head>\n");
-	printf("<body style=\"background-color: #007700; color: #ffffff;\">\n");
-
-	printf("<h1>Exemplo de utilização</h1>\n");
+	printf("<body>\n");
 
     /*
      * Ler os valores passados à cgi que estão na variável ambiente e passá-los ao programa
