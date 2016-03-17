@@ -123,8 +123,9 @@ int cardExists (long long int hand, int naipe, int valor) {
     @param naipe	    O naipe da carta (inteiro entre 0 e 3)
     @param valor	    O valor da carta (inteiro entre 0 e 12)
     @param gameState    O estado de jogo atual
+    @param rotate       Se a carta deve ser imprimida rodada
 */
-void printCard (char *path, int x, int y, int suit, int value, state gameState) {
+void printCard (char *path, int x, int y, int suit, int value, state gameState, bool rotate) {
 
 	// Criar um estado que será usado se o utilizador clicar nesta carta
 
@@ -135,6 +136,15 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState) 
 
     // Classes html desta carta
 	char cardElementClasses[256] = "card";
+
+	// Rotação da carta
+
+	char cardRotationClass[32] = "card-rotate";
+
+	if (!rotate) {
+
+        cardRotationClass[0] = '\0';
+	}
 
     // Se a carta for do utilizador
     if (isUserCard) {
@@ -160,7 +170,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState) 
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
 
-	printf("<a xlink:href = \"%s\"><image class=\"%s\" x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, x, y, path, VALUES[value], SUITS[suit]);
+	printf("<a xlink:href = \"%s\"><image class=\"%s %s\" x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, x, y, path, VALUES[value], SUITS[suit]);
 }
 
 /** \brief Imprime um estado de jogo
@@ -173,7 +183,7 @@ void render (state gameState) {
 
 	char *path = DECK;
 
-	printf("<svg height = \"800\" width = \"800\">\n");
+	printf("<svg width = \"1280\" height = \"800\">\n");
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
@@ -196,30 +206,76 @@ void render (state gameState) {
 
                     x += 30;
 
-                    // Se a carta for do utilizador e estiver selecionada
-                    // (bastava verificar se a carta está selecionada, mas assim se a mão a ser imprimida
-                    // não for a do jogador passamos logo à frente)
-                    if ((i == 0) && (cardExists(gameState.selection, j, k))) {
 
-                        printCard(path, x, (y - 20), j, k, gameState);
-
-                    } else {
-
-                        printCard(path, x, y, j, k, gameState);
-                    }
                 }
             }
         }
 	}
 	*/
 
-	// Posições para cada mão
-	hand1x = ;
+	// Espaço entre cartas
+	int spaceBetweenCards = 30;
 
-	for (j = 0; j < 4; j++) { // Percorrer naipes
+	// Posições iniciais para cada mão
+	int hand1x = 200, hand1y = 650;
+	int hand2x = 700, hand2y = 520;
+	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
+	int hand4x = 50, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
 
-        for (k = 0; k < 13; k++) { // Percorrer valores
+	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
+	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
 
+    int i, j, k;
+
+	for (i = 0; i < 4; i++) { // Percorrer naipes
+
+        for (j = 0; j < 13; j++) { // Percorrer valores
+
+            for (k = 0; k < 4; k++) { // Percorrer todas as mãos e descobrir se a carta pertence a uma delas
+
+                if (cardExists(gameState.hands[k], i, j)) {
+
+
+                    if (k == 1 || k == 3) { // Se esta carta pertence a uma mão lateral, temos de a imprimir rodada
+
+                        // Devido à forma como a carta é rodada, temos de trocar as coordenadas e inverter a coordenada y
+                        printCard(path, handx[k], handy[k], i, j, gameState, true);
+
+                        // Incrementar ou diminuir o y para a próxima carta nas mãos imprimidas verticalmente
+                        if (k == 1) {
+                            handy[k] -= 30;
+                        } else {
+                            handy[k] += 30;
+                        }
+
+
+                    } else {
+
+                        // Se a carta for do utilizador e estiver selecionada, imprime-se mais acima
+                        // (bastava verificar se a carta está selecionada, mas assim se a mão
+                        // a ser imprimida não for a do jogador passamos logo à frente)
+                        if ((k == 0) && (cardExists(gameState.selection, i, j))) {
+
+                            printCard(path, handx[k], (handy[k] - 20), i, j, gameState, false);
+
+                        } else {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, false);
+                        }
+
+                        if (k == 0) {
+
+                            // Incrementar o x para a próxima carta na mão de baixo
+                            handx[k] += 30;
+
+                        } else {
+
+                            // Decrementar o x para a próxima carta na mão de cima
+                            handx[k] -= 30;
+                        }
+                    }
+                }
+            }
         }
 	}
 
