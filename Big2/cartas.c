@@ -26,7 +26,7 @@
 /**
     Formato da string passada como parâmetro entre jogadas
 */
-#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%d_%d_%d_%d_%lld_%d_%d"
+#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%d_%lld_%lld_%d_%d"
 
 /**
     Definir o tipo bool
@@ -41,9 +41,10 @@ typedef int bool;
 typedef struct State {
 
 	long long int hands[4];   // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	long long int onTable[4]; // Cartas de cada jogador que estão na mesa num dado momento
 	int cardCount[4];         // Número de cartas de cada jogador, na mesma ordem de hands[]
+	int consecutivePasses;    // Número de passes consecutivos que foram realizados
 	long long int selection;  // Cartas selecionadas atualmente pelo utilizador
+	long long int lastPlay;   // Cartas na última jogada (sem contar passes. se houveram 3 passes seguidos, lastPlay = 0)
 	bool pass, play;          // Se o útlimo clique do utilizador representa uma ação
 
 } state;
@@ -51,22 +52,22 @@ typedef struct State {
 /** \brief Processa a string recebida como parâmetro e retorna o estado atual do jogo
 
     @param stateString  A string que contém a informação sobre o atual estado de jgoo
-    @return     A informação contida na string recebida num formato utilizável em código
+    @return             A informação contida na string recebida num formato utilizável em código
 */
 state stringToState (char* str) {
 	state e;
-	sscanf(str, PARAMETER_STRING_FORMAT, &e.hands[0], &e.hands[1], &e.hands[2], &e.hands[3], &e.onTable[0], &e.onTable[1], &e.onTable[2], &e.onTable[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.selection, &e.pass, &e.play);
+	sscanf(str, PARAMETER_STRING_FORMAT, &e.hands[0], &e.hands[1], &e.hands[2], &e.hands[3], &e.cardCount[0], &e.cardCount[1], &e.cardCount[2], &e.cardCount[3], &e.consecutivePasses, &e.selection, &e.lastPlay, &e.pass, &e.play);
 	return e;
 }
 
 /** \brief Codifica o estado atual do jogo numa string
 
     @param gameState    O estado de jogo atual
-    @return     Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro
+    @return             Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro
 */
 char* stateToString (state e) {
 	static char res[10240];
-	sprintf(res, PARAMETER_STRING_FORMAT, e.hands[0], e.hands[1], e.hands[2], e.hands[3], e.onTable[0], e.onTable[1], e.onTable[2], e.onTable[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.selection, e.pass, e.play);
+	sprintf(res, PARAMETER_STRING_FORMAT, e.hands[0], e.hands[1], e.hands[2], e.hands[3], e.cardCount[0], e.cardCount[1], e.cardCount[2], e.cardCount[3], e.consecutivePasses, e.selection, e.lastPlay, e.pass, e.play);
 	return res;
 }
 
@@ -320,9 +321,10 @@ bool isSelectionPlayable (state gameState) {
         typedef struct State {
 
             long long int hands[4];   // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-            long long int onTable[4]; // Cartas de cada jogador que estão na mesa num dado momento
             int cardCount[4];         // Número de cartas de cada jogador, na mesma ordem de hands[]
+            int consecutivePasses;    // Número de passes consecutivos que foram realizados
             long long int selection;  // Cartas selecionadas atualmente pelo utilizador
+            long long int lastPlay;   // Cartas na última jogada (sem contar passes. se houveram 3 passes seguidos, lastPlay = 0)
             bool pass, play;          // Se o útlimo clique do utilizador representa uma ação
 
         } state;
