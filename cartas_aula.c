@@ -61,7 +61,7 @@ state stringToState (char* str) {
 /** \brief Codifica o estado atual do jogo numa string
 
     @param gameState    O estado de jogo atual
-    @return     Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro
+    @return             Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro
 */
 char* stateToString (state e) {
 	static char res[10240];
