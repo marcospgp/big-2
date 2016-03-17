@@ -82,36 +82,36 @@ int getCardIndex (int naipe, int valor) {
 /** \brief Adiciona uma carta ao estado
 
     @param hand     A mão a ser modificada
-    @param naipe	O naipe da carta (inteiro entre 0 e 3)
-    @param valor	O valor da carta (inteiro entre 0 e 12)
-    @return		O novo estado
+    @param suit	    O naipe da carta (inteiro entre 0 e 3)
+    @param value   	O valor da carta (inteiro entre 0 e 12)
+    @return		    O novo estado
 */
-long long int addCard (long long int hand, int naipe, int valor) {
-	int idx = getCardIndex(naipe, valor);
+long long int addCard (long long int hand, int suit, int value) {
+	int idx = getCardIndex(suit, value);
 	return hand | ((long long int) 1 << idx);
 }
 
 /** \brief Remove uma carta do estado
 
     @param hand     A mão a ser modificada
-    @param naipe	O naipe da carta (inteiro entre 0 e 3)
-    @param valor	O valor da carta (inteiro entre 0 e 12)
-    @return		O novo estado
+    @param suit 	O naipe da carta (inteiro entre 0 e 3)
+    @param value	O valor da carta (inteiro entre 0 e 12)
+    @return		    O novo estado
 */
-long long int removeCard (long long int hand, int naipe, int valor) {
-	int idx = getCardIndex(naipe, valor);
+long long int removeCard (long long int hand, int suit, int value) {
+	int idx = getCardIndex(suit, value);
 	return hand & ~((long long int) 1 << idx);
 }
 
 /** \brief Verifica se uma carta pertence ao estado
 
     @param hand     A mão a ser verificada
-    @param naipe	O naipe da carta (inteiro entre 0 e 3)
-    @param valor	O valor da carta (inteiro entre 0 e 12)
-    @return		1 se a carta existe e 0 caso contrário
+    @param suit	    O naipe da carta (inteiro entre 0 e 3)
+    @param value	O valor da carta (inteiro entre 0 e 12)
+    @return		    1 se a carta existe e 0 caso contrário
 */
-int cardExists (long long int hand, int naipe, int valor) {
-	int idx = getCardIndex(naipe, valor);
+int cardExists (long long int hand, int suit, int value) {
+	int idx = getCardIndex(suit, value);
 	return (hand >> idx) & 1;
 }
 
