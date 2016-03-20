@@ -176,16 +176,15 @@ int cardExists (long long int hand, int suit, int value) {
 
 /** \brief Imprime o html correspondente a uma carta
 
-    @param path	        O URL correspondente à pasta que contém todas as cartas
-    @param x            A coordenada x da carta
-    @param y            A coordenada y da carta
-    @param suit	        O naipe da carta (inteiro entre 0 e 3)
-    @param value	    O valor da carta (inteiro entre 0 e 12)
-    @param gameState    O estado de jogo atual
-    @param rotate90     Se a carta deve ser imprimida rodada 90 graus
-    @param rotate180    Se a carta deve ser imprimida rodada 180 graus
+    @param path	         O URL correspondente à pasta que contém todas as cartas
+    @param x             A coordenada x da carta
+    @param y             A coordenada y da carta
+    @param suit	         O naipe da carta (inteiro entre 0 e 3)
+    @param value	     O valor da carta (inteiro entre 0 e 12)
+    @param gameState     O estado de jogo atual
+    @param cardPosition  Usado para a rotação. 0 - cima, 1 - direita, 2 - baixo, 3 - esquerda
 */
-void printCard (char *path, int x, int y, int suit, int value, state gameState, bool rotate90, bool rotate180) {
+void printCard (char *path, int x, int y, int suit, int value, state gameState, int cardPosition) {
 
 	// Criar um estado que será usado se o utilizador clicar nesta carta
 
@@ -197,26 +196,34 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
     // Classes html desta carta
 	char cardElementClasses[256] = "card";
 
-	// Rotação da carta
-	char cardRotationClass[32] = "card-rotate-90";
+	// Classe de rotação da carta
+	char cardRotationClass[32];
+
+	if (cardPosition == 0) {
+
+        strcpy(cardRotationClass, "card-top");
+
+	} else if (cardPosition == 1) {
+
+	    strcpy(cardRotationClass, "card-right");
+
+	} else if (cardPosition == 2) {
+
+	    strcpy(cardRotationClass, "card-bottom");
+
+	} else if (cardPosition == 3) {
+
+	    strcpy(cardRotationClass, "card-left");
+	}
 
 	// Classe que desativa cliques na carta
 	char cardDisableClass[32] = "disabled";
 
-	if (!rotate90) {
-
-        if (rotate180) {
-
-            strcpy(cardRotationClass, "card-rotate-180");
-
-        } else {
-
-            cardRotationClass[0] = '\0';
-        }
-	}
-
     // Se a carta for do utilizador
     if (isUserCard) {
+
+        // Não adicionar à carta a classe que a desativa
+        cardDisableClass[0] = '\0';
 
         // Mudar as classes html desta carta (para aplicar estilos personalizados)
         strcpy(cardElementClasses, "card user-card");
@@ -232,9 +239,6 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
             // Ao clicar nela será selecionada
              stateAfterClick.selection = addCard(stateAfterClick.selection, suit, value);
         }
-
-        // Não adicionar à carta a classe que a desativa
-        cardDisableClass[0] = '\0';
 
     } // Else, clicar na carta não faz nada
 
@@ -264,6 +268,9 @@ void render (state gameState) {
 	int spaceBetweenCards = 30;
 
 	// Posições iniciais para cada mão
+	//        mão 3
+	// mão 4        mão 2
+	//        mão 1
 	int hand1x = 180, hand1y = 650;
 	int hand2x = 685, hand2y = 520;
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
@@ -282,46 +289,37 @@ void render (state gameState) {
 
                 if (cardExists(gameState.hands[k], i, j)) {
 
-                    if (k == 1 || k == 3) { // Se esta carta pertence a uma mão lateral, temos de a imprimir rodada
-
-                        // Devido à forma como a carta é rodada, temos de trocar as coordenadas e inverter a coordenada y
-                        printCard(path, handx[k], handy[k], i, j, gameState, true, false);
-
-                        // Incrementar ou diminuir o y para a próxima carta nas mãos imprimidas verticalmente
-                        if (k == 1) {
-                            handy[k] -= 30;
-                        } else {
-                            handy[k] += 30;
-                        }
-
-                    } else {
+                    if (k == 0) {
 
                         // Se a carta for do utilizador e estiver selecionada, imprime-se mais acima
-                        // (bastava verificar se a carta está selecionada, mas assim se a mão
-                        // a ser imprimida não for a do jogador passamos logo à frente)
-                        if ((k == 0) && (cardExists(gameState.selection, i, j))) {
+                        if (cardExists(gameState.selection, i, j)) {
 
-                            printCard(path, handx[k], (handy[k] - 20), i, j, gameState, false, false);
-
-                        } else if (k == 0) {
-
-                            // Imprimir a carta sem rotação
-                            printCard(path, handx[k], handy[k], i, j, gameState, false, false);
+                            printCard(path, handx[k], (handy[k] - 20), i, j, gameState, 2);
 
                         } else {
 
-                            // Imprimir a carta rodada 180 graus
-                            printCard(path, handx[k], handy[k], i, j, gameState, false, true);
+                            printCard(path, handx[k], handy[k], i, j, gameState, 2);
                         }
 
-                        if (k == 0) {
+                        handx[k] += 30; // Incrementar o x para a próxima carta na mão de baixo
 
-                            handx[k] += 30; // Incrementar o x para a próxima carta na mão de baixo
+                    } else if (k == 1) {
 
-                        } else {
+                        printCard(path, handx[k], handy[k], i, j, gameState, 1);
 
-                            handx[k] -= 30; // Decrementar o x para a próxima carta na mão de cima
-                        }
+                        handy[k] -= 30;
+
+                    } else if (k == 2) {
+
+                        printCard(path, handx[k], handy[k], i, j, gameState, 0);
+
+                        handx[k] -= 30; // Decrementar o x para a próxima carta na mão de cima
+
+                    } else if (k == 3) {
+
+                        printCard(path, handx[k], handy[k], i, j, gameState, 3);
+
+                        handy[k] += 30;
                     }
                 }
             }
