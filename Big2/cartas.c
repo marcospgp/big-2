@@ -41,7 +41,7 @@ typedef int bool;
 typedef struct State {
 
 	long long int hands[4];     // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa. 0 implica um passe. lastPlays[0] é a jogada mais recente, lastPlays[4] a mais antiga.
+	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa. No sentido anti-horário, lastPlays[0] refere-se à última jogada do utilizador, e lastPlays[0] à última jogada do bot à sua direita
 	long long int selection;    // Cartas selecionadas atualmente pelo utilizador
 	bool pass, play;            // Se o útlimo clique do utilizador representa uma ação
 
@@ -103,7 +103,7 @@ char* stateToString (state e) {
 
     @param naipe	O naipe da carta (inteiro entre 0 e 3)
     @param valor	O valor da carta (inteiro entre 0 e 12)
-    @return		O índice correspondente à carta
+    @return		    O índice correspondente à carta
 */
 int getCardIndex (int naipe, int valor) {
 	return naipe * 13 + valor;
@@ -469,6 +469,31 @@ bool isSelectionPlayable (state gameState) {
 */
 state processUserPlay (state gameState) {
 
+    // A seleção já deve ter sido validada antes de o utilizador carregar no botão de jogar, mas aqui fazemos um double check
+    if (!isSelectionPlayable(gameState)) {
+
+        gameState.selection = 0;
+
+        return gameState;
+    }
+
+    // Colocar a jogada mais recente do utilizador no índice 0 do array lastPlays
+    gameState.lastPlays[0] = gameState.selection;
+
+    // Remover da mào do jogador cada carta presente na seleção
+    int i, j;
+    for (i = 0; i < 4; i++) { // Percorrer naipes
+        for (j = 0; j < 13; j++) { // Percorrer valores
+
+            if (cardExists(gameState.selection, i, j)) { // Se a carta estiver selecionada
+
+                removeCard(gameState.hands[0], i, j); // Removê-la da mào
+            }
+        }
+    }
+
+    // Limpar a ação jogar do estado de jogo
+    gameState.play = false;
 
     return gameState;
 }
