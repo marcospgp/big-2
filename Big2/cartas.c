@@ -26,7 +26,7 @@
 /**
     Formato da string passada como parâmetro entre jogadas
 */
-#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%d_%d_%d_%d_%d_%lld_%lld_%d_%d"
+#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%d_%d"
 
 /**
     Definir o tipo bool
@@ -41,11 +41,8 @@ typedef int bool;
 typedef struct State {
 
 	long long int hands[4];     // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa
-	int cardCount[4];           // Número de cartas de cada jogador, na mesma ordem de hands[]
-	int consecutivePasses;      // Número de passes consecutivos que foram realizados
+	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa. 0 implica um passe. lastPlays[0] é a jogada mais recente, lastPlays[4] a mais antiga.
 	long long int selection;    // Cartas selecionadas atualmente pelo utilizador
-	long long int lastPlay;     // Cartas na última jogada (sem contar passes. se houveram 3 passes seguidos, lastPlay = 0)
 	bool pass, play;            // Se o útlimo clique do utilizador representa uma ação
 
 } state;
@@ -64,13 +61,11 @@ state stringToState (char* str) {
         &e.hands[1],
         &e.hands[2],
         &e.hands[3],
-        &e.cardCount[0],
-        &e.cardCount[1],
-        &e.cardCount[2],
-        &e.cardCount[3],
-        &e.consecutivePasses,
+        &e.lastPlays[0],
+        &e.lastPlays[1],
+        &e.lastPlays[2],
+        &e.lastPlays[3],
         &e.selection,
-        &e.lastPlay,
         &e.pass,
         &e.play
     );
@@ -86,21 +81,19 @@ state stringToState (char* str) {
 char* stateToString (state e) {
 	static char res[10240];
 	sprintf(
-         res,
-         PARAMETER_STRING_FORMAT,
-         e.hands[0],
-         e.hands[1],
-         e.hands[2],
-         e.hands[3],
-         e.cardCount[0],
-         e.cardCount[1],
-         e.cardCount[2],
-         e.cardCount[3],
-         e.consecutivePasses,
-         e.selection,
-         e.lastPlay,
-         e.pass,
-         e.play
+        res,
+        PARAMETER_STRING_FORMAT,
+        e.hands[0],
+        e.hands[1],
+        e.hands[2],
+        e.hands[3],
+        e.lastPlays[0],
+        e.lastPlays[1],
+        e.lastPlays[2],
+        e.lastPlays[3],
+        e.selection,
+        e.pass,
+        e.play
     );
 
 	return res;
@@ -467,6 +460,19 @@ bool isSelectionPlayable (state gameState) {
 
 }
 
+/** \brief Processa uma jogada do utilizador
+
+    Normalmente chamada depois de o utilizador clicar no botão de jogar
+
+    @param gameState    O estado de jogo atual
+    @return             O estado de jogo imediatamente após a jogada
+*/
+state processUserPlay (state gameState) {
+
+
+    return gameState;
+}
+
 /** \brief Cria um estado de jogo inicial e retorna-o
 
     Esta função é normalmente usada no início de um jogo para criar um estado inicial
@@ -478,12 +484,6 @@ state getInitialGameState () {
     state e;
 
     distributeCards(e.hands);
-
-    // Tem-se de usar um for loop para se reinicializar um array
-    int i;
-    for (i = 0; i < 4; i++) {
-        e.cardCount[i] = 13; // Atribuir uma contagem de 13 cartas a cada jogador
-    }
 
     e.selection = 0;
     e.pass = false;
@@ -508,16 +508,10 @@ void parse (char *query) {
 
         state gameState = stringToState(stateString);
 
-        /*if (gameState.userTurn)
+        if (gameState.play) {
 
-            render(gameState);
-
-            state newGameState = gameState;
-
-        if (newGameState.pass) {
-
-
-        }*/
+            gameState = processUserPlay(gameState);
+        }
 
 		render(gameState);
 
