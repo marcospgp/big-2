@@ -41,7 +41,8 @@ typedef int bool;
 typedef struct State {
 
 	long long int hands[4];     // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa. No sentido anti-horário, lastPlays[0] refere-se à última jogada do utilizador, e lastPlays[0] à última jogada do bot à sua direita
+	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa. 0 implica um passe, e todos os bits a 1 implica que aquele jogador ainda não fez nada no jogo atual.
+                                // No sentido anti-horário, lastPlays[0] refere-se à última jogada do utilizador, e lastPlays[1] à última jogada do bot à sua direita
 	long long int selection;    // Cartas selecionadas atualmente pelo utilizador
 	bool pass, play;            // Se o útlimo clique do utilizador representa uma ação
 
@@ -136,7 +137,7 @@ int getHandLength (long long int hand) {
     @param hand     A mão a ser modificada
     @param suit	    O naipe da carta (inteiro entre 0 e 3)
     @param value   	O valor da carta (inteiro entre 0 e 12)
-    @return		    O novo estado
+    @return		    A mão modificada
 */
 long long int addCard (long long int hand, int suit, int value) {
 	int idx = getCardIndex(suit, value);
@@ -148,7 +149,7 @@ long long int addCard (long long int hand, int suit, int value) {
     @param hand     A mão a ser modificada
     @param suit 	O naipe da carta (inteiro entre 0 e 3)
     @param value	O valor da carta (inteiro entre 0 e 12)
-    @return		    O novo estado
+    @return		    A mão modificada
 */
 long long int removeCard (long long int hand, int suit, int value) {
 	int idx = getCardIndex(suit, value);
@@ -257,8 +258,34 @@ void render (state gameState) {
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
+    // Largura das cartas (não pode ser modificado aqui, read only)
+    int cardWidth = 80;
+
 	// Espaço entre cartas
 	int spaceBetweenCards = 30;
+
+	// Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho
+
+	int handDeltas[4], lastPlayDeltas[4];
+
+    int l;
+    for (l = 0; l < 4; l++) {
+
+        int handLength = getHandLength(gameState.hands[l];
+        int lastPlayLength = getHandLength(gameState.lastPlays[l]);
+
+        int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
+        // int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) );
+
+        // A deslocação é de 1/(13 * 2) da largura da mão por cada carta removida (por cada carta a menos de 13)
+        int deltaHand = (13 - handLength) * ( ( 1 / (26) ) * handLengthPx );
+
+        // A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1 (se lastPlayLength for 0 não há problema porque este valor não vai chegar a ser usado)
+        int deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
+
+        handDeltas[l] = deltaHand;
+        lastPlayDeltas[l] = deltaLastPlay;
+    }
 
 	// Posições iniciais para cada mão
 	//        mão 3
@@ -269,8 +296,20 @@ void render (state gameState) {
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
 	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
 
+	int play1x = hand1x + 220, play1y = hand1y - 80;
+	int play2x = hand2x - 80, play2y = hand2y - 220;
+	int play3x = hand3x - 220, play3y = hand3y + 80;
+	int play4x = hand4x + 80, play4y = hand4y + 220;
+
 	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
 	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
+
+	int playx[4] = {play1x, play2x, play3x, play4x};
+	int playy[4] = {play1y, play2y, play3y, play4y};
+
+	// Aplicar deltas às posições originais
+
+	handx[l] += handDeltas[l]; // Todooooo
 
     int i, j, k;
 
@@ -460,14 +499,91 @@ bool isSelectionPlayable (state gameState) {
 
 }
 
-/** \brief Processa uma jogada do utilizador
-
-    Normalmente chamada depois de o utilizador clicar no botão de jogar
+/** \brief Descobre quem tem o 3 de ouros (e por isso, joga primeiro)
 
     @param gameState    O estado de jogo atual
-    @return             O estado de jogo imediatamente após a jogada
+    @return             O índice da mão do jogador com o 3 de ouros
 */
-state processUserPlay (state gameState) {
+int whoGoesFirst (state gameState) {
+
+    int i;
+    for (i = 0; i < 4; i++) { // Percorrer as mãos dos jogadores
+
+        // Descobrir quem tem o 3 de ouros
+        if (cardExists(gameState.hands[i], 0, 0)) {
+
+            return i;
+        }
+    }
+}
+
+/** \brief Decide que jogada um bot deve fazer baseando-se no estado de jogo atual
+
+    @param gameState    O estado de jogo atual
+    @param index        O índice da mão do bot que está a jogar (no array hands do estado de jogo)
+    @return             Uma mão que representa as cartas que devem ser jogadas. 0 significa um passe
+*/
+chooseAIPlay (state gameState, int index) {
+
+    // TODO
+
+    return (long long int) 0;
+}
+
+/** \brief Processa uma jogada do computador
+
+    Sabendo qual é o bot que tem de jogar, decide que jogada fazer e processa-a
+
+    @param gameState    O estado de jogo atual
+    @param index        O índice da mão do bot que está a jogar (no array hands do estado de jogo)
+    @return             O estado de jogo imediatamente após a jogada do computador
+*/
+state processBotAction (state gameState, int index) {
+
+    // Decidir que jogada fazer
+    long long int play = chooseAIPlay(gameState, index);
+
+    gameState.lastPlays[index] = play;
+
+    if (play != 0) { // Se a jogada não for um passe (se for um passe não é preciso fazer nada)
+
+        // Remover da mào do bot cada carta presente na sua jogada
+        int i, j;
+        for (i = 0; i < 4; i++) { // Percorrer naipes
+            for (j = 0; j < 13; j++) { // Percorrer valores
+
+                if (cardExists(play, i, j)) { // Se a carta fizer parte da jogada
+
+                    gameState.hands[index] = removeCard(gameState.hands[index], i, j); // Removê-la da mào
+                }
+            }
+        }
+    }
+
+    return gameState;
+}
+
+/** \brief Processa uma jogada do utilizador
+
+    Normalmente chamada depois de o utilizador clicar num botão (jogar ou passar)
+
+    @param gameState    O estado de jogo atual
+    @return             O estado de jogo imediatamente após a ação
+*/
+state processUserAction (state gameState) {
+
+    if (gameState.pass) {
+
+        // Um 0 no array lastPlays implica um passe
+        gameState.lastPlays[0] = 0;
+
+        // Remover a ação de passar do estado de jogo
+        gameState.pass = false;
+
+        return gameState; // Parar a execução da função
+    }
+
+    // Se a ação não foi um passe, então o utilizador clicou no botão jogar
 
     // A seleção já deve ter sido validada antes de o utilizador carregar no botão de jogar, mas aqui fazemos um double check
     if (!isSelectionPlayable(gameState)) {
@@ -477,7 +593,7 @@ state processUserPlay (state gameState) {
         return gameState;
     }
 
-    // Colocar a jogada mais recente do utilizador no índice 0 do array lastPlays
+    // Colocar a jogada mais recente do utilizador no índice 0 do array lastPlays (correspondente à última jogada do utilizador)
     gameState.lastPlays[0] = gameState.selection;
 
     // Remover da mào do jogador cada carta presente na seleção
@@ -487,7 +603,7 @@ state processUserPlay (state gameState) {
 
             if (cardExists(gameState.selection, i, j)) { // Se a carta estiver selecionada
 
-                removeCard(gameState.hands[0], i, j); // Removê-la da mào
+                gameState.hands[0] = removeCard(gameState.hands[0], i, j); // Removê-la da mào
             }
         }
     }
@@ -508,8 +624,17 @@ state getInitialGameState () {
 
     state e;
 
+    // Distribuir cartas
     distributeCards(e.hands);
 
+    // Todos os bits a 1 numa jogada significa que aquele jogador ainda não realizou nenhuma ação no jogo atual
+    int i;
+    for (i = 0; i < 4; i++) {
+
+        e.lastPlays[i] = ~((long long int) 0);
+    }
+
+    // Definir valores iniciais
     e.selection = 0;
     e.pass = false;
     e.play = false;
@@ -527,22 +652,42 @@ void parse (char *query) {
 
 	char stateString[1024];
 
-	// const long long int ESTADO_INICIAL = 0xfffffffffffff;
-
 	if(sscanf(query, "q=%s", stateString) == 1) {
 
         state gameState = stringToState(stateString);
 
-        if (gameState.play) {
+        if (!gameState.play && !gameState.pass) {
 
-            gameState = processUserPlay(gameState);
+            gameState.pass = true; // Se não houve nenhuma ação (impossível de acontecer normalmente) assumimos um passe
         }
 
-		render(gameState);
+        // Processar a jogada do utilizador
+        gameState = processUserAction(gameState);
+
+        // Processar a jogada dos bots
+        int i;
+        for (i = 1; i < 4; i++) {
+
+            processBotAction(gameState, i);
+        }
+
+        render(gameState);
 
 	} else {
 
-		render(getInitialGameState());
+	    // Obter um estado de jogo inicial com mãos baralhadas e valores por defeito
+	    state gameState = getInitialGameState();
+
+	    // Descobrir quem joga primeiro (quem tem o 3 de ouros)
+        int i = whoGoesFirst(gameState);
+
+        // Processar jogadas dos bots até ser a vez do utilizador
+        while (i > 0 && i < 4) {
+
+            gameState = processBotAction(gameState, i);
+        }
+
+		render(gameState);
 	}
 }
 
