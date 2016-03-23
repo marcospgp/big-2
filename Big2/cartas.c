@@ -266,7 +266,7 @@ void render (state gameState) {
 
 	// Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho
 
-	int handDeltas[4], lastPlayDeltas[4];
+	int handDeltas[4], playDeltas[4];
 
     int l;
     for (l = 0; l < 4; l++) {
@@ -284,7 +284,7 @@ void render (state gameState) {
         int deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
 
         handDeltas[l] = deltaHand;
-        lastPlayDeltas[l] = deltaLastPlay;
+        playDeltas[l] = deltaLastPlay;
     }
 
 	// Posições iniciais para cada mão
@@ -309,7 +309,15 @@ void render (state gameState) {
 
 	// Aplicar deltas às posições originais
 
-	handx[l] += handDeltas[l]; // Todooooo
+	handx[0] += handDeltas[0];
+	handy[1] -= handDeltas[1];
+	handx[2] -= handDeltas[2];
+	handy[3] += handDeltas[3];
+
+	playx[0] += playDeltas[0];
+	playy[1] -= playDeltas[1];
+	playx[2] -= playDeltas[2];
+	playy[3] += playDeltas[3];
 
     int i, j, k;
 
@@ -317,7 +325,7 @@ void render (state gameState) {
 
         for (i = 0; i < 4; i++) { // Percorrer naipes
 
-            for (k = 0; k < 4; k++) { // Percorrer todas as mãos e descobrir se a carta pertence a uma delas
+            for (k = 0; k < 4; k++) { // Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas
 
                 if (cardExists(gameState.hands[k], i, j)) {
 
@@ -333,25 +341,46 @@ void render (state gameState) {
                             printCard(path, handx[k], handy[k], i, j, gameState, 2);
                         }
 
-                        handx[k] += 30; // Incrementar o x para a próxima carta na mão de baixo
+                        handx[k] += spaceBetweenCards; // Incrementar o x para a próxima carta na mão de baixo
 
                     } else if (k == 1) {
 
                         printCard(path, handx[k], handy[k], i, j, gameState, 1);
 
-                        handy[k] -= 30;
+                        handy[k] -= spaceBetweenCards;
 
                     } else if (k == 2) {
 
                         printCard(path, handx[k], handy[k], i, j, gameState, 0);
 
-                        handx[k] -= 30; // Decrementar o x para a próxima carta na mão de cima
+                        handx[k] -= spaceBetweenCards; // Decrementar o x para a próxima carta na mão de cima
 
                     } else if (k == 3) {
 
                         printCard(path, handx[k], handy[k], i, j, gameState, 3);
 
-                        handy[k] += 30;
+                        handy[k] += spaceBetweenCards;
+                    }
+
+                } else if (cardExists(gameState.lastPlays[k], i, j)) {
+
+                    printCard(path, playx[k], playy[k], i, j, gameState, 2);
+
+                    if (k == 0) {
+
+                        playx[k] += spaceBetweenCards;
+
+                    } else if (k == 1) {
+
+                        playy[k] -= spaceBetweenCards;
+
+                    } else if (k == 2) {
+
+                        playx[k] -= spaceBetweenCards;
+
+                    } else if (k == 3) {
+
+                        playy[k] += spaceBetweenCards;
                     }
                 }
             }
