@@ -175,7 +175,7 @@ int cardExists (long long int hand, int suit, int value) {
     @param y             A coordenada y da carta
     @param suit	         O naipe da carta (inteiro entre 0 e 3)
     @param value	     O valor da carta (inteiro entre 0 e 12)
-    @param gameState     O estado de jogo atual
+    @param gameState     O estado de jogo atual (para determinar urls após cliques nas cartas)
     @param cardPosition  Usado para a rotação. 0 - cima, 1 - direita, 2 - baixo, 3 - esquerda
 */
 void printCard (char *path, int x, int y, int suit, int value, state gameState, int cardPosition) {
@@ -242,6 +242,17 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
 
 	printf("<a xlink:href = \"%s\"><image class=\"%s %s %s\" x = \"%d\" y = \"%d\" height = \"110\" width = \"80\" xlink:href = \"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, cardDisableClass, x, y, path, VALUES[value], SUITS[suit]);
+}
+
+/** \brief Imprime o html correspondente a um passe
+
+    @param x             A coordenada x de onde deve ser imprimido o html
+    @param y             A coordenada y de onde deve ser imprimido o html
+*/
+void printPass (int x, int y) {
+
+    // TODO
+
 }
 
 /** \brief Imprime um estado de jogo
@@ -726,8 +737,6 @@ void parse (char *query) {
 	    // Obter um estado de jogo inicial com mãos baralhadas e valores por defeito
 	    state gameState = getInitialGameState();
 
-        /* TODO - JOGAR PRIMEIRO QUEM TEM O 3 DE OUROS
-
 	    // Descobrir quem joga primeiro (quem tem o 3 de ouros)
         int i = whoGoesFirst(gameState);
 
@@ -735,9 +744,9 @@ void parse (char *query) {
         while (i > 0 && i < 4) {
 
             gameState = processBotAction(gameState, i);
-        }
 
-        */
+            i++;
+        }
 
 		render(gameState);
 	}
