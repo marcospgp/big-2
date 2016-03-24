@@ -251,7 +251,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 */
 void printPass (int x, int y) {
 
-    // TODO
+    printf("<text class=\"pass-text\" x = \"%d\" y = \"%d\">Passou</text>\n", x, y);
 
 }
 
@@ -303,10 +303,10 @@ void render (state gameState) {
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
 	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
 
-	int play1x = hand1x + 220, play1y = hand1y - 80;
-	int play2x = hand2x - 80, play2y = hand2y - 220;
-	int play3x = hand3x - 220, play3y = hand3y + 80;
-	int play4x = hand4x + 80, play4y = hand4y + 220;
+	int play1x = hand1x + 220, play1y = hand1y - 150;
+	int play2x = hand2x - 150, play2y = hand2y - 220;
+	int play3x = play1x, play3y = hand3y + 150;
+	int play4x = hand4x + 150, play4y = play2y;
 
 	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
 	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
@@ -414,6 +414,15 @@ void render (state gameState) {
                     }
                 }
             }
+        }
+	}
+
+	// Imprimir os textos "Passou" nos jogadores que passaram nesta jogada
+	int p;
+	for (p = 0; p < 4; p++) {
+
+        if (hasPassed[p] == true) {
+            printPass(playx[p], playy[p]);
         }
 	}
 
@@ -667,6 +676,9 @@ state processUserAction (state gameState) {
         }
     }
 
+    // Limpar a seleção do jogador
+    gameState.selection = 0;
+
     // Limpar a ação jogar do estado de jogo
     gameState.play = false;
 
@@ -717,20 +729,24 @@ void parse (char *query) {
 
         if (!gameState.play && !gameState.pass) {
 
-            gameState.pass = true; // Se não houve nenhuma ação (impossível de acontecer normalmente) assumimos um passe
+            // Se há uma string de parâmetros mas o utilizador não fez nada, imprimir o estado atual
+            // (o jogador provavelmente apenas selecionou uma carta)
+            render(gameState);
+
+        } else {
+
+            // Processar a jogada do utilizador
+            gameState = processUserAction(gameState);
+
+            // Processar a jogada dos bots
+            int i;
+            for (i = 1; i < 4; i++) {
+
+                gameState = processBotAction(gameState, i);
+            }
+
+            render(gameState);
         }
-
-        // Processar a jogada do utilizador
-        gameState = processUserAction(gameState);
-
-        // Processar a jogada dos bots
-        int i;
-        for (i = 1; i < 4; i++) {
-
-            processBotAction(gameState, i);
-        }
-
-        render(gameState);
 
 	} else {
 
