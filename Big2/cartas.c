@@ -258,6 +258,28 @@ void render (state gameState) {
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
+	int lol, lal;
+
+	for (lol = 0; lol < 4; lol++) {
+
+        //printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", gameState.lastPlays[lol]);
+	}
+
+	// Se ainda não houveram jogadas, mudar as lastplays para 0 para não haver confusão ao imprimir as cartas
+	int m;
+	for (m = 0; m < 4; m++) {
+
+        if (~(gameState.lastPlays[m]) == 0) {
+
+            gameState.lastPlays[m] = 0;
+        }
+	}
+
+	for (lal = 0; lal < 4; lal++) {
+
+        //printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", gameState.lastPlays[lal]);
+	}
+
     // Largura das cartas (não pode ser modificado aqui, read only)
     int cardWidth = 80;
 
@@ -271,8 +293,12 @@ void render (state gameState) {
     int l;
     for (l = 0; l < 4; l++) {
 
-        int handLength = getHandLength(gameState.hands[l];
+        printf("\n\n<!-- %d One for: -->\n", l);
+
+        int handLength = getHandLength(gameState.hands[l]);
         int lastPlayLength = getHandLength(gameState.lastPlays[l]);
+
+        printf("<!-- handLength: %d -->\n", handLength);
 
         int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
         // int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) );
@@ -285,6 +311,13 @@ void render (state gameState) {
 
         handDeltas[l] = deltaHand;
         playDeltas[l] = deltaLastPlay;
+    }
+
+    // Debug logs
+    int u;
+    for (u = 0; u < 4; u++) {
+        //printf("<!-- handDelta %d: %d -->\n", u, handDeltas[u]);
+        //printf("<!-- handDelta %d: %d -->\n\n", u, handDeltas[u]);
     }
 
 	// Posições iniciais para cada mão
@@ -309,15 +342,17 @@ void render (state gameState) {
 
 	// Aplicar deltas às posições originais
 
+	/*
 	handx[0] += handDeltas[0];
 	handy[1] -= handDeltas[1];
 	handx[2] -= handDeltas[2];
 	handy[3] += handDeltas[3];
 
+    /*
 	playx[0] += playDeltas[0];
 	playy[1] -= playDeltas[1];
 	playx[2] -= playDeltas[2];
-	playy[3] += playDeltas[3];
+	playy[3] += playDeltas[3]; */
 
     int i, j, k;
 
@@ -552,7 +587,7 @@ int whoGoesFirst (state gameState) {
     @param index        O índice da mão do bot que está a jogar (no array hands do estado de jogo)
     @return             Uma mão que representa as cartas que devem ser jogadas. 0 significa um passe
 */
-chooseAIPlay (state gameState, int index) {
+long long int chooseAIPlay (state gameState, int index) {
 
     // TODO
 
