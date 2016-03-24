@@ -258,26 +258,23 @@ void render (state gameState) {
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
-	int lol, lal;
+	// Anotar quem já jogou para não haver confusão ao imprimir as cartas
+	// (porque se ainda não houveram jogadas, o valor de lastplay será ~((long long int) 0)))
 
-	for (lol = 0; lol < 4; lol++) {
+	bool hasPlayed[4] = {true, true, true, true};     // Quais jogadores já jogaram
+	bool hasPassed[4] = {false, false, false, false}; // Quais jogadores passaram
 
-        printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", lol, gameState.lastPlays[lol]);
-	}
-
-	// Se ainda não houveram jogadas, mudar as lastplays para 0 para não haver confusão ao imprimir as cartas
 	int m;
 	for (m = 0; m < 4; m++) {
 
-        if (~(gameState.lastPlays[m]) == 0) {
+        if (gameState.lastPlays[m] == 0) { // Se este jogador passou
 
-            gameState.lastPlays[m] = 0;
+            hasPassed[m] = true;
+
+        } else if (~(gameState.lastPlays[m]) == 0) { // Se este jogador ainda não fez nada neste jogo
+
+            hasPlayed[m] = false;
         }
-	}
-
-	for (lal = 0; lal < 4; lal++) {
-
-        printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", lal, gameState.lastPlays[lal]);
 	}
 
     // Largura das cartas (não pode ser modificado aqui, read only)
@@ -285,6 +282,26 @@ void render (state gameState) {
 
 	// Espaço entre cartas
 	int spaceBetweenCards = 30;
+
+	// Posições iniciais para cada mão
+	//        mão 3
+	// mão 4        mão 2
+	//        mão 1
+	int hand1x = 180, hand1y = 650;
+	int hand2x = 685, hand2y = 520;
+	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
+	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
+
+	int play1x = hand1x + 220, play1y = hand1y - 80;
+	int play2x = hand2x - 80, play2y = hand2y - 220;
+	int play3x = hand3x - 220, play3y = hand3y + 80;
+	int play4x = hand4x + 80, play4y = hand4y + 220;
+
+	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
+	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
+
+	int playx[4] = {play1x, play2x, play3x, play4x};
+	int playy[4] = {play1y, play2y, play3y, play4y};
 
 	// Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho
 
@@ -308,33 +325,6 @@ void render (state gameState) {
         handDeltas[l] = deltaHand;
         playDeltas[l] = deltaLastPlay;
     }
-
-    // Debug logs
-    int u;
-    for (u = 0; u < 4; u++) {
-        printf("\n\n<!-- handDelta %d: %d -->\n", u, handDeltas[u]);
-        printf("<!-- playDelta %d: %d -->\n\n", u, playDeltas[u]);
-    }
-
-	// Posições iniciais para cada mão
-	//        mão 3
-	// mão 4        mão 2
-	//        mão 1
-	int hand1x = 180, hand1y = 650;
-	int hand2x = 685, hand2y = 520;
-	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
-	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
-
-	int play1x = hand1x + 220, play1y = hand1y - 80;
-	int play2x = hand2x - 80, play2y = hand2y - 220;
-	int play3x = hand3x - 220, play3y = hand3y + 80;
-	int play4x = hand4x + 80, play4y = hand4y + 220;
-
-	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
-	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
-
-	int playx[4] = {play1x, play2x, play3x, play4x};
-	int playy[4] = {play1y, play2y, play3y, play4y};
 
 	// Aplicar deltas às posições originais
 
@@ -391,7 +381,7 @@ void render (state gameState) {
                         handy[k] += spaceBetweenCards;
                     }
 
-                } else if (cardExists(gameState.lastPlays[k], i, j)) {
+                } else if (hasPlayed[k] && !hasPassed[k] && cardExists(gameState.lastPlays[k], i, j)) {
 
                     printCard(path, playx[k], playy[k], i, j, gameState, 2);
 
