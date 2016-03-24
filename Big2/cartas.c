@@ -262,7 +262,7 @@ void render (state gameState) {
 
 	for (lol = 0; lol < 4; lol++) {
 
-        //printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", gameState.lastPlays[lol]);
+        printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", lol, gameState.lastPlays[lol]);
 	}
 
 	// Se ainda não houveram jogadas, mudar as lastplays para 0 para não haver confusão ao imprimir as cartas
@@ -277,7 +277,7 @@ void render (state gameState) {
 
 	for (lal = 0; lal < 4; lal++) {
 
-        //printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", gameState.lastPlays[lal]);
+        printf("\n\n<!-- gameState.lastPlays[%d]: %d -->", lal, gameState.lastPlays[lal]);
 	}
 
     // Largura das cartas (não pode ser modificado aqui, read only)
@@ -312,8 +312,8 @@ void render (state gameState) {
     // Debug logs
     int u;
     for (u = 0; u < 4; u++) {
-        //printf("<!-- handDelta %d: %d -->\n", u, handDeltas[u]);
-        //printf("<!-- handDelta %d: %d -->\n\n", u, handDeltas[u]);
+        printf("\n\n<!-- handDelta %d: %d -->\n", u, handDeltas[u]);
+        printf("<!-- playDelta %d: %d -->\n\n", u, playDeltas[u]);
     }
 
 	// Posições iniciais para cada mão
@@ -338,17 +338,15 @@ void render (state gameState) {
 
 	// Aplicar deltas às posições originais
 
-	/*
 	handx[0] += handDeltas[0];
 	handy[1] -= handDeltas[1];
 	handx[2] -= handDeltas[2];
 	handy[3] += handDeltas[3];
 
-    /*
 	playx[0] += playDeltas[0];
 	playy[1] -= playDeltas[1];
 	playx[2] -= playDeltas[2];
-	playy[3] += playDeltas[3]; */
+	playy[3] += playDeltas[3];
 
     int i, j, k;
 
@@ -738,6 +736,8 @@ void parse (char *query) {
 	    // Obter um estado de jogo inicial com mãos baralhadas e valores por defeito
 	    state gameState = getInitialGameState();
 
+        /* TODO - JOGAR PRIMEIRO QUEM TEM O 3 DE OUROS
+
 	    // Descobrir quem joga primeiro (quem tem o 3 de ouros)
         int i = whoGoesFirst(gameState);
 
@@ -746,6 +746,8 @@ void parse (char *query) {
 
             gameState = processBotAction(gameState, i);
         }
+
+        */
 
 		render(gameState);
 	}
