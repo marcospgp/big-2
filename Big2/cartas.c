@@ -293,12 +293,8 @@ void render (state gameState) {
     int l;
     for (l = 0; l < 4; l++) {
 
-        printf("\n\n<!-- %d One for: -->\n", l);
-
         int handLength = getHandLength(gameState.hands[l]);
         int lastPlayLength = getHandLength(gameState.lastPlays[l]);
-
-        printf("<!-- handLength: %d -->\n", handLength);
 
         int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
         // int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) );
