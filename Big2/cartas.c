@@ -251,6 +251,10 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 */
 void printPass (int x, int y) {
 
+    // Temos de alterar um bocadinho as coordenadas
+    y += 80;
+    x -= 50;
+
     printf("<text class=\"pass-text\" x = \"%d\" y = \"%d\">Passou</text>\n", x, y);
 
 }
@@ -303,10 +307,10 @@ void render (state gameState) {
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
 	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
 
-	int play1x = hand1x + 220, play1y = hand1y - 150;
-	int play2x = hand2x - 150, play2y = hand2y - 220;
-	int play3x = play1x, play3y = hand3y + 150;
-	int play4x = hand4x + 150, play4y = play2y;
+	int play1x = hand1x + 180, play1y = hand1y - 150;
+	int play2x = hand2x - 190, play2y = hand2y - 190;
+	int play3x = play1x, play3y = hand3y + 100;
+	int play4x = play2x - 270, play4y = play2y;
 
 	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
 	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
@@ -330,8 +334,18 @@ void render (state gameState) {
         // A deslocação é de 1/(13 * 2) da largura da mão por cada carta removida (por cada carta a menos de 13)
         int deltaHand = (13 - handLength) * ( ( 1 / (26) ) * handLengthPx );
 
-        // A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1 (se lastPlayLength for 0 não há problema porque este valor não vai chegar a ser usado)
-        int deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
+        // A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1
+
+        int deltaLastPlay;
+
+        if (lastPlayLength > 0) {
+
+           deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
+
+        } else {
+
+            deltaLastPlay = 0;
+        }
 
         handDeltas[l] = deltaHand;
         playDeltas[l] = deltaLastPlay;
@@ -344,10 +358,10 @@ void render (state gameState) {
 	handx[2] -= handDeltas[2];
 	handy[3] += handDeltas[3];
 
-	playx[0] += playDeltas[0];
-	playy[1] -= playDeltas[1];
+	playx[0] -= playDeltas[0];
+	playx[1] -= playDeltas[1];
 	playx[2] -= playDeltas[2];
-	playy[3] += playDeltas[3];
+	playx[3] -= playDeltas[3];
 
     int i, j, k;
 
