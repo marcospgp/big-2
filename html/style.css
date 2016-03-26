@@ -3,11 +3,12 @@ body {
 }
 
 .pass-text {
-	font-size: 22px;
-	color: black;
-	-webkit-text-fill-color: white; /* Will override color (regardless of order) */
-	-webkit-text-stroke-width: 1px;
-	-webkit-text-stroke-color: black;
+	font-size: 42px;
+	font-weight: 800;
+	text-transform: uppercase;
+	fill: white;
+	stroke: black;
+	stroke-width: 3px;
 }
 
 .disabled {

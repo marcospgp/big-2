@@ -40,11 +40,11 @@ typedef int bool;
 */
 typedef struct State {
 
-	long long int hands[4];     // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-	long long int lastPlays[4]; // As 4 últimas jogadas, que serão apresentadas na mesa. 0 implica um passe, e todos os bits a 1 implica que aquele jogador ainda não fez nada no jogo atual.
-                                // No sentido anti-horário, lastPlays[0] refere-se à última jogada do utilizador, e lastPlays[1] à última jogada do bot à sua direita
-	long long int selection;    // Cartas selecionadas atualmente pelo utilizador
-	bool pass, play;            // Se o útlimo clique do utilizador representa uma ação
+	long long int hands[4];     /* Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento */
+	long long int lastPlays[4]; /* As 4 últimas jogadas, que serão apresentadas na mesa. 0 implica um passe, e todos os bits a 1 implica que aquele jogador ainda não fez nada no jogo atual. */
+                                /* No sentido anti-horário, lastPlays[0] refere-se à última jogada do utilizador, e lastPlays[1] à última jogada do bot à sua direita */
+	long long int selection;    /* Cartas selecionadas atualmente pelo utilizador */
+	bool pass, play;            /* Se o útlimo clique do utilizador representa uma ação */
 
 } state;
 
@@ -180,17 +180,17 @@ int cardExists (long long int hand, int suit, int value) {
 */
 void printCard (char *path, int x, int y, int suit, int value, state gameState, int cardPosition) {
 
-	// Criar um estado que será usado se o utilizador clicar nesta carta
+	/* Criar um estado que será usado se o utilizador clicar nesta carta */
 
 	state stateAfterClick = gameState;
 
-	// Se a carta pertence ao utilizador
+	/* Se a carta pertence ao utilizador */
 	bool isUserCard = cardExists(gameState.hands[0], suit, value);
 
-    // Classes html desta carta
+    /* Classes html desta carta */
 	char cardElementClasses[256] = "card";
 
-	// Classe de rotação da carta
+	/* Classe de rotação da carta */
 	char cardRotationClass[32];
 
 	if (cardPosition == 0) {
@@ -210,33 +210,33 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 	    strcpy(cardRotationClass, "card-left");
 	}
 
-	// Classe que desativa cliques na carta
+	/* Classe que desativa cliques na carta */
 	char cardDisableClass[32] = "disabled";
 
-    // Se a carta for do utilizador
+    /* Se a carta for do utilizador */
     if (isUserCard) {
 
-        // Não adicionar à carta a classe que a desativa
+        /* Não adicionar à carta a classe que a desativa */
         cardDisableClass[0] = '\0';
 
-        // Mudar as classes html desta carta (para aplicar estilos personalizados)
+        /* Mudar as classes html desta carta (para aplicar estilos personalizados) */
         strcpy(cardElementClasses, "card user-card");
 
-        // Se a carta já está selecionada
+        /* Se a carta já está selecionada */
         if (cardExists(gameState.selection, suit, value)) {
 
-            // Ao clicar nela será descelecionada
+            /* Ao clicar nela será descelecionada */
             stateAfterClick.selection = removeCard(stateAfterClick.selection, suit, value);
 
         } else {
 
-            // Ao clicar nela será selecionada
+            /* Ao clicar nela será selecionada */
              stateAfterClick.selection = addCard(stateAfterClick.selection, suit, value);
         }
 
-    } // Else, clicar na carta não faz nada
+    } /* Else, clicar na carta não faz nada */
 
-	// Criar url que será usado se esta carta for clicada, usando o estado que já foi criado acima
+	/* Criar url que será usado se esta carta for clicada, usando o estado que já foi criado acima */
 	char onClickUrl[10240];
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
@@ -250,6 +250,10 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
     @param y             A coordenada y de onde deve ser imprimido o html
 */
 void printPass (int x, int y) {
+
+    /* Temos de alterar um bocadinho as coordenadas */
+    y += 80;
+    x -= 50;
 
     printf("<text class=\"pass-text\" x = \"%d\" y = \"%d\">Passou</text>\n", x, y);
 
@@ -269,44 +273,44 @@ void render (state gameState) {
     printf("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
-	// Anotar quem já jogou para não haver confusão ao imprimir as cartas
-	// (porque se ainda não houveram jogadas, o valor de lastplay será ~((long long int) 0)))
+	/* Anotar quem já jogou para não haver confusão ao imprimir as cartas */
+	/* (porque se ainda não houveram jogadas, o valor de lastplay será ~((long long int) 0))) */
 
-	bool hasPlayed[4] = {true, true, true, true};     // Quais jogadores já jogaram
-	bool hasPassed[4] = {false, false, false, false}; // Quais jogadores passaram
+	bool hasPlayed[4] = {true, true, true, true};     /* Quais jogadores já jogaram */
+	bool hasPassed[4] = {false, false, false, false}; /* Quais jogadores passaram */
 
 	int m;
 	for (m = 0; m < 4; m++) {
 
-        if (gameState.lastPlays[m] == 0) { // Se este jogador passou
+        if (gameState.lastPlays[m] == 0) { /* Se este jogador passou */
 
             hasPassed[m] = true;
 
-        } else if (~(gameState.lastPlays[m]) == 0) { // Se este jogador ainda não fez nada neste jogo
+        } else if (~(gameState.lastPlays[m]) == 0) { /* Se este jogador ainda não fez nada neste jogo */
 
             hasPlayed[m] = false;
         }
 	}
 
-    // Largura das cartas (não pode ser modificado aqui, read only)
+    /* Largura das cartas (não pode ser modificado aqui, read only) */
     int cardWidth = 80;
 
-	// Espaço entre cartas
+	/* Espaço entre cartas */
 	int spaceBetweenCards = 30;
 
-	// Posições iniciais para cada mão
-	//        mão 3
-	// mão 4        mão 2
-	//        mão 1
+	/* Posições iniciais para cada mão */
+	/*        mão 3 */
+	/* mão 4        mão 2 */
+	/*        mão 1 */
 	int hand1x = 180, hand1y = 650;
 	int hand2x = 685, hand2y = 520;
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
-	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); // As duas mãos laterais são imprimidas na vertical uma ao contrário da outra
+	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
 
-	int play1x = hand1x + 220, play1y = hand1y - 150;
-	int play2x = hand2x - 150, play2y = hand2y - 220;
-	int play3x = play1x, play3y = hand3y + 150;
-	int play4x = hand4x + 150, play4y = play2y;
+	int play1x = hand1x + 180, play1y = hand1y - 150;
+	int play2x = hand2x - 190, play2y = hand2y - 190;
+	int play3x = play1x, play3y = hand3y + 100;
+	int play4x = play2x - 270, play4y = play2y;
 
 	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
 	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
@@ -314,7 +318,7 @@ void render (state gameState) {
 	int playx[4] = {play1x, play2x, play3x, play4x};
 	int playy[4] = {play1y, play2y, play3y, play4y};
 
-	// Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho
+	/* Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho */
 
 	int handDeltas[4], playDeltas[4];
 
@@ -325,43 +329,53 @@ void render (state gameState) {
         int lastPlayLength = getHandLength(gameState.lastPlays[l]);
 
         int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
-        // int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) );
+        /* int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) ); */
 
-        // A deslocação é de 1/(13 * 2) da largura da mão por cada carta removida (por cada carta a menos de 13)
+        /* A deslocação é de 1/(13 * 2) da largura da mão por cada carta removida (por cada carta a menos de 13) */
         int deltaHand = (13 - handLength) * ( ( 1 / (26) ) * handLengthPx );
 
-        // A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1 (se lastPlayLength for 0 não há problema porque este valor não vai chegar a ser usado)
-        int deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
+        /* A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1 */
+
+        int deltaLastPlay;
+
+        if (lastPlayLength > 0) {
+
+           deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
+
+        } else {
+
+            deltaLastPlay = 0;
+        }
 
         handDeltas[l] = deltaHand;
         playDeltas[l] = deltaLastPlay;
     }
 
-	// Aplicar deltas às posições originais
+	/* Aplicar deltas às posições originais */
 
 	handx[0] += handDeltas[0];
 	handy[1] -= handDeltas[1];
 	handx[2] -= handDeltas[2];
 	handy[3] += handDeltas[3];
 
-	playx[0] += playDeltas[0];
-	playy[1] -= playDeltas[1];
+	playx[0] -= playDeltas[0];
+	playx[1] -= playDeltas[1];
 	playx[2] -= playDeltas[2];
-	playy[3] += playDeltas[3];
+	playx[3] -= playDeltas[3];
 
     int i, j, k;
 
-    for (j = 0; j < 13; j++) { // Percorrer valores
+    for (j = 0; j < 13; j++) { /* Percorrer valores */
 
-        for (i = 0; i < 4; i++) { // Percorrer naipes
+        for (i = 0; i < 4; i++) { /* Percorrer naipes */
 
-            for (k = 0; k < 4; k++) { // Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas
+            for (k = 0; k < 4; k++) { /* Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas */
 
                 if (cardExists(gameState.hands[k], i, j)) {
 
                     if (k == 0) {
 
-                        // Se a carta for do utilizador e estiver selecionada, imprime-se mais acima
+                        /* Se a carta for do utilizador e estiver selecionada, imprime-se mais acima */
                         if (cardExists(gameState.selection, i, j)) {
 
                             printCard(path, handx[k], (handy[k] - 20), i, j, gameState, 2);
@@ -371,7 +385,7 @@ void render (state gameState) {
                             printCard(path, handx[k], handy[k], i, j, gameState, 2);
                         }
 
-                        handx[k] += spaceBetweenCards; // Incrementar o x para a próxima carta na mão de baixo
+                        handx[k] += spaceBetweenCards; /* Incrementar o x para a próxima carta na mão de baixo */
 
                     } else if (k == 1) {
 
@@ -383,7 +397,7 @@ void render (state gameState) {
 
                         printCard(path, handx[k], handy[k], i, j, gameState, 0);
 
-                        handx[k] -= spaceBetweenCards; // Decrementar o x para a próxima carta na mão de cima
+                        handx[k] -= spaceBetweenCards; /* Decrementar o x para a próxima carta na mão de cima */
 
                     } else if (k == 3) {
 
@@ -417,7 +431,7 @@ void render (state gameState) {
         }
 	}
 
-	// Imprimir os textos "Passou" nos jogadores que passaram nesta jogada
+	/* Imprimir os textos "Passou" nos jogadores que passaram nesta jogada */
 	int p;
 	for (p = 0; p < 4; p++) {
 
@@ -428,15 +442,15 @@ void render (state gameState) {
 
 	printf("</svg>\n");
 
-	// Imprimir botões
+	/* Imprimir botões */
 
 	printf("<div id=\"button-container\">");
 
-	// Botão de jogar
+	/* Botão de jogar */
 
 	char playStateString[10240];
 
-	// Se a seleção atual for jogável
+	/* Se a seleção atual for jogável */
 	if (isSelectionPlayable(gameState)) {
 
         state stateAfterPlay = gameState;
@@ -452,7 +466,7 @@ void render (state gameState) {
         printf("<a href=\"#\" class=\"btn green disabled\">Jogar</a>");
 	}
 
-	// Botão de passar
+	/* Botão de passar */
 
 	state stateAfterPass = gameState;
 
@@ -464,7 +478,7 @@ void render (state gameState) {
 
 	printf("<a href=\"%s\" class=\"btn orange\">Passar</a>", passStateString);
 
-	// Botão de limpar
+	/* Botão de limpar */
 
 	state stateAfterClear = gameState;
 
@@ -476,7 +490,7 @@ void render (state gameState) {
 
 	printf("<a href=\"%s\" class=\"btn purple\">Limpar</a>", clearStateString);
 
-	// Botão de recomeçar
+	/* Botão de recomeçar */
 
 	printf("<a href=\"%s\" class=\"btn red\">Recomeçar</a>", SCRIPT);
 
@@ -491,42 +505,42 @@ void render (state gameState) {
 */
 void distributeCards (long long int *hands) {
 
-    // Ter a certeza que as hands estão a zero
+    /* Ter a certeza que as hands estão a zero */
     int m;
     for (m = 0; m < 4; m++) {
         hands[m] = 0;
     }
 
-    // Percorrer todos os naipes e cartas e atribuí-las a uma mão aleatória
+    /* Percorrer todos os naipes e cartas e atribuí-las a uma mão aleatória */
 
     int i, j, handSelected;
 
-    // char currentSuit, currentValue, currentCardIndex;
+    /* char currentSuit, currentValue, currentCardIndex; */
 
-    // Mantém a conta de quantas cartas já foram para cada mão
+    /* Mantém a conta de quantas cartas já foram para cada mão */
     int cardsInEachHand[4] = {0};
 
-    for (i = 0; i < 4; i++) { // Percorrer naipes
+    for (i = 0; i < 4; i++) { /* Percorrer naipes */
 
-            // currentSuit = SUITS[i];
+            /* currentSuit = SUITS[i]; */
 
-        for (j = 0; j < 13; j++) { // Percorrer cartas
+        for (j = 0; j < 13; j++) { /* Percorrer cartas */
 
-            // currentValue = VALUES[j];
+            /* currentValue = VALUES[j]; */
 
-            // currentCardIndex = getCardIndex(i, j);
+            /* currentCardIndex = getCardIndex(i, j); */
 
-            // Repetir a escolha da mão até sair uma que não esteja completa
+            /* Repetir a escolha da mão até sair uma que não esteja completa */
             do {
 
                 handSelected = rand() % 4;
 
             } while (cardsInEachHand[handSelected] == 13);
 
-            // Anotar que esta mão vai ter mais uma carta
+            /* Anotar que esta mão vai ter mais uma carta */
             cardsInEachHand[handSelected] += 1;
 
-            // Adicionar a carta à mao selecionada (hands é um array global)
+            /* Adicionar a carta à mao selecionada (hands é um array global) */
             hands[handSelected] = addCard(hands[handSelected], i, j);
         }
     }
@@ -539,22 +553,7 @@ void distributeCards (long long int *hands) {
 */
 bool isSelectionPlayable (state gameState) {
 
-    /* Inserir código aqui
-
-        Formato do estado de jogo:
-
-        typedef struct State {
-
-            long long int hands[4];   // Mãos dos 4 jogadores. A primeira deverá ser sempre a do utilizador, de modo a que sejá fácil averiguar que cartas tem num dado momento
-            int cardCount[4];         // Número de cartas de cada jogador, na mesma ordem de hands[]
-            int consecutivePasses;    // Número de passes consecutivos que foram realizados
-            long long int selection;  // Cartas selecionadas atualmente pelo utilizador
-            long long int lastPlay;   // Cartas na última jogada (sem contar passes. se houveram 3 passes seguidos, lastPlay = 0)
-            bool pass, play;          // Se o útlimo clique do utilizador representa uma ação
-
-        } state;
-
-    */
+    /* Inserir código aqui */
 
     if (handSize(gameState.lastPlays[3]) == handSize(gameState.lastPlays[2]) == handSize(gameState.lastPlays[1]) == 0) {
 
@@ -582,7 +581,6 @@ bool isSelectionPlayable (state gameState) {
         }
 
     }
-
 }
 
 /** \brief Descobre quem tem o 3 de ouros (e por isso, joga primeiro)
@@ -593,9 +591,9 @@ bool isSelectionPlayable (state gameState) {
 int whoGoesFirst (state gameState) {
 
     int i;
-    for (i = 0; i < 4; i++) { // Percorrer as mãos dos jogadores
+    for (i = 0; i < 4; i++) { /* Percorrer as mãos dos jogadores */
 
-        // Descobrir quem tem o 3 de ouros
+        /* Descobrir quem tem o 3 de ouros */
         if (cardExists(gameState.hands[i], 0, 0)) {
 
             return i;
@@ -881,21 +879,21 @@ long long int chooseAIPlay (state gameState, int index) {
 */
 state processBotAction (state gameState, int index) {
 
-    // Decidir que jogada fazer
+    /* Decidir que jogada fazer */
     long long int play = chooseAIPlay(gameState, index);
 
     gameState.lastPlays[index] = play;
 
-    if (play != 0) { // Se a jogada não for um passe (se for um passe não é preciso fazer nada)
+    if (play != 0) { /* Se a jogada não for um passe (se for um passe não é preciso fazer nada) */
 
-        // Remover da mào do bot cada carta presente na sua jogada
+        /* Remover da mào do bot cada carta presente na sua jogada */
         int i, j;
-        for (i = 0; i < 4; i++) { // Percorrer naipes
-            for (j = 0; j < 13; j++) { // Percorrer valores
+        for (i = 0; i < 4; i++) { /* Percorrer naipes */
+            for (j = 0; j < 13; j++) { /* Percorrer valores */
 
-                if (cardExists(play, i, j)) { // Se a carta fizer parte da jogada
+                if (cardExists(play, i, j)) { /* Se a carta fizer parte da jogada */
 
-                    gameState.hands[index] = removeCard(gameState.hands[index], i, j); // Removê-la da mào
+                    gameState.hands[index] = removeCard(gameState.hands[index], i, j); /* Removê-la da mào */
                 }
             }
         }
@@ -915,18 +913,18 @@ state processUserAction (state gameState) {
 
     if (gameState.pass) {
 
-        // Um 0 no array lastPlays implica um passe
+        /* Um 0 no array lastPlays implica um passe */
         gameState.lastPlays[0] = 0;
 
-        // Remover a ação de passar do estado de jogo
+        /* Remover a ação de passar do estado de jogo */
         gameState.pass = false;
 
-        return gameState; // Parar a execução da função
+        return gameState; /* Parar a execução da função */
     }
 
-    // Se a ação não foi um passe, então o utilizador clicou no botão jogar
+    /* Se a ação não foi um passe, então o utilizador clicou no botão jogar */
 
-    // A seleção já deve ter sido validada antes de o utilizador carregar no botão de jogar, mas aqui fazemos um double check
+    /* A seleção já deve ter sido validada antes de o utilizador carregar no botão de jogar, mas aqui fazemos um double check */
     if (!isSelectionPlayable(gameState)) {
 
         gameState.selection = 0;
@@ -934,25 +932,25 @@ state processUserAction (state gameState) {
         return gameState;
     }
 
-    // Colocar a jogada mais recente do utilizador no índice 0 do array lastPlays (correspondente à última jogada do utilizador)
+    /* Colocar a jogada mais recente do utilizador no índice 0 do array lastPlays (correspondente à última jogada do utilizador) */
     gameState.lastPlays[0] = gameState.selection;
 
-    // Remover da mào do jogador cada carta presente na seleção
+    /* Remover da mào do jogador cada carta presente na seleção */
     int i, j;
-    for (i = 0; i < 4; i++) { // Percorrer naipes
-        for (j = 0; j < 13; j++) { // Percorrer valores
+    for (i = 0; i < 4; i++) { /* Percorrer naipes */
+        for (j = 0; j < 13; j++) { /* Percorrer valores */
 
-            if (cardExists(gameState.selection, i, j)) { // Se a carta estiver selecionada
+            if (cardExists(gameState.selection, i, j)) { /* Se a carta estiver selecionada */
 
-                gameState.hands[0] = removeCard(gameState.hands[0], i, j); // Removê-la da mào
+                gameState.hands[0] = removeCard(gameState.hands[0], i, j); /* Removê-la da mào */
             }
         }
     }
 
-    // Limpar a seleção do jogador
+    /* Limpar a seleção do jogador */
     gameState.selection = 0;
 
-    // Limpar a ação jogar do estado de jogo
+    /* Limpar a ação jogar do estado de jogo */
     gameState.play = false;
 
     return gameState;
@@ -968,17 +966,17 @@ state getInitialGameState () {
 
     state e;
 
-    // Distribuir cartas
+    /* Distribuir cartas */
     distributeCards(e.hands);
 
-    // Todos os bits a 1 numa jogada significa que aquele jogador ainda não realizou nenhuma ação no jogo atual
+    /* Todos os bits a 1 numa jogada significa que aquele jogador ainda não realizou nenhuma ação no jogo atual */
     int i;
     for (i = 0; i < 4; i++) {
 
         e.lastPlays[i] = ~((long long int) 0);
     }
 
-    // Definir valores iniciais
+    /* Definir valores iniciais */
     e.selection = 0;
     e.pass = false;
     e.play = false;
@@ -1002,16 +1000,16 @@ void parse (char *query) {
 
         if (!gameState.play && !gameState.pass) {
 
-            // Se há uma string de parâmetros mas o utilizador não fez nada, imprimir o estado atual
-            // (o jogador provavelmente apenas selecionou uma carta)
+            /* Se há uma string de parâmetros mas o utilizador não fez nada, imprimir o estado atual */
+            /* (o jogador provavelmente apenas selecionou uma carta) */
             render(gameState);
 
         } else {
 
-            // Processar a jogada do utilizador
+            /* Processar a jogada do utilizador */
             gameState = processUserAction(gameState);
 
-            // Processar a jogada dos bots
+            /* Processar a jogada dos bots */
             int i;
             for (i = 1; i < 4; i++) {
 
@@ -1023,13 +1021,13 @@ void parse (char *query) {
 
 	} else {
 
-	    // Obter um estado de jogo inicial com mãos baralhadas e valores por defeito
+	    /* Obter um estado de jogo inicial com mãos baralhadas e valores por defeito */
 	    state gameState = getInitialGameState();
 
-	    // Descobrir quem joga primeiro (quem tem o 3 de ouros)
+	    /* Descobrir quem joga primeiro (quem tem o 3 de ouros) */
         int i = whoGoesFirst(gameState);
 
-        // Processar jogadas dos bots até ser a vez do utilizador
+        /* Processar jogadas dos bots até ser a vez do utilizador */
         while (i > 0 && i < 4) {
 
             gameState = processBotAction(gameState, i);
@@ -1048,7 +1046,7 @@ void parse (char *query) {
  */
 int main () {
 
-    // Fornecer uma seed ao rand()
+    /* Fornecer uma seed ao rand() */
     srand(time(NULL));
 
     /*
