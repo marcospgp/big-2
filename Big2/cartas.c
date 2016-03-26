@@ -737,7 +737,7 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
 
         }
-
+            /* para o caso de o jogador anterior jogar 2 cartas - nao funciona nada, nao sei definir */
             if (handSize(gameState.lastPlays[0]) == 2) {
                 /* se o maior par disponível for menor que o jogado anteriormente, passa  */
                 if (biggestPair(gameState.hands[1]) < biggestPair(gameState.lastPlays[0])) {
@@ -749,7 +749,7 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
 
         }
-
+            /* para o caso de o jogador anterior jogar 3 cartas - nao funciona nada, nao sei definir */
             if (handSize(gameState.lastPlays[0]) == 3) {
                 /* se o maior trio disponível for menor que o jogado anteriormente, passa  */
                 if (biggestTrio(gameState.hands[1]) < biggestTrio(gameState.lastPlays[0])) {
@@ -788,7 +788,7 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
 
         }
-
+            /* para o caso de o jogador anterior jogar 2 cartas - nao funciona nada, nao sei definir */
             if (handSize(gameState.lastPlays[1]) == 2) {
                 /* handSizese o maior par disponível for menor que o jogado anteriormente, passa logo */
                 if (biggestPair(gameState.hands[2]) < biggestPair(gameState.lastPlays[1])) {
@@ -800,7 +800,7 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
 
         }
-
+            /* para o caso de o jogador anterior jogar 3 cartas - nao funciona nada, nao sei definir */
             if (handSize(gameState.lastPlays[1]) == 3) {
                 /* se o maior trio disponível for menor que o jogado anteriormente, passa logo */
                 if (biggestTrio(gameState.hands[2]) < biggestTrio(gameState.lastPlays[1])) {
@@ -839,7 +839,7 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
 
         }
-
+            /* para o caso de o jogador anterior jogar 2 cartas - nao funciona nada, nao sei definir */
             if (handSize(gameState.lastPlays[2]) == 2) {
                 /* se o maior par disponível for menor que o jogado anteriormente, passa logo */
                 if (biggestPair(gameState.hands[3]) < biggestPair(gameState.lastPlays[2])) {
@@ -851,7 +851,7 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
 
         }
-
+            /* para o caso de o jogador anterior jogar 3 cartas - nao funciona nada, nao sei definir */
             if (handSize(gameState.lastPlays[2]) == 3) {
                 /* se o maior trio disponível for menor que o jogado anteriormente, passa logo */
                 if (biggestTrio(gameState.hands[3]) < biggestTrio(gameState.lastPlays[2])) {
