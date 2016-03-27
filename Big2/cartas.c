@@ -416,15 +416,15 @@ void render (state gameState) {
 
                     } else if (k == 1) {
 
-                        playy[k] -= spaceBetweenCards;
+                        playx[k] += spaceBetweenCards;
 
                     } else if (k == 2) {
 
-                        playx[k] -= spaceBetweenCards;
+                        playx[k] += spaceBetweenCards;
 
                     } else if (k == 3) {
 
-                        playy[k] += spaceBetweenCards;
+                        playx[k] += spaceBetweenCards;
                     }
                 }
             }
@@ -625,20 +625,19 @@ bool isSelectionPlayable (state gameState) {
         int mostRecentPlayLength = getHandLength(mostRecentPlay);
         int selectionLength = getHandLength(gameState.selection);
 
-        if (
-            /* Se a jogada mais recente for um passe ou não tiver havido jogada mais recente
-               ou se ambas as mãos têm o mesmo tamanho */
-            (mostRecentPlay == 0 || (mostRecentPlayLength == selectionLength))
-        ) {
+        /* TODO - Verificar que a seleção é um par ou um trio válido e retornar false caso não seja
 
-            if (selectionLength == 2) {
+        if (selectionLength == 2) {
 
-                /* TODO - Verificar que a seleção é um par e retornar false caso não seja*/
+        } else if (selectionLength == 3) {
 
-            } else if (selectionLength == 3) {
+        } */
 
-                /* TODO - Verificar que a seleção é um trio */
-            }
+        if (mostRecentPlay == 0) { /* Se a jogada mais recente for um passe ou não tiver havido jogada mais recente */
+
+           return true;
+
+        } else if (mostRecentPlayLength == selectionLength) { /* Se ambas as mãos têm o mesmo tamanho */
 
             /* Retornar true se a seleção é maior que a jogada do bot que jogou anteriormente */
             return isPlayBigger(gameState.selection, mostRecentPlay);
