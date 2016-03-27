@@ -102,12 +102,12 @@ char* stateToString (state e) {
 
 /** \brief Devolve o índice da carta
 
-    @param naipe	O naipe da carta (inteiro entre 0 e 3)
-    @param valor	O valor da carta (inteiro entre 0 e 12)
+    @param suit     O naipe da carta (inteiro entre 0 e 3)
+    @param value	O valor da carta (inteiro entre 0 e 12)
     @return		    O índice correspondente à carta
 */
-int getCardIndex (int naipe, int valor) {
-	return naipe * 13 + valor;
+int getCardIndex (int suit, int value) {
+	return (value * 4) + suit; /* Índice da carta reflete o seu poder */
 }
 
 /** \brief Devolve o número de cartas numa mão
@@ -307,9 +307,9 @@ void render (state gameState) {
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
 	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
 
-	int play1x = hand1x + 180, play1y = hand1y - 150;
+	int play1x = hand1x + 190, play1y = hand1y - 150;
 	int play2x = hand2x - 190, play2y = hand2y - 190;
-	int play3x = play1x, play3y = hand3y + 100;
+	int play3x = play1x, play3y = hand3y + 130;
 	int play4x = play2x - 270, play4y = play2y;
 
 	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
@@ -546,6 +546,50 @@ void distributeCards (long long int *hands) {
     }
 }
 
+/** \brief Avalia se uma jogada é maior que outra
+
+    Não é garantido que esta função avalie se ambas as jogadas são válidas. Essa verificação deve ser feita noutro lugar.
+
+    @param play1   A jogada que se quer descobrir se é maior
+    @param play2   A jogada contra a qual se quer comparar
+    @return        True se a primeira jogada for maior
+*/
+bool isPlayBigger (long long int play1, long long int play2) {
+
+    /* A primeira coisa a fazer é verificar o tamanho das jogadas */
+
+    int play1len = getHandLength(play1), play2len = getHandLength(play2);
+
+    if (
+        play1len == 4 ||
+        play1len > 5 ||
+        play1len < 1 ||
+        play2len == 4 ||
+        play2len > 5 ||
+        play2len < 1 ||
+        play1len != play2len
+    ) {
+        printf("<!-- Tried to compare two plays when one of them wasn't of valid size. -->");
+        return false;
+    }
+
+    if (play1len == 1 || play1len == 2 || play1len == 3) {
+
+        /* Quanto maior o poder de uma carta menor o valor do número que a representa
+           Nota: Não estamos a ter em conta se as jogadas são válidas ou não
+        */
+        return play1 > play2;
+
+    } else {
+
+        /* TODO
+           Comparar jogadas de mais que 3 cartas
+        */
+        printf("<!-- Tried to use undeveloped functionality (play comparison). -->");
+        return false;
+    }
+}
+
 /** \brief Decide se a seleção atual do jogador é jogável
 
     @param gameState    O estado de jogo atual
@@ -553,15 +597,48 @@ void distributeCards (long long int *hands) {
 */
 bool isSelectionPlayable (state gameState) {
 
-    /* Inserir código aqui */
-
     if (getHandLength(gameState.selection) == 0) {
 
         return false;
 
     } else {
 
-        return true;
+        /* Obter a jogada mais recente */
+
+        long long int mostRecentPlay = 0; /* Vai ficar a 0 se não for encontrada uma jogada na última ronda */
+
+        int i;
+        for (i = 3; i > 0; i--) {
+
+            if (gameState.lastPlays[i] != 0 && ~(gameState.lastPlays[i]) != 0) { /* ~(long long int) 0 significa que aquele jogador ainda não fez nada */
+
+                mostRecentPlay = gameState.lastPlays[i];
+
+                break; /* Esta little bitch fez-me perder um pouco de tempo por me ter esquecido de o escrever (>8-/) */
+            }
+        }
+
+
+        if (mostRecentPlay == 0) {
+
+            /* TODO
+               Neste momento se não houver nenhuma jogada anterior, pode-se jogar qualquer coisa.
+               No futuro tem-se de verificar se é uma jogada válida
+
+               TODO 2
+               Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar
+            */
+            return true;
+
+        } else if (getHandLength(mostRecentPlay) != getHandLength(gameState.selection)) { /* Se a seleção não tiver o mesmo tamanho que a última jogada */
+
+            return false;
+
+        } else {
+
+            /* Se a seleção é maior que a jogada do bot que jogou anteriormente */
+            return isPlayBigger(gameState.selection, mostRecentPlay);
+        }
     }
 }
 
@@ -591,9 +668,183 @@ int whoGoesFirst (state gameState) {
 */
 long long int chooseAIPlay (state gameState, int index) {
 
-    /* TODO */
+    /* Descobrir quais foram as jogadas anteriores */
 
-    return (long long int) 0;
+    long long int lastPlays[3]; /* Array das últimas jogadas ordenadas da mais recente para a mais antiga */
+
+    if (index == 1) {
+
+        lastPlays[0] = gameState.lastPlays[0];
+        lastPlays[1] = gameState.lastPlays[3];
+        lastPlays[2] = gameState.lastPlays[2];
+
+    } else if (index == 2) {
+
+        lastPlays[0] = gameState.lastPlays[1];
+        lastPlays[1] = gameState.lastPlays[0];
+        lastPlays[2] = gameState.lastPlays[3];
+
+    } else if (index == 3) {
+
+        lastPlays[0] = gameState.lastPlays[2];
+        lastPlays[1] = gameState.lastPlays[1];
+        lastPlays[2] = gameState.lastPlays[0];
+
+    } else {
+
+        printf("<!-- An AI play was requested with a non-bot index, returned a pass. -->");
+        return (long long int) 0;
+    }
+
+    /* Descobrir qual foi a jogada válida mais recente */
+
+    long long int mostRecentPlay = 0; /* Vai continuar a zero a menos que tenha havido uma jogada válida que não tenha sido um passe na última ronda */
+
+    int i;
+    for (i = 0; i < 3; i++) {
+
+        /* Se:
+            - Esta jogada foi uma jogada válida ((~(long long int) 0) significa que o jogador ainda não fez nada)
+            - Esta jogada não foi um passe
+        */
+        if (~(lastPlays[i]) != 0 && lastPlays[i] != 0) {
+
+            /* Anotar o valor da jogada mais recente que tenha sido válida e não tenha sido um passe */
+            mostRecentPlay = lastPlays[i];
+
+            break;
+        }
+    }
+
+    /* Finalmente, decidir que jogada fazer */
+
+    if (mostRecentPlay == 0) { /* Se não houve uma jogada na última ronda */
+
+        /* Jogar a carta mais baixa do baralho */
+        int j, k;
+        for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
+            for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+                if (cardExists(gameState.hands[index], k, j)) { /* Se o bot que tem de jogar tem esta carta */
+
+                    /* Retornar a carta mais baixa */
+                    return addCard((long long int) 0, k, j);
+                }
+            }
+        }
+
+    } else { /* Se houve uma jogada */
+
+        /* Descobrir o número de cartas que temos de jogar */
+        int numberOfCardsPlayed = getHandLength(mostRecentPlay);
+
+        if (numberOfCardsPlayed == 1) {
+
+            /* Jogar a carta válida mais baixa do baralho */
+            int j, k;
+            for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
+                for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+                    if (cardExists(gameState.hands[index], k, j)) { /* Se o bot tem esta carta */
+
+                        long long int possiblePlay = addCard((long long int) 0, k, j);
+
+                        if (isPlayBigger(possiblePlay, mostRecentPlay)) { /* Se o bot que tem de jogar tem esta carta e é maior que a anterior */
+
+                            /* Retornar a carta válida mais baixa */
+                            return possiblePlay;
+                        }
+                    }
+                }
+            }
+
+            /* Não encontramos uma jogada válida, logo passamos */
+            return (long long int) 0;
+
+        } else if (numberOfCardsPlayed == 2) {
+
+            /* Jogar o par válido mais baixo do baralho */
+            int j, k, l;
+            for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
+                for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+                    if (cardExists(gameState.hands[index], k, j)) { /* Se o bot tem esta carta */
+
+                        for (l = 0; l < 4; l++) { /* Tentar encontrar um par (percorrer naipes) */
+
+                            if (l != k) { /* Se não estamos no mesmo naipe da carta pela qual estamos a passar */
+
+                                if (cardExists(gameState.hands[index], l, j)) { /* Se o bot tem esta carta */
+
+                                    long long int possiblePlay = addCard((long long int) 0, k, j);
+
+                                    possiblePlay = addCard(possiblePlay, l, j);
+
+                                    if (isPlayBigger(possiblePlay, mostRecentPlay)) {
+
+                                        return possiblePlay;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Não encontramos uma jogada válida, logo passamos */
+            return (long long int) 0;
+
+        } else if (numberOfCardsPlayed == 3) {
+
+            /* Jogar o trio válido mais baixo do baralho */
+            int j, k, l, m;
+            for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
+                for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+                    if (cardExists(gameState.hands[index], k, j)) { /* Se o bot tem esta carta */
+
+                        for (l = 0; l < 4; l++) { /* Tentar encontrar um par (percorrer naipes) */
+
+                            if (l != k) { /* Se não estamos no mesmo naipe da carta pela qual estamos a passar */
+
+                                if (cardExists(gameState.hands[index], l, j)) { /* Se o bot tem esta carta */
+
+                                    for (m = 0; m < 4; m++) { /* Tentar encontrar um trio (percorrer naipes) */
+
+                                        if (m != k && m != l) { /* Se não estamos no mesmo naipe das cartas do par que encontramos */
+
+                                            if (cardExists(gameState.hands[index], m, j)) { /* Se o bot tem esta carta */
+
+                                                long long int possiblePlay = addCard((long long int) 0, k, j);
+
+                                                possiblePlay = addCard(possiblePlay, l, j);
+
+                                                possiblePlay = addCard(possiblePlay, m, j);
+
+                                                if (isPlayBigger(possiblePlay, mostRecentPlay)) {
+
+                                                    return possiblePlay;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            /* Não encontramos uma jogada válida, logo passamos */
+            return (long long int) 0;
+
+        } else {
+
+            /* O bot não sabe jogar mais que 3 cartas iguais por agora */
+            printf("<!-- An AI play was requested of more than 3 cards, and the bot didn't know what to do so it passed. -->");
+            return (long long int) 0;
+        }
+    }
 }
 
 /** \brief Processa uma jogada do computador
