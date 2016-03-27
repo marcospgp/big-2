@@ -618,26 +618,34 @@ bool isSelectionPlayable (state gameState) {
             }
         }
 
+        /* TODO
+           Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar
+        */
 
-        if (mostRecentPlay == 0) {
+        int mostRecentPlayLength = getHandLength(mostRecentPlay);
+        int selectionLength = getHandLength(gameState.selection);
 
-            /* TODO
-               Neste momento se não houver nenhuma jogada anterior, pode-se jogar qualquer coisa.
-               No futuro tem-se de verificar se é uma jogada válida
+        if (
+            /* Se a jogada mais recente for um passe ou não tiver havido jogada mais recente
+               ou se ambas as mãos têm o mesmo tamanho */
+            (mostRecentPlay == 0 || (mostRecentPlayLength == selectionLength))
+        ) {
 
-               TODO 2
-               Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar
-            */
-            return true;
+            if (selectionLength == 2) {
 
-        } else if (getHandLength(mostRecentPlay) != getHandLength(gameState.selection)) { /* Se a seleção não tiver o mesmo tamanho que a última jogada */
+                /* TODO - Verificar que a seleção é um par e retornar false caso não seja*/
+
+            } else if (selectionLength == 3) {
+
+                /* TODO - Verificar que a seleção é um trio */
+            }
+
+            /* Retornar true se a seleção é maior que a jogada do bot que jogou anteriormente */
+            return isPlayBigger(gameState.selection, mostRecentPlay);
+
+        } else { /* Se a seleção não for válida */
 
             return false;
-
-        } else {
-
-            /* Se a seleção é maior que a jogada do bot que jogou anteriormente */
-            return isPlayBigger(gameState.selection, mostRecentPlay);
         }
     }
 }
