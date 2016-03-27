@@ -597,12 +597,38 @@ bool isPlayBigger (long long int play1, long long int play2) {
 */
 bool isSelectionPlayable (state gameState) {
 
+<<<<<<< HEAD
     if (getHandLength(gameState.selection) == 0) {
+=======
+    /* Inserir código aqui */
 
-        return false;
+    if (handSize(gameState.lastPlays[3]) == handSize(gameState.lastPlays[2]) == handSize(gameState.lastPlays[1]) == 0) {
+>>>>>>> origin/master
 
-    } else {
+            if ((getHandLength(gameState.selection) == 0) || (getHandLength(gameState.selection) > 5)) {
 
+                return false;
+
+            } else {
+
+                return true;
+            }
+    }
+
+
+    if (handSize(gameState.selection) == handSize(gameState.lastPlays[3])) {
+
+        if (handPower(gameState.selection) > handPower(gameState.lastPlays[3])) {
+
+            return true;
+
+        } else {
+
+            return false;
+
+        }
+
+<<<<<<< HEAD
         /* Obter a jogada mais recente */
 
         long long int mostRecentPlay = 0; /* Vai ficar a 0 se não for encontrada uma jogada na última ronda */
@@ -639,6 +665,8 @@ bool isSelectionPlayable (state gameState) {
             /* Se a seleção é maior que a jogada do bot que jogou anteriormente */
             return isPlayBigger(gameState.selection, mostRecentPlay);
         }
+=======
+>>>>>>> origin/master
     }
 }
 
@@ -660,6 +688,109 @@ int whoGoesFirst (state gameState) {
     }
 }
 
+
+/** \brief Diz o poder da maior carta da mao a avaliar
+
+    @param long long int    Para poder receber gameState.lastPlays ou gameState.selection de isSelectionPlayable
+*/
+
+int handPower (long long int avaliate) {
+
+    int contador=0, tmp=0;
+
+    while (avaliate>0) {
+
+        if ((avaliate % 2) == 1) {
+            (avaliate = (x/2));
+            if (tmp > contador) contador=tmp;
+            tmp++;
+            }
+
+        else {
+            (avaliate = (avaliate/2));
+            tmp++;
+        }
+    }
+
+    return contador;
+
+}
+
+
+
+
+/** \brief Diz o tamanho da mao a avaliar
+
+    @param long long int    Para poder receber gameState.lastPlays ou gameState.selection de isSelectionPlayable
+*/
+
+int handSize (long long int avaliate) {
+
+    int contador;
+
+    for (contador=0; x>0; x = (x/2)) {
+        if ((x % 2) == 1) {
+            (contador++);
+            }
+    }
+
+    return contador;
+}
+
+
+/** \brief Decide que jogada um bot deve fazer baseando-se no estado de jogo atual
+
+    @param base         Neste caso, sempre base 2
+    @param exp          A quanto se quer elevar a base
+    @return             Resultado da exponencial
+*/
+int power(int base, unsigned int exp) {
+    int i, result = 1;
+    for (i = 0; i < exp; i++)
+        result *= base;
+    return result;
+ }
+
+
+
+/** \brief Decide que jogada um bot deve fazer baseando-se na mao que tem
+
+    @param maoAI        A mao que tem o bot
+    @return             Uma mão que representa as cartas que devem ser jogadas.
+*/
+long long int menorcartaquetem (long long int maoAI) { /* FALTA VERIFICAR SE FUNCIONA */
+    /* vai percorrer os index todos do menor para o maior, para ver qual o primeiro cujo exponencial é menor
+    que a mão dada. Aí está a posição da menor carta */
+    int expoen=51;
+
+    while (expoen>0) {
+
+        if (power(2, expoen) > maoAI) {
+            expoen--;
+        }
+
+        else {
+            return (long long int power(2, expoen));
+        }
+
+    }
+}
+
+
+/** \brief Decide que jogada um bot deve fazer baseando-se na mao que tem
+
+    @param maoAI        A mao que tem o bot
+    @return             Uma mão que representa as cartas que devem ser jogadas.
+*/
+long long int maiorcartaquetem (long long int maoAI) { /* FALTA VERIFICAR SE FUNCIONA */
+    /* faz a potencia de 2 elevada à posição do algarismo binário mais à direita que encontra na mão, 
+    que por sua vez é o index da maior carta */
+    return (long long int power(2, handPower(maoAI)));
+
+}
+
+
+
 /** \brief Decide que jogada um bot deve fazer baseando-se no estado de jogo atual
 
     @param gameState    O estado de jogo atual
@@ -668,6 +799,7 @@ int whoGoesFirst (state gameState) {
 */
 long long int chooseAIPlay (state gameState, int index) {
 
+<<<<<<< HEAD
     /* Descobrir quais foram as jogadas anteriores */
 
     long long int lastPlays[3]; /* Array das últimas jogadas ordenadas da mais recente para a mais antiga */
@@ -845,6 +977,163 @@ long long int chooseAIPlay (state gameState, int index) {
             return (long long int) 0;
         }
     }
+=======
+    /* os tres ifs sao para verificar se as ultimas 3 jogadas foram "pass". se forem, joga sempre a menor carta que tem */
+    /* TODO - funcao do maior par, funcao do maior trio */
+
+    /* para o caso de ser o jogador 1 */
+    if (index==1) {
+        /* verificar se as ultimas 3 jogadas foram "pass". se forem, joga sempre a menor carta que tem */
+        if (handSize(gameState.lastPlays[2]) == handSize(gameState.lastPlays[3]) == handSize(gameState.lastPlays[0]) == 0) {
+            return (menorcartaquetem(gameState.hands[1]));
+        }
+
+        /* verifica se o numero de cartas que o outro jogou foi 1, 2 ou 3, e daí decide o que jogar */
+        else {
+
+            /* verifica se o jogador anterior jogou 1 carta */
+            if (handSize(gameState.lastPlays[0]) == 1) {
+                /* se não tiver 1 carta maior que a do ultimo jogador, então passa logo */
+                if (handPower(gameState.hands[1]) < handPower(gameState.lastPlays[0])) {
+                    return (long long int) 0;
+                }
+                /* tem carta maior, então vai jogar a maior que tem */
+                else {
+                    return ((long long int) maiorcartaquetem(gameState.hands[1]));
+                }
+
+        }
+            /* para o caso de o jogador anterior jogar 2 cartas - nao funciona nada, nao sei definir */
+            if (handSize(gameState.lastPlays[0]) == 2) {
+                /* se o maior par disponível for menor que o jogado anteriormente, passa  */
+                if (biggestPair(gameState.hands[1]) < biggestPair(gameState.lastPlays[0])) {
+                    return (long long int) 0;
+                }
+                /* else, vai jogar o maior par que tem */
+                else {
+                    return ((long long int) biggestPair(gameState.hands[1]));
+                }
+
+        }
+            /* para o caso de o jogador anterior jogar 3 cartas - nao funciona nada, nao sei definir */
+            if (handSize(gameState.lastPlays[0]) == 3) {
+                /* se o maior trio disponível for menor que o jogado anteriormente, passa  */
+                if (biggestTrio(gameState.hands[1]) < biggestTrio(gameState.lastPlays[0])) {
+                    return (long long int) 0;
+                }
+                /* else, vai jogar o maior trio que tem */
+                else {
+                    return ((long long int) biggestTrio(gameState.hands[1]));
+                }
+
+        }
+
+        }
+    }
+
+
+    /* para o caso de ser o jogador 2 */
+    if (index==2) {
+        /* verificar se as ultimas 3 jogadas foram "pass". se forem, joga sempre a menor carta que tem */
+        if (handSize(gameState.lastPlays[3]) == handSize(gameState.lastPlays[0]) == handSize(gameState.lastPlays[1]) == 0) {
+            return (menorcartaquetem(gameState.hands[2]));
+        }
+
+        /* verifica se o numero de cartas que o outro jogou foi 1, 2 ou 3, e daí decide o que jogar */
+        else {
+
+            /* verifica se o jogador anterior jogou 1 carta */
+            if (handSize(gameState.lastPlays[1]) == 1) {
+                /* se não tiver 1 carta maior que a do ultimo jogador, então passa logo */
+                if (handPower(gameState.hands[2]) < handPower(gameState.lastPlays[1])) {
+                    return (long long int) 0;
+                }
+                /* tem carta maior, então vai jogar a maior que tem */
+                else {
+                    return ((long long int) maiorcartaquetem(gameState.hands[2]));
+                }
+
+        }
+            /* para o caso de o jogador anterior jogar 2 cartas - nao funciona nada, nao sei definir */
+            if (handSize(gameState.lastPlays[1]) == 2) {
+                /* handSizese o maior par disponível for menor que o jogado anteriormente, passa logo */
+                if (biggestPair(gameState.hands[2]) < biggestPair(gameState.lastPlays[1])) {
+                    return (long long int) 0;
+                }
+                /* vai jogar o maior par que tem */
+                else {
+                    return ((long long int) biggestPair(gameState.hands[2]));
+                }
+
+        }
+            /* para o caso de o jogador anterior jogar 3 cartas - nao funciona nada, nao sei definir */
+            if (handSize(gameState.lastPlays[1]) == 3) {
+                /* se o maior trio disponível for menor que o jogado anteriormente, passa logo */
+                if (biggestTrio(gameState.hands[2]) < biggestTrio(gameState.lastPlays[1])) {
+                    return (long long int) 0;
+                }
+                /* vai jogar o maior trio que tem */
+                else {
+                    return ((long long int) biggestTrio(gameState.hands[2]));
+                }
+
+        }
+
+        }
+    }
+
+
+    /* para o caso de ser o jogador 3 */
+    if (index==3) {
+        /* verificar se as ultimas 3 jogadas foram "pass". se forem, joga sempre a menor carta que tem */
+        if (handSize(gameState.lastPlays[0]) == handSize(gameState.lastPlays[1]) == handSize(gameState.lastPlays[2]) == 0) {
+            return (menorcartaquetem(gameState.hands[3]));
+        }
+
+        /* verifica se o numero de cartas que o outro jogou foi 1, 2 ou 3, e daí decide o que jogar */
+        else {
+
+            /* verifica se o jogador anterior jogou 1 carta */
+            if (handSize(gameState.lastPlays[2]) == 1) {
+                /* se não tiver 1 carta maior que a do ultimo jogador, então passa logo */
+                if (handPower(gameState.hands[3]) < handPower(gameState.lastPlays[2])) {
+                    return (long long int) 0;
+                }
+                /* tem carta maior, então vai jogar a maior que tem */
+                else {
+                    return ((long long int) maiorcartaquetem(gameState.hands[3]));
+                }
+
+        }
+            /* para o caso de o jogador anterior jogar 2 cartas - nao funciona nada, nao sei definir */
+            if (handSize(gameState.lastPlays[2]) == 2) {
+                /* se o maior par disponível for menor que o jogado anteriormente, passa logo */
+                if (biggestPair(gameState.hands[3]) < biggestPair(gameState.lastPlays[2])) {
+                    return (long long int) 0;
+                }
+                /* vai jogar o maior par que tem */
+                else {
+                    return ((long long int) biggestPair(gameState.hands[3]));
+                }
+
+        }
+            /* para o caso de o jogador anterior jogar 3 cartas - nao funciona nada, nao sei definir */
+            if (handSize(gameState.lastPlays[2]) == 3) {
+                /* se o maior trio disponível for menor que o jogado anteriormente, passa logo */
+                if (biggestTrio(gameState.hands[3]) < biggestTrio(gameState.lastPlays[2])) {
+                    return (long long int) 0;
+                }
+                /* vai jogar o maior trio que tem */
+                else {
+                    return ((long long int) biggestTrio(gameState.hands[3]));
+                }
+
+        }
+
+        }
+    }
+
+>>>>>>> origin/master
 }
 
 /** \brief Processa uma jogada do computador
