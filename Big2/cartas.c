@@ -241,7 +241,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
 
-	printf("<a href=\"%s\"><img class=\"%s %s %s\" style=\"position: absolute; left:%dpx; top: %dpx; height: 110px; width: 80px;\" src=\"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, cardDisableClass, x, y, path, VALUES[value], SUITS[suit]);
+	printf("<a href=\"%s\"><img class=\"%s %s %s\" style=\"position: absolute; left:%dpx; top: %dpx; height: 110px; width: 76px;\" src=\"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, cardDisableClass, x, y, path, VALUES[value], SUITS[suit]);
 }
 
 /** \brief Imprime o html correspondente a um passe
@@ -270,9 +270,6 @@ void render (state gameState) {
 	char *path = DECK;
 
 	printf("<svg width = \"800\" height = \"800\">\n");
-
-    /*("\n<filter id=\"drop-shadow\">\n<feGaussianBlur in=\"SourceAlpha\" stdDeviation=\"5\"/>\n<feOffset dx=\"2\" dy=\"2\" result=\"offsetblur\"/>\n<feFlood flood-color=\"rgba(0,0,0,0.5)\"/>\n<feComposite in2=\"offsetblur\" operator=\"in\"/>\n<feMerge>\n<feMergeNode/>\n<feMergeNode in=\"SourceGraphic\"/>\n</feMerge>\n</filter>");
-	*/
 
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
 
