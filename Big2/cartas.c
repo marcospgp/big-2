@@ -241,7 +241,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
 
-	printf("<a href=\"%s\"><img class=\"%s %s %s\" style=\"position: absolute; left:%dpx; top: %dpx; height: 110px; width: 76px;\" src=\"%s/%c%c.svg\" /></a>\n", onClickUrl, cardElementClasses, cardRotationClass, cardDisableClass, x, y, path, VALUES[value], SUITS[suit]);
+	printf("<a href=\"%s\"><img src=\"%s/%c%c.svg\" class=\"%s %s %s\" style=\"position: absolute; left:%dpx; top: %dpx; height: 110px; width: 76px;\"></a>\n", onClickUrl, path, VALUES[value], SUITS[suit], cardElementClasses, cardRotationClass, cardDisableClass, x, y);
 }
 
 /** \brief Imprime o html correspondente a um passe
@@ -272,6 +272,8 @@ void render (state gameState) {
 	printf("<svg width = \"800\" height = \"800\">\n");
 
 	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
+
+	printf("</svg>\n");
 
 	/* Anotar quem já jogou para não haver confusão ao imprimir as cartas */
 	/* (porque se ainda não houveram jogadas, o valor de lastplay será ~((long long int) 0))) */
@@ -439,8 +441,6 @@ void render (state gameState) {
             printPass(playx[p], playy[p]);
         }
 	}
-
-	printf("</svg>\n");
 
 	/* Imprimir botões */
 
