@@ -24,7 +24,7 @@
 #define VALUES		"3456789TJQKA2"
 
 /**
-    Formato da string passada como par‚metro entre jogadas
+    Formato da string passada como par√¢metro entre jogadas
 */
 #define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%d_%d"
 
@@ -36,22 +36,22 @@ typedef int bool;
 #define false 0
 
 /**
-    Estrutura que contÈm o estado do jogo num dado momento
+    Estrutura que cont√©m o estado do jogo num dado momento
 */
 typedef struct State {
 
-	long long int hands[4];     /* M„os dos 4 jogadores. A primeira dever· ser sempre a do utilizador, de modo a que sej· f·cil averiguar que cartas tem num dado momento */
-	long long int lastPlays[4]; /* As 4 ˙ltimas jogadas, que ser„o apresentadas na mesa. 0 implica um passe, e todos os bits a 1 implica que aquele jogador ainda n„o fez nada no jogo atual. */
-                                /* No sentido anti-hor·rio, lastPlays[0] refere-se ‡ ˙ltima jogada do utilizador, e lastPlays[1] ‡ ˙ltima jogada do bot ‡ sua direita */
+	long long int hands[4];     /* M√£os dos 4 jogadores. A primeira dever√° ser sempre a do utilizador, de modo a que sej√° f√°cil averiguar que cartas tem num dado momento */
+	long long int lastPlays[4]; /* As 4 √∫ltimas jogadas, que ser√£o apresentadas na mesa. 0 implica um passe, e todos os bits a 1 implica que aquele jogador ainda n√£o fez nada no jogo atual. */
+                                /* No sentido anti-hor√°rio, lastPlays[0] refere-se √† √∫ltima jogada do utilizador, e lastPlays[1] √† √∫ltima jogada do bot √† sua direita */
 	long long int selection;    /* Cartas selecionadas atualmente pelo utilizador */
-	bool pass, play;            /* Se o ˙tlimo clique do utilizador representa uma aÁ„o */
+	bool pass, play;            /* Se o √∫tlimo clique do utilizador representa uma a√ß√£o */
 
 } state;
 
-/** \brief Processa a string recebida como par‚metro e retorna o estado atual do jogo
+/** \brief Processa a string recebida como par√¢metro e retorna o estado atual do jogo
 
-    @param stateString  A string que contÈm a informaÁ„o sobre o atual estado de jgoo
-    @return             A informaÁ„o contida na string recebida num formato utiliz·vel em cÛdigo
+    @param stateString  A string que cont√©m a informa√ß√£o sobre o atual estado de jgoo
+    @return             A informa√ß√£o contida na string recebida num formato utiliz√°vel em c√≥digo
 */
 state stringToState (char* str) {
 	state e;
@@ -77,7 +77,7 @@ state stringToState (char* str) {
 /** \brief Codifica o estado atual do jogo numa string
 
     @param gameState    O estado de jogo atual
-    @return             Uma string que contÈm toda a informaÁ„o do estado atual do jogo, pronta a ser usada como par‚metro
+    @return             Uma string que cont√©m toda a informa√ß√£o do estado atual do jogo, pronta a ser usada como par√¢metro
 */
 char* stateToString (state e) {
 	static char res[10240];
@@ -100,20 +100,20 @@ char* stateToString (state e) {
 	return res;
 }
 
-/** \brief Devolve o Ìndice da carta
+/** \brief Devolve o √≠ndice da carta
 
     @param suit     O naipe da carta (inteiro entre 0 e 3)
     @param value	O valor da carta (inteiro entre 0 e 12)
-    @return		    O Ìndice correspondente ‡ carta
+    @return		    O √≠ndice correspondente √† carta
 */
 int getCardIndex (int suit, int value) {
-	return (value * 4) + suit; /* Õndice da carta reflete o seu poder */
+	return (value * 4) + suit; /* √çndice da carta reflete o seu poder */
 }
 
-/** \brief Devolve o n˙mero de cartas numa m„o
+/** \brief Devolve o n√∫mero de cartas numa m√£o
 
-    @param hand     A m„o a ser contada
-    @return         N˙mero de cartas na m„o
+    @param hand     A m√£o a ser contada
+    @return         N√∫mero de cartas na m√£o
 */
 int getHandLength (long long int hand) {
 
@@ -134,10 +134,10 @@ int getHandLength (long long int hand) {
 
 /** \brief Adiciona uma carta ao estado
 
-    @param hand     A m„o a ser modificada
+    @param hand     A m√£o a ser modificada
     @param suit	    O naipe da carta (inteiro entre 0 e 3)
     @param value   	O valor da carta (inteiro entre 0 e 12)
-    @return		    A m„o modificada
+    @return		    A m√£o modificada
 */
 long long int addCard (long long int hand, int suit, int value) {
 	int idx = getCardIndex(suit, value);
@@ -146,10 +146,10 @@ long long int addCard (long long int hand, int suit, int value) {
 
 /** \brief Remove uma carta do estado
 
-    @param hand     A m„o a ser modificada
+    @param hand     A m√£o a ser modificada
     @param suit 	O naipe da carta (inteiro entre 0 e 3)
     @param value	O valor da carta (inteiro entre 0 e 12)
-    @return		    A m„o modificada
+    @return		    A m√£o modificada
 */
 long long int removeCard (long long int hand, int suit, int value) {
 	int idx = getCardIndex(suit, value);
@@ -158,10 +158,10 @@ long long int removeCard (long long int hand, int suit, int value) {
 
 /** \brief Verifica se uma carta pertence ao estado
 
-    @param hand     A m„o a ser verificada
+    @param hand     A m√£o a ser verificada
     @param suit	    O naipe da carta (inteiro entre 0 e 3)
     @param value	O valor da carta (inteiro entre 0 e 12)
-    @return		    1 se a carta existe e 0 caso contr·rio
+    @return		    1 se a carta existe e 0 caso contr√°rio
 */
 int cardExists (long long int hand, int suit, int value) {
 	int idx = getCardIndex(suit, value);
@@ -170,17 +170,17 @@ int cardExists (long long int hand, int suit, int value) {
 
 /** \brief Imprime o html correspondente a uma carta
 
-    @param path	         O URL correspondente ‡ pasta que contÈm todas as cartas
+    @param path	         O URL correspondente √† pasta que cont√©m todas as cartas
     @param x             A coordenada x da carta
     @param y             A coordenada y da carta
     @param suit	         O naipe da carta (inteiro entre 0 e 3)
     @param value	     O valor da carta (inteiro entre 0 e 12)
-    @param gameState     O estado de jogo atual (para determinar urls apÛs cliques nas cartas)
-    @param cardPosition  Usado para a rotaÁ„o. 0 - cima, 1 - direita, 2 - baixo, 3 - esquerda
+    @param gameState     O estado de jogo atual (para determinar urls ap√≥s cliques nas cartas)
+    @param cardPosition  Usado para a rota√ß√£o. 0 - cima, 1 - direita, 2 - baixo, 3 - esquerda
 */
 void printCard (char *path, int x, int y, int suit, int value, state gameState, int cardPosition) {
 
-	/* Criar um estado que ser· usado se o utilizador clicar nesta carta */
+	/* Criar um estado que ser√° usado se o utilizador clicar nesta carta */
 
 	state stateAfterClick = gameState;
 
@@ -190,7 +190,7 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
     /* Classes html desta carta */
 	char cardElementClasses[256] = "card";
 
-	/* Classe de rotaÁ„o da carta */
+	/* Classe de rota√ß√£o da carta */
 	char cardRotationClass[32];
 
 	if (cardPosition == 0) {
@@ -216,27 +216,27 @@ void printCard (char *path, int x, int y, int suit, int value, state gameState, 
     /* Se a carta for do utilizador */
     if (isUserCard) {
 
-        /* N„o adicionar ‡ carta a classe que a desativa */
+        /* N√£o adicionar √† carta a classe que a desativa */
         cardDisableClass[0] = '\0';
 
         /* Mudar as classes html desta carta (para aplicar estilos personalizados) */
         strcpy(cardElementClasses, "card user-card");
 
-        /* Se a carta j· est· selecionada */
+        /* Se a carta j√° est√° selecionada */
         if (cardExists(gameState.selection, suit, value)) {
 
-            /* Ao clicar nela ser· descelecionada */
+            /* Ao clicar nela ser√° descelecionada */
             stateAfterClick.selection = removeCard(stateAfterClick.selection, suit, value);
 
         } else {
 
-            /* Ao clicar nela ser· selecionada */
+            /* Ao clicar nela ser√° selecionada */
              stateAfterClick.selection = addCard(stateAfterClick.selection, suit, value);
         }
 
-    } /* Else, clicar na carta n„o faz nada */
+    } /* Else, clicar na carta n√£o faz nada */
 
-	/* Criar url que ser· usado se esta carta for clicada, usando o estado que j· foi criado acima */
+	/* Criar url que ser√° usado se esta carta for clicada, usando o estado que j√° foi criado acima */
 	char onClickUrl[10240];
 
 	sprintf(onClickUrl, "%s?q=%s", SCRIPT, stateToString(stateAfterClick));
@@ -261,7 +261,7 @@ void printPass (int x, int y) {
 
 /** \brief Imprime um estado de jogo
 
-    Esta funÁ„o imprime o estado atual do jogo no browser
+    Esta fun√ß√£o imprime o estado atual do jogo no browser
 
     @param gameState    estado atual do jogo
 */
@@ -275,10 +275,10 @@ void render (state gameState) {
 
 	printf("</svg>\n");
 
-	/* Anotar quem j· jogou para n„o haver confus„o ao imprimir as cartas */
-	/* (porque se ainda n„o houveram jogadas, o valor de lastplay ser· ~((long long int) 0))) */
+	/* Anotar quem j√° jogou para n√£o haver confus√£o ao imprimir as cartas */
+	/* (porque se ainda n√£o houveram jogadas, o valor de lastplay ser√° ~((long long int) 0))) */
 
-	bool hasPlayed[4] = {true, true, true, true};     /* Quais jogadores j· jogaram */
+	bool hasPlayed[4] = {true, true, true, true};     /* Quais jogadores j√° jogaram */
 	bool hasPassed[4] = {false, false, false, false}; /* Quais jogadores passaram */
 
 	int m;
@@ -288,26 +288,26 @@ void render (state gameState) {
 
             hasPassed[m] = true;
 
-        } else if (~(gameState.lastPlays[m]) == 0) { /* Se este jogador ainda n„o fez nada neste jogo */
+        } else if (~(gameState.lastPlays[m]) == 0) { /* Se este jogador ainda n√£o fez nada neste jogo */
 
             hasPlayed[m] = false;
         }
 	}
 
-    /* Largura das cartas (n„o pode ser modificado aqui, read only) */
+    /* Largura das cartas (n√£o pode ser modificado aqui, read only) */
     int cardWidth = 80;
 
-	/* EspaÁo entre cartas */
+	/* Espa√ßo entre cartas */
 	int spaceBetweenCards = 30;
 
-	/* PosiÁıes iniciais para cada m„o */
-	/*        m„o 3 */
-	/* m„o 4        m„o 2 */
-	/*        m„o 1 */
+	/* Posi√ß√µes iniciais para cada m√£o */
+	/*        m√£o 3 */
+	/* m√£o 4        m√£o 2 */
+	/*        m√£o 1 */
 	int hand1x = 180, hand1y = 650;
 	int hand2x = 685, hand2y = 520;
 	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
-	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas m„os laterais s„o imprimidas na vertical uma ao contr·rio da outra */
+	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas m√£os laterais s√£o imprimidas na vertical uma ao contr√°rio da outra */
 
 	int play1x = hand1x + 190, play1y = hand1y - 150;
 	int play2x = hand2x - 190, play2y = hand2y - 190;
@@ -320,7 +320,7 @@ void render (state gameState) {
 	int playx[4] = {play1x, play2x, play3x, play4x};
 	int playy[4] = {play1y, play2y, play3y, play4y};
 
-	/* Calcular o distanciamento das m„os em pixeis em relaÁ„o ‡ sua posiÁ„o original com base no seu tamanho */
+	/* Calcular o distanciamento das m√£os em pixeis em rela√ß√£o √† sua posi√ß√£o original com base no seu tamanho */
 
 	int handDeltas[4], playDeltas[4];
 
@@ -333,10 +333,10 @@ void render (state gameState) {
         int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
         /* int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) ); */
 
-        /* A deslocaÁ„o È de 1/(13 * 2) da largura da m„o por cada carta removida (por cada carta a menos de 13) */
+        /* A desloca√ß√£o √© de 1/(13 * 2) da largura da m√£o por cada carta removida (por cada carta a menos de 13) */
         int deltaHand = (13 - handLength) * ( ( 1 / (26) ) * handLengthPx );
 
-        /* A deslocaÁ„o È de 1/2 * spaceBetweenCards por cada carta acima de 1 */
+        /* A desloca√ß√£o √© de 1/2 * spaceBetweenCards por cada carta acima de 1 */
 
         int deltaLastPlay;
 
@@ -353,7 +353,7 @@ void render (state gameState) {
         playDeltas[l] = deltaLastPlay;
     }
 
-	/* Aplicar deltas ‡s posiÁıes originais */
+	/* Aplicar deltas √†s posi√ß√µes originais */
 
 	handx[0] += handDeltas[0];
 	handy[1] -= handDeltas[1];
@@ -371,7 +371,7 @@ void render (state gameState) {
 
         for (i = 0; i < 4; i++) { /* Percorrer naipes */
 
-            for (k = 0; k < 4; k++) { /* Percorrer todas as m„os / ˙ltimas jogadas e descobrir se a carta pertence a uma delas */
+            for (k = 0; k < 4; k++) { /* Percorrer todas as m√£os / √∫ltimas jogadas e descobrir se a carta pertence a uma delas */
 
                 if (cardExists(gameState.hands[k], i, j)) {
 
@@ -387,7 +387,7 @@ void render (state gameState) {
                             printCard(path, handx[k], handy[k], i, j, gameState, 2);
                         }
 
-                        handx[k] += spaceBetweenCards; /* Incrementar o x para a prÛxima carta na m„o de baixo */
+                        handx[k] += spaceBetweenCards; /* Incrementar o x para a pr√≥xima carta na m√£o de baixo */
 
                     } else if (k == 1) {
 
@@ -399,7 +399,7 @@ void render (state gameState) {
 
                         printCard(path, handx[k], handy[k], i, j, gameState, 0);
 
-                        handx[k] -= spaceBetweenCards; /* Decrementar o x para a prÛxima carta na m„o de cima */
+                        handx[k] -= spaceBetweenCards; /* Decrementar o x para a pr√≥xima carta na m√£o de cima */
 
                     } else if (k == 3) {
 
@@ -442,15 +442,15 @@ void render (state gameState) {
         }
 	}
 
-	/* Imprimir botıes */
+	/* Imprimir bot√µes */
 
 	printf("<div id=\"button-container\">");
 
-	/* Bot„o de jogar */
+	/* Bot√£o de jogar */
 
 	char playStateString[10240];
 
-	/* Se a seleÁ„o atual for jog·vel */
+	/* Se a sele√ß√£o atual for jog√°vel */
 	if (isSelectionPlayable(gameState)) {
 
         state stateAfterPlay = gameState;
@@ -466,7 +466,7 @@ void render (state gameState) {
         printf("<a href=\"#\" class=\"btn green disabled\">Jogar</a>");
 	}
 
-	/* Bot„o de passar */
+	/* Bot√£o de passar */
 
 	state stateAfterPass = gameState;
 
@@ -478,7 +478,7 @@ void render (state gameState) {
 
 	printf("<a href=\"%s\" class=\"btn orange\">Passar</a>", passStateString);
 
-	/* Bot„o de limpar */
+	/* Bot√£o de limpar */
 
 	state stateAfterClear = gameState;
 
@@ -490,34 +490,34 @@ void render (state gameState) {
 
 	printf("<a href=\"%s\" class=\"btn purple\">Limpar</a>", clearStateString);
 
-	/* Bot„o de recomeÁar */
+	/* Bot√£o de recome√ßar */
 
-	printf("<a href=\"%s\" class=\"btn red\">RecomeÁar</a>", SCRIPT);
+	printf("<a href=\"%s\" class=\"btn red\">Recome√ßar</a>", SCRIPT);
 
 	printf("</div>");
 }
 
-/** \brief Distribui cartas por 4 m„os aleatoriamente
+/** \brief Distribui cartas por 4 m√£os aleatoriamente
 
-    Esta funÁ„o preenche um array com m„os selecionadas aleatoriamente
+    Esta fun√ß√£o preenche um array com m√£os selecionadas aleatoriamente
 
-    @param hands     Array que vai ser preenchido com as m„os geradas aleatoriamente
+    @param hands     Array que vai ser preenchido com as m√£os geradas aleatoriamente
 */
 void distributeCards (long long int *hands) {
 
-    /* Ter a certeza que as hands est„o a zero */
+    /* Ter a certeza que as hands est√£o a zero */
     int m;
     for (m = 0; m < 4; m++) {
         hands[m] = 0;
     }
 
-    /* Percorrer todos os naipes e cartas e atribuÌ-las a uma m„o aleatÛria */
+    /* Percorrer todos os naipes e cartas e atribu√≠-las a uma m√£o aleat√≥ria */
 
     int i, j, handSelected;
 
     /* char currentSuit, currentValue, currentCardIndex; */
 
-    /* MantÈm a conta de quantas cartas j· foram para cada m„o */
+    /* Mant√©m a conta de quantas cartas j√° foram para cada m√£o */
     int cardsInEachHand[4] = {0};
 
     for (i = 0; i < 4; i++) { /* Percorrer naipes */
@@ -530,33 +530,33 @@ void distributeCards (long long int *hands) {
 
             /* currentCardIndex = getCardIndex(i, j); */
 
-            /* Repetir a escolha da m„o atÈ sair uma que n„o esteja completa */
+            /* Repetir a escolha da m√£o at√© sair uma que n√£o esteja completa */
             do {
 
                 handSelected = rand() % 4;
 
             } while (cardsInEachHand[handSelected] == 13);
 
-            /* Anotar que esta m„o vai ter mais uma carta */
+            /* Anotar que esta m√£o vai ter mais uma carta */
             cardsInEachHand[handSelected] += 1;
 
-            /* Adicionar a carta ‡ mao selecionada (hands È um array global) */
+            /* Adicionar a carta √† mao selecionada (hands √© um array global) */
             hands[handSelected] = addCard(hands[handSelected], i, j);
         }
     }
 }
 
-/** \brief Avalia se uma jogada È maior que outra
+/** \brief Avalia se uma jogada √© maior que outra
 
-    N„o È garantido que esta funÁ„o avalie se ambas as jogadas s„o v·lidas. Essa verificaÁ„o deve ser feita noutro lugar.
+    N√£o √© garantido que esta fun√ß√£o avalie se ambas as jogadas s√£o v√°lidas. Essa verifica√ß√£o deve ser feita noutro lugar.
 
-    @param play1   A jogada que se quer descobrir se È maior
+    @param play1   A jogada que se quer descobrir se √© maior
     @param play2   A jogada contra a qual se quer comparar
     @return        True se a primeira jogada for maior
 */
 bool isPlayBigger (long long int play1, long long int play2) {
 
-    /* A primeira coisa a fazer È verificar o tamanho das jogadas */
+    /* A primeira coisa a fazer √© verificar o tamanho das jogadas */
 
     int play1len = getHandLength(play1), play2len = getHandLength(play2);
 
@@ -575,8 +575,8 @@ bool isPlayBigger (long long int play1, long long int play2) {
 
     if (play1len == 1 || play1len == 2 || play1len == 3) {
 
-        /* Quanto maior o poder de uma carta menor o valor do n˙mero que a representa
-           Nota: N„o estamos a ter em conta se as jogadas s„o v·lidas ou n„o
+        /* Quanto maior o poder de uma carta menor o valor do n√∫mero que a representa
+           Nota: N√£o estamos a ter em conta se as jogadas s√£o v√°lidas ou n√£o
         */
         return play1 > play2;
 
@@ -590,10 +590,10 @@ bool isPlayBigger (long long int play1, long long int play2) {
     }
 }
 
-/** \brief Decide se a seleÁ„o atual do jogador È jog·vel
+/** \brief Decide se a sele√ß√£o atual do jogador √© jog√°vel
 
     @param gameState    O estado de jogo atual
-    @return             True se a seleÁ„o for jog·vel
+    @return             True se a sele√ß√£o for jog√°vel
 */
 bool isSelectionPlayable (state gameState) {
 
@@ -605,12 +605,12 @@ bool isSelectionPlayable (state gameState) {
 
         /* Obter a jogada mais recente */
 
-        long long int mostRecentPlay = 0; /* Vai ficar a 0 se n„o for encontrada uma jogada na ˙ltima ronda */
+        long long int mostRecentPlay = 0; /* Vai ficar a 0 se n√£o for encontrada uma jogada na √∫ltima ronda */
 
         int i;
         for (i = 3; i > 0; i--) {
 
-            if (gameState.lastPlays[i] != 0 && ~(gameState.lastPlays[i]) != 0) { /* ~(long long int) 0 significa que aquele jogador ainda n„o fez nada */
+            if (gameState.lastPlays[i] != 0 && ~(gameState.lastPlays[i]) != 0) { /* ~(long long int) 0 significa que aquele jogador ainda n√£o fez nada */
 
                 mostRecentPlay = gameState.lastPlays[i];
 
@@ -619,13 +619,13 @@ bool isSelectionPlayable (state gameState) {
         }
 
         /* TODO
-           Verificar que, se o utilizador tem o 3 de ouros na m„o, tem de o jogar
+           Verificar que, se o utilizador tem o 3 de ouros na m√£o, tem de o jogar
         */
 
         int mostRecentPlayLength = getHandLength(mostRecentPlay);
         int selectionLength = getHandLength(gameState.selection);
 
-        /* TODO - Verificar que a seleÁ„o È um par ou um trio v·lido e retornar false caso n„o seja
+        /* TODO - Verificar que a sele√ß√£o √© um par ou um trio v√°lido e retornar false caso n√£o seja
 
         if (selectionLength == 2) {
 
@@ -633,16 +633,16 @@ bool isSelectionPlayable (state gameState) {
 
         } */
 
-        if (mostRecentPlay == 0) { /* Se a jogada mais recente for um passe ou n„o tiver havido jogada mais recente */
+        if (mostRecentPlay == 0) { /* Se a jogada mais recente for um passe ou n√£o tiver havido jogada mais recente */
 
            return true;
 
-        } else if (mostRecentPlayLength == selectionLength) { /* Se ambas as m„os tÍm o mesmo tamanho */
+        } else if (mostRecentPlayLength == selectionLength) { /* Se ambas as m√£os t√™m o mesmo tamanho */
 
-            /* Retornar true se a seleÁ„o È maior que a jogada do bot que jogou anteriormente */
+            /* Retornar true se a sele√ß√£o √© maior que a jogada do bot que jogou anteriormente */
             return isPlayBigger(gameState.selection, mostRecentPlay);
 
-        } else { /* Se a seleÁ„o n„o for v·lida */
+        } else { /* Se a sele√ß√£o n√£o for v√°lida */
 
             return false;
         }
@@ -652,12 +652,12 @@ bool isSelectionPlayable (state gameState) {
 /** \brief Descobre quem tem o 3 de ouros (e por isso, joga primeiro)
 
     @param gameState    O estado de jogo atual
-    @return             O Ìndice da m„o do jogador com o 3 de ouros
+    @return             O √≠ndice da m√£o do jogador com o 3 de ouros
 */
 int whoGoesFirst (state gameState) {
 
     int i;
-    for (i = 0; i < 4; i++) { /* Percorrer as m„os dos jogadores */
+    for (i = 0; i < 4; i++) { /* Percorrer as m√£os dos jogadores */
 
         /* Descobrir quem tem o 3 de ouros */
         if (cardExists(gameState.hands[i], 0, 0)) {
@@ -670,14 +670,14 @@ int whoGoesFirst (state gameState) {
 /** \brief Decide que jogada um bot deve fazer baseando-se no estado de jogo atual
 
     @param gameState    O estado de jogo atual
-    @param index        O Ìndice da m„o do bot que est· a jogar (no array hands do estado de jogo)
-    @return             Uma m„o que representa as cartas que devem ser jogadas. 0 significa um passe
+    @param index        O √≠ndice da m√£o do bot que est√° a jogar (no array hands do estado de jogo)
+    @return             Uma m√£o que representa as cartas que devem ser jogadas. 0 significa um passe
 */
 long long int chooseAIPlay (state gameState, int index) {
 
     /* Descobrir quais foram as jogadas anteriores */
 
-    long long int lastPlays[3]; /* Array das ˙ltimas jogadas ordenadas da mais recente para a mais antiga */
+    long long int lastPlays[3]; /* Array das √∫ltimas jogadas ordenadas da mais recente para a mais antiga */
 
     if (index == 1) {
 
@@ -703,20 +703,20 @@ long long int chooseAIPlay (state gameState, int index) {
         return (long long int) 0;
     }
 
-    /* Descobrir qual foi a jogada v·lida mais recente */
+    /* Descobrir qual foi a jogada v√°lida mais recente */
 
-    long long int mostRecentPlay = 0; /* Vai continuar a zero a menos que tenha havido uma jogada v·lida que n„o tenha sido um passe na ˙ltima ronda */
+    long long int mostRecentPlay = 0; /* Vai continuar a zero a menos que tenha havido uma jogada v√°lida que n√£o tenha sido um passe na √∫ltima ronda */
 
     int i;
     for (i = 0; i < 3; i++) {
 
         /* Se:
-            - Esta jogada foi uma jogada v·lida ((~(long long int) 0) significa que o jogador ainda n„o fez nada)
-            - Esta jogada n„o foi um passe
+            - Esta jogada foi uma jogada v√°lida ((~(long long int) 0) significa que o jogador ainda n√£o fez nada)
+            - Esta jogada n√£o foi um passe
         */
         if (~(lastPlays[i]) != 0 && lastPlays[i] != 0) {
 
-            /* Anotar o valor da jogada mais recente que tenha sido v·lida e n„o tenha sido um passe */
+            /* Anotar o valor da jogada mais recente que tenha sido v√°lida e n√£o tenha sido um passe */
             mostRecentPlay = lastPlays[i];
 
             break;
@@ -725,7 +725,7 @@ long long int chooseAIPlay (state gameState, int index) {
 
     /* Finalmente, decidir que jogada fazer */
 
-    if (mostRecentPlay == 0) { /* Se n„o houve uma jogada na ˙ltima ronda */
+    if (mostRecentPlay == 0) { /* Se n√£o houve uma jogada na √∫ltima ronda */
 
         /* Jogar a carta mais baixa do baralho */
         int j, k;
@@ -742,12 +742,12 @@ long long int chooseAIPlay (state gameState, int index) {
 
     } else { /* Se houve uma jogada */
 
-        /* Descobrir o n˙mero de cartas que temos de jogar */
+        /* Descobrir o n√∫mero de cartas que temos de jogar */
         int numberOfCardsPlayed = getHandLength(mostRecentPlay);
 
         if (numberOfCardsPlayed == 1) {
 
-            /* Jogar a carta v·lida mais baixa do baralho */
+            /* Jogar a carta v√°lida mais baixa do baralho */
             int j, k;
             for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
                 for (k = 0; k < 4; k++) { /* Percorrer naipes */
@@ -756,21 +756,21 @@ long long int chooseAIPlay (state gameState, int index) {
 
                         long long int possiblePlay = addCard((long long int) 0, k, j);
 
-                        if (isPlayBigger(possiblePlay, mostRecentPlay)) { /* Se o bot que tem de jogar tem esta carta e È maior que a anterior */
+                        if (isPlayBigger(possiblePlay, mostRecentPlay)) { /* Se o bot que tem de jogar tem esta carta e √© maior que a anterior */
 
-                            /* Retornar a carta v·lida mais baixa */
+                            /* Retornar a carta v√°lida mais baixa */
                             return possiblePlay;
                         }
                     }
                 }
             }
 
-            /* N„o encontramos uma jogada v·lida, logo passamos */
+            /* N√£o encontramos uma jogada v√°lida, logo passamos */
             return (long long int) 0;
 
         } else if (numberOfCardsPlayed == 2) {
 
-            /* Jogar o par v·lido mais baixo do baralho */
+            /* Jogar o par v√°lido mais baixo do baralho */
             int j, k, l;
             for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
                 for (k = 0; k < 4; k++) { /* Percorrer naipes */
@@ -779,7 +779,7 @@ long long int chooseAIPlay (state gameState, int index) {
 
                         for (l = 0; l < 4; l++) { /* Tentar encontrar um par (percorrer naipes) */
 
-                            if (l != k) { /* Se n„o estamos no mesmo naipe da carta pela qual estamos a passar */
+                            if (l != k) { /* Se n√£o estamos no mesmo naipe da carta pela qual estamos a passar */
 
                                 if (cardExists(gameState.hands[index], l, j)) { /* Se o bot tem esta carta */
 
@@ -798,12 +798,12 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
             }
 
-            /* N„o encontramos uma jogada v·lida, logo passamos */
+            /* N√£o encontramos uma jogada v√°lida, logo passamos */
             return (long long int) 0;
 
         } else if (numberOfCardsPlayed == 3) {
 
-            /* Jogar o trio v·lido mais baixo do baralho */
+            /* Jogar o trio v√°lido mais baixo do baralho */
             int j, k, l, m;
             for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
                 for (k = 0; k < 4; k++) { /* Percorrer naipes */
@@ -812,13 +812,13 @@ long long int chooseAIPlay (state gameState, int index) {
 
                         for (l = 0; l < 4; l++) { /* Tentar encontrar um par (percorrer naipes) */
 
-                            if (l != k) { /* Se n„o estamos no mesmo naipe da carta pela qual estamos a passar */
+                            if (l != k) { /* Se n√£o estamos no mesmo naipe da carta pela qual estamos a passar */
 
                                 if (cardExists(gameState.hands[index], l, j)) { /* Se o bot tem esta carta */
 
                                     for (m = 0; m < 4; m++) { /* Tentar encontrar um trio (percorrer naipes) */
 
-                                        if (m != k && m != l) { /* Se n„o estamos no mesmo naipe das cartas do par que encontramos */
+                                        if (m != k && m != l) { /* Se n√£o estamos no mesmo naipe das cartas do par que encontramos */
 
                                             if (cardExists(gameState.hands[index], m, j)) { /* Se o bot tem esta carta */
 
@@ -842,12 +842,12 @@ long long int chooseAIPlay (state gameState, int index) {
                 }
             }
 
-            /* N„o encontramos uma jogada v·lida, logo passamos */
+            /* N√£o encontramos uma jogada v√°lida, logo passamos */
             return (long long int) 0;
 
         } else {
 
-            /* O bot n„o sabe jogar mais que 3 cartas iguais por agora */
+            /* O bot n√£o sabe jogar mais que 3 cartas iguais por agora */
             printf("<!-- An AI play was requested of more than 3 cards, and the bot didn't know what to do so it passed. -->");
             return (long long int) 0;
         }
@@ -856,11 +856,11 @@ long long int chooseAIPlay (state gameState, int index) {
 
 /** \brief Processa uma jogada do computador
 
-    Sabendo qual È o bot que tem de jogar, decide que jogada fazer e processa-a
+    Sabendo qual √© o bot que tem de jogar, decide que jogada fazer e processa-a
 
     @param gameState    O estado de jogo atual
-    @param index        O Ìndice da m„o do bot que est· a jogar (no array hands do estado de jogo)
-    @return             O estado de jogo imediatamente apÛs a jogada do computador
+    @param index        O √≠ndice da m√£o do bot que est√° a jogar (no array hands do estado de jogo)
+    @return             O estado de jogo imediatamente ap√≥s a jogada do computador
 */
 state processBotAction (state gameState, int index) {
 
@@ -869,16 +869,16 @@ state processBotAction (state gameState, int index) {
 
     gameState.lastPlays[index] = play;
 
-    if (play != 0) { /* Se a jogada n„o for um passe (se for um passe n„o È preciso fazer nada) */
+    if (play != 0) { /* Se a jogada n√£o for um passe (se for um passe n√£o √© preciso fazer nada) */
 
-        /* Remover da m‡o do bot cada carta presente na sua jogada */
+        /* Remover da m√†o do bot cada carta presente na sua jogada */
         int i, j;
         for (i = 0; i < 4; i++) { /* Percorrer naipes */
             for (j = 0; j < 13; j++) { /* Percorrer valores */
 
                 if (cardExists(play, i, j)) { /* Se a carta fizer parte da jogada */
 
-                    gameState.hands[index] = removeCard(gameState.hands[index], i, j); /* RemovÍ-la da m‡o */
+                    gameState.hands[index] = removeCard(gameState.hands[index], i, j); /* Remov√™-la da m√†o */
                 }
             }
         }
@@ -889,10 +889,10 @@ state processBotAction (state gameState, int index) {
 
 /** \brief Processa uma jogada do utilizador
 
-    Normalmente chamada depois de o utilizador clicar num bot„o (jogar ou passar)
+    Normalmente chamada depois de o utilizador clicar num bot√£o (jogar ou passar)
 
     @param gameState    O estado de jogo atual
-    @return             O estado de jogo imediatamente apÛs a aÁ„o
+    @return             O estado de jogo imediatamente ap√≥s a a√ß√£o
 */
 state processUserAction (state gameState) {
 
@@ -901,15 +901,15 @@ state processUserAction (state gameState) {
         /* Um 0 no array lastPlays implica um passe */
         gameState.lastPlays[0] = 0;
 
-        /* Remover a aÁ„o de passar do estado de jogo */
+        /* Remover a a√ß√£o de passar do estado de jogo */
         gameState.pass = false;
 
-        return gameState; /* Parar a execuÁ„o da funÁ„o */
+        return gameState; /* Parar a execu√ß√£o da fun√ß√£o */
     }
 
-    /* Se a aÁ„o n„o foi um passe, ent„o o utilizador clicou no bot„o jogar */
+    /* Se a a√ß√£o n√£o foi um passe, ent√£o o utilizador clicou no bot√£o jogar */
 
-    /* A seleÁ„o j· deve ter sido validada antes de o utilizador carregar no bot„o de jogar, mas aqui fazemos um double check */
+    /* A sele√ß√£o j√° deve ter sido validada antes de o utilizador carregar no bot√£o de jogar, mas aqui fazemos um double check */
     if (!isSelectionPlayable(gameState)) {
 
         gameState.selection = 0;
@@ -917,25 +917,25 @@ state processUserAction (state gameState) {
         return gameState;
     }
 
-    /* Colocar a jogada mais recente do utilizador no Ìndice 0 do array lastPlays (correspondente ‡ ˙ltima jogada do utilizador) */
+    /* Colocar a jogada mais recente do utilizador no √≠ndice 0 do array lastPlays (correspondente √† √∫ltima jogada do utilizador) */
     gameState.lastPlays[0] = gameState.selection;
 
-    /* Remover da m‡o do jogador cada carta presente na seleÁ„o */
+    /* Remover da m√†o do jogador cada carta presente na sele√ß√£o */
     int i, j;
     for (i = 0; i < 4; i++) { /* Percorrer naipes */
         for (j = 0; j < 13; j++) { /* Percorrer valores */
 
             if (cardExists(gameState.selection, i, j)) { /* Se a carta estiver selecionada */
 
-                gameState.hands[0] = removeCard(gameState.hands[0], i, j); /* RemovÍ-la da m‡o */
+                gameState.hands[0] = removeCard(gameState.hands[0], i, j); /* Remov√™-la da m√†o */
             }
         }
     }
 
-    /* Limpar a seleÁ„o do jogador */
+    /* Limpar a sele√ß√£o do jogador */
     gameState.selection = 0;
 
-    /* Limpar a aÁ„o jogar do estado de jogo */
+    /* Limpar a a√ß√£o jogar do estado de jogo */
     gameState.play = false;
 
     return gameState;
@@ -943,7 +943,7 @@ state processUserAction (state gameState) {
 
 /** \brief Cria um estado de jogo inicial e retorna-o
 
-    Esta funÁ„o È normalmente usada no inÌcio de um jogo para criar um estado inicial
+    Esta fun√ß√£o √© normalmente usada no in√≠cio de um jogo para criar um estado inicial
 
     @return     Um estado de jogo inicial
 */
@@ -954,7 +954,7 @@ state getInitialGameState () {
     /* Distribuir cartas */
     distributeCards(e.hands);
 
-    /* Todos os bits a 1 numa jogada significa que aquele jogador ainda n„o realizou nenhuma aÁ„o no jogo atual */
+    /* Todos os bits a 1 numa jogada significa que aquele jogador ainda n√£o realizou nenhuma a√ß√£o no jogo atual */
     int i;
     for (i = 0; i < 4; i++) {
 
@@ -971,9 +971,9 @@ state getInitialGameState () {
 
 /** \brief Trata os argumentos da CGI
 
-    Esta funÁ„o recebe a query que È passada ‡ cgi-bin e trata-a.
+    Esta fun√ß√£o recebe a query que √© passada √† cgi-bin e trata-a.
 
-    @param query A query que È passada ‡ cgi-bin
+    @param query A query que √© passada √† cgi-bin
  */
 void parse (char *query) {
 
@@ -985,7 +985,7 @@ void parse (char *query) {
 
         if (!gameState.play && !gameState.pass) {
 
-            /* Se h· uma string de par‚metros mas o utilizador n„o fez nada, imprimir o estado atual */
+            /* Se h√° uma string de par√¢metros mas o utilizador n√£o fez nada, imprimir o estado atual */
             /* (o jogador provavelmente apenas selecionou uma carta) */
             render(gameState);
 
@@ -1006,13 +1006,13 @@ void parse (char *query) {
 
 	} else {
 
-	    /* Obter um estado de jogo inicial com m„os baralhadas e valores por defeito */
+	    /* Obter um estado de jogo inicial com m√£os baralhadas e valores por defeito */
 	    state gameState = getInitialGameState();
 
 	    /* Descobrir quem joga primeiro (quem tem o 3 de ouros) */
         int i = whoGoesFirst(gameState);
 
-        /* Processar jogadas dos bots atÈ ser a vez do utilizador */
+        /* Processar jogadas dos bots at√© ser a vez do utilizador */
         while (i > 0 && i < 4) {
 
             gameState = processBotAction(gameState, i);
@@ -1024,10 +1024,10 @@ void parse (char *query) {
 	}
 }
 
-/** \brief FunÁ„o principal
+/** \brief Fun√ß√£o principal
 
-    FunÁ„o principal do programa que imprime os cabeÁalhos necess·rios e de seguida
-    invoca a funÁ„o que imprime o cÛdigo html para desenhar as cartas
+    Fun√ß√£o principal do programa que imprime os cabe√ßalhos necess√°rios e de seguida
+    invoca a fun√ß√£o que imprime o c√≥digo html para desenhar as cartas
  */
 int main () {
 
@@ -1035,17 +1035,28 @@ int main () {
     srand(time(NULL));
 
     /*
-     * CabeÁalhos necess·rios numa CGI
+     * Cabe√ßalhos necess√°rios numa CGI
      */
 	printf("Content-Type: text/html; charset=iso-8859-1\n\n");
 	printf("<head><title>Exemplo</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../big-2/style.css\">\n</head>\n");
 	printf("<body>\n");
 
     /*
-     * Ler os valores passados ‡ cgi que est„o na vari·vel ambiente e pass·-los ao programa
+     * Ler os valores passados √† cgi que est√£o na vari√°vel ambiente e pass√°-los ao programa
      */
 	parse(getenv("QUERY_STRING"));
 
 	printf("</body>\n");
 	return 0;
 }
+
+
+
+/*
+separar_naipes vai contar o n√∫mero de cartas de cada naipe. ex: [3,2,5,3]
+                                                                 D,C,H,S
+separar_valores vai contar o n√∫mero de cartas de cada valor. ex: [1,0,3,0,1,2,1,0,2,0,1,2,0]
+                                                                  3,4,5,6,7,8,9,T,J,Q,K,A,2
+
+para straights a √∫nica coisa que mudar √© em vez da lista acima [1,0,3,0,1,2,1,0,2,0,1,2,0], devemos ter uma lista que no fim conte de novo
+tudo e mais o A de novo, pq estas jogadas podem terminar com A sendo a maior carta
