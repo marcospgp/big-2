@@ -681,21 +681,21 @@ long long int chooseAIPlay (state gameState, int index) {
 
     if (index == 1) {
 
-        lastPlays[0] = gameState.lastPlays[0];
+        lastPlays[0] = gameState.lastPlays[2]; /* para que seja possivel jogar com sentido horario (Vitor) */
         lastPlays[1] = gameState.lastPlays[3];
-        lastPlays[2] = gameState.lastPlays[2];
+        lastPlays[2] = gameState.lastPlays[0];
 
     } else if (index == 2) {
 
-        lastPlays[0] = gameState.lastPlays[1];
-        lastPlays[1] = gameState.lastPlays[0];
-        lastPlays[2] = gameState.lastPlays[3];
+        lastPlays[0] = gameState.lastPlays[3];
+        lastPlays[1] = gameState.lastPlays[0]; /* em todo este conjunto de instruções */
+        lastPlays[2] = gameState.lastPlays[1];
 
     } else if (index == 3) {
 
-        lastPlays[0] = gameState.lastPlays[2];
+        lastPlays[0] = gameState.lastPlays[0];
         lastPlays[1] = gameState.lastPlays[1];
-        lastPlays[2] = gameState.lastPlays[0];
+        lastPlays[2] = gameState.lastPlays[2]; /* para que seja possivel jogar com sentido horario (Vitor) */
 
     } else {
 
@@ -996,7 +996,7 @@ void parse (char *query) {
 
             /* Processar a jogada dos bots */
             int i;
-            for (i = 1; i < 4; i++) {
+            for (i = 3; i > 0; i--) { /* para que seja possivel jogar com sentido horario (Vitor) */
 
                 gameState = processBotAction(gameState, i);
             }
@@ -1017,7 +1017,7 @@ void parse (char *query) {
 
             gameState = processBotAction(gameState, i);
 
-            i++;
+            i--; /* para que seja possivel jogar com sentido horario (Vitor) */
         }
 
 		render(gameState);
@@ -1060,3 +1060,4 @@ separar_valores vai contar o número de cartas de cada valor. ex: [1,0,3,0,1,2,1
 
 para straights a única coisa que mudar é em vez da lista acima [1,0,3,0,1,2,1,0,2,0,1,2,0], devemos ter uma lista que no fim conte de novo
 tudo e mais o A de novo, pq estas jogadas podem terminar com A sendo a maior carta
+*/
