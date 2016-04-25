@@ -44,7 +44,7 @@ typedef struct State {
 	long long int lastPlays[4]; /* As 4 últimas jogadas, que serão apresentadas na mesa. 0 implica um passe, e todos os bits a 1 implica que aquele jogador ainda não fez nada no jogo atual. */
                                 /* No sentido anti-horário, lastPlays[0] refere-se à última jogada do utilizador, e lastPlays[1] à última jogada do bot à sua direita */
 	long long int selection;    /* Cartas selecionadas atualmente pelo utilizador */
-	bool pass, play, sort;      /* Se o útlimo clique do utilizador representa uma ação @@@@@@@@@@@@@ adicionei sort */
+	bool pass, play, sort;      /* Se o útlimo clique do utilizador representa uma ação */
 
 } state;
 
@@ -69,7 +69,7 @@ state stringToState (char* str) {
         &e.selection,
         &e.pass,
         &e.play,
-        &e.sort // @@@@@@@@@@@@@@@ adicionei isto
+        &e.sort
     );
 
 	return e;
@@ -367,7 +367,7 @@ void render (state gameState) {
 	playx[2] -= playDeltas[2];
 	playx[3] -= playDeltas[3];
 
-    if (gameState.sort == 0) { // para o default, ou seja, quando as cartas estão ordenadas por valores @@@@@@@@ VITOR
+    if (gameState.sort == 0) { /* para o default do sort=0, que vai meter ordem por valores @@@@@@@@@@@ VITOR */
 
         int i, j, k;
 
@@ -438,7 +438,7 @@ void render (state gameState) {
     	}
     }
 
-    else { //para o caso de o jogador ter carregado no botão sort, que vai meter ordem por naipes @@@@@@@@@@@ VITOR
+    else { /* para o caso de o jogador ter mudado a ordenação, tornando o valor do sort=1, que vai meter ordem por naipes @@@@@@@@@@@ VITOR */
 
         int i, j, k;
 
@@ -576,11 +576,6 @@ void render (state gameState) {
 
     char sortStateString[10240];
 
-    /* Se estava no default */
-    /*
-    if (gameState.sort == 0) {
-    */
-
     state stateAfterSort = gameState;
 
     stateAfterSort.sort = !(stateAfterSort.sort);
@@ -589,18 +584,6 @@ void render (state gameState) {
 
     printf("<a href=\"%s\" class=\"btn blue\">Ordem</a>", sortStateString);
 
-    /*
-    } else {
-
-        state stateAfterSort = gameState;
-
-        stateAfterSort.sort = 0;
-
-        sprintf(sortStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterSort));
-
-        printf("<a href=\"%s\" class=\"btn blue\">Ordem</a>", sortStateString);
-    }
-    */
 }
 
 /** \brief Distribui cartas por 4 mãos aleatoriamente
@@ -1071,6 +1054,7 @@ state getInitialGameState () {
     e.selection = 0;
     e.pass = false;
     e.play = false;
+    e.sort = false;
 
     return e;
 }
