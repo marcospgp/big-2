@@ -315,7 +315,129 @@ void distributeCards (long long int *hands) {
     @param hand  A seleção que se pretende avaliar
     @return      True ou False
 */
+bool isStraight (long long int hand) {
 
+    /* Num straight o às pode tanto contar como a maior carta como a menor (A2345, 10JQKA) */
+    /* Num straight o 2 conta como a carta abaixo do 3 */
+
+    /* Verificar o caso em que o às conta como carta maior */
+
+    /* Indice do valor do 2: 12 ("3456789TJQKA2") */
+
+    int j, k, cardsFound = 0;
+    bool cardFoundOfThisValue = false;
+
+    for (j = 0; j < 13; j++) { /* Percorrer valores */
+
+            /* Contar o 2 como carta menor */
+            if (j == 0) {
+
+                j = 12; /* Começar pelo 2 */
+
+            } else {
+
+                j -= 1;
+            }
+
+        for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+            if (cardExists(hand, k, j)) {
+
+                cardsFound++;
+
+                cardFoundOfThisValue = true;
+            }
+        }
+
+        if (cardsFound > 0 && !cardFoundOfThisValue) { /* Se não foi encontrada uma carta nesta iteração e já tinham sido encontradas cartas */
+
+            return false;
+
+        } else {
+
+            cardFoundOfThisValue = false; /* Dar reset ao valor */
+        }
+    }
+
+    if (cardsFound == 5) {
+
+        return true;
+    }
+
+    /* Verificar o caso em que o às conta como carta menor */
+
+    cardsFound = 0;
+    cardFoundOfThisValue = false;
+
+    for (j = 0; j < 13; j++) { /* Percorrer valores */
+
+            /* Contar o 2 e o às como cartas menores */
+            if (j == 0) {
+
+                j = 11; /* Começar pelo às */
+
+            } else if (j == 1) {
+
+                j = 12; /* De seguida o 2 */
+
+            } else {
+
+                j -= 2;
+            }
+
+        for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+            if (cardExists(hand, k, j)) {
+
+                cardsFound++;
+
+                cardFoundOfThisValue = true;
+            }
+        }
+
+        if (cardsFound > 0 && !cardFoundOfThisValue) { /* Se não foi encontrada uma carta nesta iteração e já tinham sido encontradas cartas */
+
+            return false;
+
+        } else {
+
+            cardFoundOfThisValue = false; /* Dar reset ao valor */
+        }
+    }
+
+    return (cardsFound == 5);
+
+}
+
+/** \brief Avalia se uma seleção é um flush
+
+    @param hand  A seleção que se pretende avaliar
+    @return      True ou False
+*/
+bool isFlush (long long int hand) {
+
+    return false;
+}
+
+/** \brief Avalia se uma seleção é um 4 of a kind
+
+    @param hand  A seleção que se pretende avaliar
+    @return      True ou False
+*/
+bool is4OfAKind (long long int hand) {
+
+    return false;
+}
+
+/** \brief Avalia se uma seleção é um full house
+
+    @param hand  A seleção que se pretende avaliar
+    @return      True ou False
+*/
+bool isFullHouse (long long int hand) {
+
+    return false;
+}
 
 /** \brief Avalia se uma jogada é maior que outra
 
@@ -433,7 +555,7 @@ bool isSelectionPlayable (state gameState) {
 
         } else if (selectionLength == 5) {
 
-            /*if (!( / Se não for nenhuma mão conhecida *
+            if (!( /* Se não for nenhuma mão conhecida */
                 isStraight(gameState.selection)  ||
                 isFlush(gameState.selection)     ||
                 is4OfAKind(gameState.selection)  ||
@@ -441,7 +563,19 @@ bool isSelectionPlayable (state gameState) {
             )) {
 
                 return false;
-            }*/
+
+            } else {
+
+                /* TODO - REMOVER; APENAS SERVE PARA DEBUGAR AS FUNÇOES ISSTRAIGHT, ETC. */
+
+
+
+                /*   / \   */
+                /*  / ! \  */
+                /* /_____\ */
+
+                return true;
+            }
         }
 
         /* Verificar se a jogada (que já verificamos se é válida) pode ser jogada no contexto de jogo atual */
@@ -831,16 +965,16 @@ void render (state gameState) {
     int spaceBetweenCards = 30;
 
     /* Posições iniciais para cada mão */
-    /*        mão 3 */
-    /* mão 4        mão 2 */
-    /*        mão 1 */
+    /*              mão 3              */
+    /*       mão 4        mão 2        */
+    /*              mão 1              */
     int hand1x = 180, hand1y = 650;
     int hand2x = 685, hand2y = 520;
     int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
     int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
 
-    int play1x = hand1x + 190, play1y = hand1y - 150;
-    int play2x = hand2x - 190, play2y = hand2y - 190;
+    int play1x = hand1x + 170, play1y = hand1y - 150;
+    int play2x = hand2x - 210, play2y = hand2y - 190;
     int play3x = play1x, play3y = hand3y + 130;
     int play4x = play2x - 270, play4y = play2y;
 
