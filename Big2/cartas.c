@@ -707,20 +707,62 @@ bool isSelectionPlayable (state gameState) {
             }
         }
 
-        /* TODO
-           Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar
-        */
+        /* Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar */
+        if (cardExists(gameState.hands[0], 0, 0) && !cardExists(gameState.selection, 0, 0)) {
+
+            return false;
+        }
 
         int mostRecentPlayLength = getHandLength(mostRecentPlay);
         int selectionLength = getHandLength(gameState.selection);
 
-        /* TODO - Verificar que a seleção é um par ou um trio válido e retornar false caso não seja
+        /* Verificar que a seleção é uma combinação válida */
 
-        if (selectionLength == 2) {
+        if (selectionLength == 4 || selectionLength > 5) {
 
-        } else if (selectionLength == 3) {
+            return false;
 
-        } */
+        } else if (selectionLength == 2 || selectionLength == 3) {
+
+            /* Verificar que a seleção é um par ou um trio válido (só temos de verificar que as cartas são do mesmo valor) */
+
+            int j, k, cardsFound = 0;
+
+            for (j = 0; j < 13; j++) { /* Percorrer valores */
+
+                for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+                    if (cardExists(gameState.selection, k, j)) {
+
+                        cardsFound++;
+                    }
+                }
+
+                /* Se foram encontradas cartas, verificar que foram encontradas todas (dado que já percorremos o naipe todo) */
+                if (cardsFound > 0) {
+
+                    return (cardsFound == selectionLength); /* Retornar true se encontramos todas as cartas no mesmo valor */
+                }
+            }
+
+            /* Não é esperado que a execução chegue aqui */
+            printf("<!-- Supposedly unreachable code has been executed in isSelectionPlayable -->");
+            return false;
+
+        } else if (selectionLength == 5) {
+
+            if (!( /* Se não for nenhuma mão conhecida */
+                isStraight(gameState.selection)  ||
+                isFlush(gameState.selection)     ||
+                is4OfAKind(gameState.selection)  ||
+                isFullHouse(gameState.selection)
+            )) {
+
+                return false;
+            }
+        }
+
+        /* Verificar se a jogada (que já verificamos se é válida) pode ser jogada no contexto de jogo atual */
 
         if (mostRecentPlay == 0) { /* Se a jogada mais recente for um passe ou não tiver havido jogada mais recente */
 
