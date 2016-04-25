@@ -406,7 +406,6 @@ bool isStraight (long long int hand) {
     }
 
     return (cardsFound == 5);
-
 }
 
 /** \brief Avalia se uma seleção é um flush
@@ -416,17 +415,24 @@ bool isStraight (long long int hand) {
 */
 bool isFlush (long long int hand) {
 
-    return false;
-}
+    int j, k, cardsFound = 0;
 
-/** \brief Avalia se uma seleção é um 4 of a kind
+    for (k = 0; k < 4; k++) { /* Percorrer naipes */
+        for (j = 0; j < 13; j++) { /* Percorrer valores */
 
-    @param hand  A seleção que se pretende avaliar
-    @return      True ou False
-*/
-bool is4OfAKind (long long int hand) {
+            if (cardExists(hand, k, j)) {
 
-    return false;
+                cardsFound++;
+            }
+        }
+
+        if (cardsFound > 0 && cardsFound != 5) { /* Se foram encontradas cartas, mas não todas neste naipe */
+
+            return false;
+        }
+    }
+
+    return (cardsFound == 5);
 }
 
 /** \brief Avalia se uma seleção é um full house
@@ -436,7 +442,63 @@ bool is4OfAKind (long long int hand) {
 */
 bool isFullHouse (long long int hand) {
 
-    return false;
+    int j, k, cardCount = 0, sameValueCardCount = 0;
+    bool has3Cards = false, has2Cards = false;;
+
+    for (j = 0; j < 13; j++) { /* Percorrer valores */
+        for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+            if (cardExists(hand, k, j)) {
+
+                cardCount++;
+                sameValueCardCount++;
+            }
+        }
+
+        if (sameValueCardCount == 3) {
+
+            has3Cards = true;
+
+        } else if (sameValueCardCount == 2) {
+
+            has2Cards = true;
+        }
+
+        sameValueCardCount = 0;
+    }
+
+    return (cardCount == 5 && has3Cards && has2Cards);
+}
+
+/** \brief Avalia se uma seleção é um 4 of a kind
+
+    @param hand  A seleção que se pretende avaliar
+    @return      True ou False
+*/
+bool is4OfAKind (long long int hand) {
+
+    int j, k, cardCount = 0, sameValueCardCount = 0;
+    bool has4Cards = false;
+
+    for (j = 0; j < 13; j++) { /* Percorrer valores */
+        for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+            if (cardExists(hand, k, j)) {
+
+                cardCount++;
+                sameValueCardCount++;
+
+                if (sameValueCardCount == 4) {
+                    has4Cards = true;
+                }
+
+            }
+        }
+
+        sameValueCardCount = 0;
+    }
+
+    return (cardCount == 5 && has4Cards);
 }
 
 /** \brief Avalia se uma jogada é maior que outra
