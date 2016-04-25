@@ -1324,6 +1324,18 @@ void render (state gameState) {
 
     printf("<a href=\"%s\" class=\"btn yellow\">Dica</a>", tipStateString);
 
+/*    
+
+int scorePlayer0 = (getHandLenght(gameState.hands[0] * (-1));
+int scorePlayer1 = (getHandLenght(gameState.hands[1] * (-1));
+int scorePlayer2 = (getHandLenght(gameState.hands[2] * (-1));
+int scorePlayer3 = (getHandLenght(gameState.hands[3] * (-1));
+
+printf("<a href=\"%d\" class=\"btn yellow\">%s - %d, %s - %d, %s - %d, %s - %d</a>", Score, "Player 0", scorePlayer0, "Player 1", scorePlayer1, "Player 2", scorePlayer2, "Player 3", scorePlayer3);
+
+*/
+/*    printf para dar score. */
+
 }
 
 /** \brief Trata os argumentos da CGI
