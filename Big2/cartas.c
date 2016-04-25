@@ -26,7 +26,7 @@
 /**
     Formato da string passada como parâmetro entre jogadas
 */
-#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%d_%d_%d" // @@@@@@ adicionei um %d para poder trocar ordem
+#define PARAMETER_STRING_FORMAT "%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%lld_%d_%d_%d"
 
 /**
     Definir o tipo bool
@@ -993,6 +993,10 @@ state getInitialGameState () {
 */
 void render (state gameState) {
 
+/* TODO
+    - METER APRESENTAÇÃO DE SCORE NO FINAL DO JOGO. vai ser preciso verificar se alguém tem 0 cartas e calcular o score no momento
+*/
+
     char *path = DECK;
 
     printf("<svg width = \"800\" height = \"800\">\n");
@@ -1166,9 +1170,9 @@ void render (state gameState) {
 
         int i, j, k;
 
-        for (i = 0; i < 4; i++) { /* Percorrer naipes */ // FOI TROCADA A ORDEM - VITOR
+        for (i = 0; i < 4; i++) { /* Percorrer naipes- FOI TROCADA A ORDEM - VITOR */
 
-            for (j = 0; j < 13; j++) { /* Percorrer valores */ // FOI TROCADA A ORDEM - VITOR
+            for (j = 0; j < 13; j++) { /* Percorrer valores - FOI TROCADA A ORDEM - VITOR */
 
                 for (k = 0; k < 4; k++) { /* Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas */
 
@@ -1312,7 +1316,7 @@ void render (state gameState) {
 
     state stateAfterTip = gameState;
 
-    stateAfterTip.selection = chooseAIPlay(stateAfterTip, 0); // @@@@@@@@@@ alterei aqui e agora vou meter no chooseAIPlay a opção do index ser = 0
+    stateAfterTip.selection = chooseAIPlay(stateAfterTip, 0); /* Cria uma possível jogada, usando a função dos bots */
 
     char tipStateString[10240];
 
@@ -1344,14 +1348,41 @@ void parse (char *query) {
 
         } else {
 
-            /* Processar a jogada do utilizador */
-            gameState = processUserAction(gameState);
+            if (getHandLength(gameState.hands[1]) != 0) { /* vê se o player 1 não ficou sem cartas. se ficou sem cartas, não deixa user jogar e faz render */
 
-            /* Processar a jogada dos bots */
+                /* Processar a jogada do utilizador */
+                gameState = processUserAction(gameState);
+
+
+                /* Processar a jogada dos bots */
             int i;
             for (i = 3; i > 0; i--) { /* para que seja possivel jogar com sentido horario (Vitor) */
 
-                gameState = processBotAction(gameState, i);
+                /* Este bloco define as mãos que vão ser analisadas, mediante o bot que estiver a jogar.
+                   As mãos devem ser analisadas para o caso de alguma anterior ao bot que vai jogar tenha acabado o jogo.
+                   Nesse caso, não se deixa alterar o gameState, fazendo o break e indo logo render.
+                */
+                int index;
+
+                if (i == 3) {
+
+                    index = 0;
+                
+                } else if (i == 2) {
+
+                    index = 3;
+                
+                } else if (i == 1) {
+
+                    index = 2;
+                }
+
+                if (getHandLength(gameState.hands[index]) != 0) {
+                    gameState = processBotAction(gameState, i); /* ve se player 0, 3 ou 2 ficou sem cartas. se ficou da break e vai logo render */
+                } else {
+                    break;
+                }
+            }
             }
 
             render(gameState);
