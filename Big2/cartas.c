@@ -608,7 +608,7 @@ bool isSelectionPlayable (state gameState) {
         long long int mostRecentPlay = 0; /* Vai ficar a 0 se não for encontrada uma jogada na última ronda */
 
         int i;
-        for (i = 3; i > 0; i--) {
+        for (i = 1; i < 4; i++) {
 
             if (gameState.lastPlays[i] != 0 && ~(gameState.lastPlays[i]) != 0) { /* ~(long long int) 0 significa que aquele jogador ainda não fez nada */
 
@@ -1037,7 +1037,7 @@ int main () {
     /*
      * Cabeçalhos necessários numa CGI
      */
-	printf("Content-Type: text/html; charset=iso-8859-1\n\n");
+	printf("Content-Type: text/html; charset=utf-8\n\n");
 	printf("<head><title>Exemplo</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../big-2/style.css\">\n</head>\n");
 	printf("<body>\n");
 
