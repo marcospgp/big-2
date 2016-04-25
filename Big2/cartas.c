@@ -261,331 +261,6 @@ void printPass (int x, int y) {
 
 }
 
-/** \brief Imprime um estado de jogo
-
-    Esta função imprime o estado atual do jogo no browser
-
-    @param gameState    estado atual do jogo
-*/
-void render (state gameState) {
-
-	char *path = DECK;
-
-	printf("<svg width = \"800\" height = \"800\">\n");
-
-	printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
-
-	printf("</svg>\n");
-
-	/* Anotar quem já jogou para não haver confusão ao imprimir as cartas */
-	/* (porque se ainda não houveram jogadas, o valor de lastplay será ~((long long int) 0))) */
-
-	bool hasPlayed[4] = {true, true, true, true};     /* Quais jogadores já jogaram */
-	bool hasPassed[4] = {false, false, false, false}; /* Quais jogadores passaram */
-
-	int m;
-	for (m = 0; m < 4; m++) {
-
-        if (gameState.lastPlays[m] == 0) { /* Se este jogador passou */
-
-            hasPassed[m] = true;
-
-        } else if (~(gameState.lastPlays[m]) == 0) { /* Se este jogador ainda não fez nada neste jogo */
-
-            hasPlayed[m] = false;
-        }
-	}
-
-    /* Largura das cartas (não pode ser modificado aqui, read only) */
-    int cardWidth = 80;
-
-	/* Espaço entre cartas */
-	int spaceBetweenCards = 30;
-
-	/* Posições iniciais para cada mão */
-	/*        mão 3 */
-	/* mão 4        mão 2 */
-	/*        mão 1 */
-	int hand1x = 180, hand1y = 650;
-	int hand2x = 685, hand2y = 520;
-	int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
-	int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
-
-	int play1x = hand1x + 190, play1y = hand1y - 150;
-	int play2x = hand2x - 190, play2y = hand2y - 190;
-	int play3x = play1x, play3y = hand3y + 130;
-	int play4x = play2x - 270, play4y = play2y;
-
-	int handx[4] = {hand1x, hand2x, hand3x, hand4x};
-	int handy[4] = {hand1y, hand2y, hand3y, hand4y};
-
-	int playx[4] = {play1x, play2x, play3x, play4x};
-	int playy[4] = {play1y, play2y, play3y, play4y};
-
-	/* Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho */
-
-	int handDeltas[4], playDeltas[4];
-
-    int l;
-    for (l = 0; l < 4; l++) {
-
-        int handLength = getHandLength(gameState.hands[l]);
-        int lastPlayLength = getHandLength(gameState.lastPlays[l]);
-
-        int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
-        /* int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) ); */
-
-        /* A deslocação é de 1/(13 * 2) da largura da mão por cada carta removida (por cada carta a menos de 13) */
-        int deltaHand = (13 - handLength) * ( ( 1 / (26) ) * handLengthPx );
-
-        /* A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1 */
-
-        int deltaLastPlay;
-
-        if (lastPlayLength > 0) {
-
-           deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
-
-        } else {
-
-            deltaLastPlay = 0;
-        }
-
-        handDeltas[l] = deltaHand;
-        playDeltas[l] = deltaLastPlay;
-    }
-
-	/* Aplicar deltas às posições originais */
-
-	handx[0] += handDeltas[0];
-	handy[1] -= handDeltas[1];
-	handx[2] -= handDeltas[2];
-	handy[3] += handDeltas[3];
-
-	playx[0] -= playDeltas[0];
-	playx[1] -= playDeltas[1];
-	playx[2] -= playDeltas[2];
-	playx[3] -= playDeltas[3];
-
-    if (gameState.sort == 0) { /* para o default do sort=0, que vai meter ordem por valores @@@@@@@@@@@ VITOR */
-
-        int i, j, k;
-
-        for (j = 0; j < 13; j++) { /* Percorrer valores */
-
-            for (i = 0; i < 4; i++) { /* Percorrer naipes */
-
-                for (k = 0; k < 4; k++) { /* Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas */
-
-                    if (cardExists(gameState.hands[k], i, j)) {
-
-                        if (k == 0) {
-
-                            /* Se a carta for do utilizador e estiver selecionada, imprime-se mais acima */
-                            if (cardExists(gameState.selection, i, j)) {
-
-                                printCard(path, handx[k], (handy[k] - 20), i, j, gameState, 2);
-
-                            } else {
-
-                                printCard(path, handx[k], handy[k], i, j, gameState, 2);
-                            }
-
-                            handx[k] += spaceBetweenCards; /* Incrementar o x para a próxima carta na mão de baixo */
-
-                        } else if (k == 1) {
-
-                            printCard(path, handx[k], handy[k], i, j, gameState, 1);
-
-                            handy[k] -= spaceBetweenCards;
-
-                        } else if (k == 2) {
-
-                            printCard(path, handx[k], handy[k], i, j, gameState, 0);
-
-                            handx[k] -= spaceBetweenCards; /* Decrementar o x para a próxima carta na mão de cima */
-
-                        } else if (k == 3) {
-
-                            printCard(path, handx[k], handy[k], i, j, gameState, 3);
-
-                            handy[k] += spaceBetweenCards;
-                        }
-
-                    } else if (hasPlayed[k] && !hasPassed[k] && cardExists(gameState.lastPlays[k], i, j)) {
-
-                        printCard(path, playx[k], playy[k], i, j, gameState, 2);
-
-                        if (k == 0) {
-
-                            playx[k] += spaceBetweenCards;
-
-                        } else if (k == 1) {
-
-                            playx[k] += spaceBetweenCards;
-
-                        } else if (k == 2) {
-
-                            playx[k] += spaceBetweenCards;
-
-                        } else if (k == 3) {
-
-                            playx[k] += spaceBetweenCards;
-                        }
-                    }
-                }
-            }
-    	}
-    }
-
-    else { /* para o caso de o jogador ter mudado a ordenação, tornando o valor do sort=1, que vai meter ordem por naipes @@@@@@@@@@@ VITOR */
-
-        int i, j, k;
-
-        for (i = 0; i < 4; i++) { /* Percorrer naipes */ // FOI TROCADA A ORDEM - VITOR
-
-            for (j = 0; j < 13; j++) { /* Percorrer valores */ // FOI TROCADA A ORDEM - VITOR
-
-                for (k = 0; k < 4; k++) { /* Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas */
-
-                    if (cardExists(gameState.hands[k], i, j)) {
-
-                        if (k == 0) {
-
-                            /* Se a carta for do utilizador e estiver selecionada, imprime-se mais acima */
-                            if (cardExists(gameState.selection, i, j)) {
-
-                                printCard(path, handx[k], (handy[k] - 20), i, j, gameState, 2);
-
-                            } else {
-
-                                printCard(path, handx[k], handy[k], i, j, gameState, 2);
-                            }
-
-                            handx[k] += spaceBetweenCards; /* Incrementar o x para a próxima carta na mão de baixo */
-
-                        } else if (k == 1) {
-
-                            printCard(path, handx[k], handy[k], i, j, gameState, 1);
-
-                            handy[k] -= spaceBetweenCards;
-
-                        } else if (k == 2) {
-
-                            printCard(path, handx[k], handy[k], i, j, gameState, 0);
-
-                            handx[k] -= spaceBetweenCards; /* Decrementar o x para a próxima carta na mão de cima */
-
-                        } else if (k == 3) {
-
-                            printCard(path, handx[k], handy[k], i, j, gameState, 3);
-
-                            handy[k] += spaceBetweenCards;
-                        }
-
-                    } else if (hasPlayed[k] && !hasPassed[k] && cardExists(gameState.lastPlays[k], i, j)) {
-
-                        printCard(path, playx[k], playy[k], i, j, gameState, 2);
-
-                        if (k == 0) {
-
-                            playx[k] += spaceBetweenCards;
-
-                        } else if (k == 1) {
-
-                            playx[k] += spaceBetweenCards;
-
-                        } else if (k == 2) {
-
-                            playx[k] += spaceBetweenCards;
-
-                        } else if (k == 3) {
-
-                            playx[k] += spaceBetweenCards;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-	/* Imprimir os textos "Passou" nos jogadores que passaram nesta jogada */
-	int p;
-	for (p = 0; p < 4; p++) {
-
-        if (hasPassed[p] == true) {
-            printPass(playx[p], playy[p]);
-        }
-	}
-
-	/* Imprimir botões */
-
-	printf("<div id=\"button-container\">");
-
-	/* Botão de jogar */
-
-	char playStateString[10240];
-
-	/* Se a seleção atual for jogável */
-	if (isSelectionPlayable(gameState)) {
-
-        state stateAfterPlay = gameState;
-
-        stateAfterPlay.play = true;
-
-        sprintf(playStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPlay));
-
-        printf("<a href=\"%s\" class=\"btn green\">Jogar</a>", playStateString);
-
-	} else {
-
-        printf("<a href=\"#\" class=\"btn green disabled\">Jogar</a>");
-	}
-
-	/* Botão de passar */
-
-	state stateAfterPass = gameState;
-
-	stateAfterPass.pass = true;
-
-	char passStateString[10240];
-
-	sprintf(passStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPass));
-
-	printf("<a href=\"%s\" class=\"btn orange\">Passar</a>", passStateString);
-
-	/* Botão de limpar */
-
-	state stateAfterClear = gameState;
-
-	stateAfterClear.selection = 0;
-
-	char clearStateString[10240];
-
-	sprintf(clearStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterClear));
-
-	printf("<a href=\"%s\" class=\"btn purple\">Limpar</a>", clearStateString);
-
-	/* Botão de recomeçar */
-
-	printf("<a href=\"%s\" class=\"btn red\">Recomeçar</a>", SCRIPT);
-
-	printf("</div>");
-
-    /* Botão de ordenar */
-
-    char sortStateString[10240];
-
-    state stateAfterSort = gameState;
-
-    stateAfterSort.sort = !(stateAfterSort.sort);
-
-    sprintf(sortStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterSort));
-
-    printf("<a href=\"%s\" class=\"btn blue\">Ordem</a>", sortStateString);
-
-}
-
 /** \brief Distribui cartas por 4 mãos aleatoriamente
 
     Esta função preenche um array com mãos selecionadas aleatoriamente
@@ -634,6 +309,13 @@ void distributeCards (long long int *hands) {
         }
     }
 }
+
+/** \brief Avalia se uma seleção é um straight
+
+    @param hand  A seleção que se pretende avaliar
+    @return      True ou False
+*/
+
 
 /** \brief Avalia se uma jogada é maior que outra
 
@@ -810,7 +492,13 @@ long long int chooseAIPlay (state gameState, int index) {
 
     long long int lastPlays[3]; /* Array das últimas jogadas ordenadas da mais recente para a mais antiga */
 
-    if (index == 1) {
+    if (index == 0) {
+
+        lastPlays[0] = gameState.lastPlays[1]; /* para dar a dica (Vitor) */
+        lastPlays[1] = gameState.lastPlays[2];
+        lastPlays[2] = gameState.lastPlays[3];
+
+    } else if (index == 1) {
 
         lastPlays[0] = gameState.lastPlays[2]; /* para que seja possivel jogar com sentido horario (Vitor) */
         lastPlays[1] = gameState.lastPlays[3];
@@ -1100,6 +788,403 @@ state getInitialGameState () {
 
     return e;
 }
+
+
+/** \brief Imprime um estado de jogo
+
+    Esta função imprime o estado atual do jogo no browser
+
+    @param gameState    estado atual do jogo
+*/
+void render (state gameState) {
+
+    char *path = DECK;
+
+    printf("<svg width = \"800\" height = \"800\">\n");
+
+    printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
+
+    printf("</svg>\n");
+
+    /* Anotar quem já jogou para não haver confusão ao imprimir as cartas */
+    /* (porque se ainda não houveram jogadas, o valor de lastplay será ~((long long int) 0))) */
+
+    bool hasPlayed[4] = {true, true, true, true};     /* Quais jogadores já jogaram */
+    bool hasPassed[4] = {false, false, false, false}; /* Quais jogadores passaram */
+
+    int m;
+    for (m = 0; m < 4; m++) {
+
+        if (gameState.lastPlays[m] == 0) { /* Se este jogador passou */
+
+            hasPassed[m] = true;
+
+        } else if (~(gameState.lastPlays[m]) == 0) { /* Se este jogador ainda não fez nada neste jogo */
+
+            hasPlayed[m] = false;
+        }
+    }
+
+<<<<<<< HEAD
+    /* Largura das cartas (não pode ser modificado aqui, read only) */
+    int cardWidth = 80;
+=======
+        /* Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar */
+        if (cardExists(gameState.hands[0], 0, 0) && !cardExists(gameState.selection, 0, 0)) {
+
+            return false;
+        }
+>>>>>>> origin/master
+
+    /* Espaço entre cartas */
+    int spaceBetweenCards = 30;
+
+<<<<<<< HEAD
+    /* Posições iniciais para cada mão */
+    /*        mão 3 */
+    /* mão 4        mão 2 */
+    /*        mão 1 */
+    int hand1x = 180, hand1y = 650;
+    int hand2x = 685, hand2y = 520;
+    int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
+    int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
+
+    int play1x = hand1x + 190, play1y = hand1y - 150;
+    int play2x = hand2x - 190, play2y = hand2y - 190;
+    int play3x = play1x, play3y = hand3y + 130;
+    int play4x = play2x - 270, play4y = play2y;
+
+    int handx[4] = {hand1x, hand2x, hand3x, hand4x};
+    int handy[4] = {hand1y, hand2y, hand3y, hand4y};
+
+    int playx[4] = {play1x, play2x, play3x, play4x};
+    int playy[4] = {play1y, play2y, play3y, play4y};
+=======
+        /* Verificar que a seleção é uma combinação válida */
+
+        if (selectionLength == 4 || selectionLength > 5) {
+
+            return false;
+
+        } else if (selectionLength == 2 || selectionLength == 3) {
+
+            /* Verificar que a seleção é um par ou um trio válido (só temos de verificar que as cartas são do mesmo valor) */
+
+            int j, k, cardsFound = 0;
+
+            for (j = 0; j < 13; j++) { /* Percorrer valores */
+
+                for (k = 0; k < 4; k++) { /* Percorrer naipes */
+
+                    if (cardExists(gameState.selection, k, j)) {
+
+                        cardsFound++;
+                    }
+                }
+
+                /* Se foram encontradas cartas, verificar que foram encontradas todas (dado que já percorremos o naipe todo) */
+                if (cardsFound > 0) {
+
+                    return (cardsFound == selectionLength); /* Retornar true se encontramos todas as cartas no mesmo valor */
+                }
+            }
+
+            /* Não é esperado que a execução chegue aqui */
+            printf("<!-- Supposedly unreachable code has been executed in isSelectionPlayable -->");
+            return false;
+
+        } else if (selectionLength == 5) {
+
+            if (!( /* Se não for nenhuma mão conhecida */
+                isStraight(gameState.selection)  ||
+                isFlush(gameState.selection)     ||
+                is4OfAKind(gameState.selection)  ||
+                isFullHouse(gameState.selection)
+            )) {
+
+                return false;
+            }
+        }
+
+        /* Verificar se a jogada (que já verificamos se é válida) pode ser jogada no contexto de jogo atual */
+>>>>>>> origin/master
+
+    /* Calcular o distanciamento das mãos em pixeis em relação à sua posição original com base no seu tamanho */
+
+    int handDeltas[4], playDeltas[4];
+
+    int l;
+    for (l = 0; l < 4; l++) {
+
+        int handLength = getHandLength(gameState.hands[l]);
+        int lastPlayLength = getHandLength(gameState.lastPlays[l]);
+
+        int handLengthPx = cardWidth + ( spaceBetweenCards * ( handLength - 1 ) );
+        /* int lastPlayLengthPx = cardWidth + ( spaceBetweenCards * ( lastPlayLength - 1 ) ); */
+
+        /* A deslocação é de 1/(13 * 2) da largura da mão por cada carta removida (por cada carta a menos de 13) */
+        int deltaHand = (13 - handLength) * ( ( 1 / (26) ) * handLengthPx );
+
+        /* A deslocação é de 1/2 * spaceBetweenCards por cada carta acima de 1 */
+
+        int deltaLastPlay;
+
+        if (lastPlayLength > 0) {
+
+           deltaLastPlay = (lastPlayLength - 1) * ( (1/2) * spaceBetweenCards);
+
+        } else {
+
+            deltaLastPlay = 0;
+        }
+
+        handDeltas[l] = deltaHand;
+        playDeltas[l] = deltaLastPlay;
+    }
+
+    /* Aplicar deltas às posições originais */
+
+    handx[0] += handDeltas[0];
+    handy[1] -= handDeltas[1];
+    handx[2] -= handDeltas[2];
+    handy[3] += handDeltas[3];
+
+    playx[0] -= playDeltas[0];
+    playx[1] -= playDeltas[1];
+    playx[2] -= playDeltas[2];
+    playx[3] -= playDeltas[3];
+
+    if (gameState.sort == 0) { /* para o default do sort=0, que vai meter ordem por valores @@@@@@@@@@@ VITOR */
+
+        int i, j, k;
+
+        for (j = 0; j < 13; j++) { /* Percorrer valores */
+
+            for (i = 0; i < 4; i++) { /* Percorrer naipes */
+
+                for (k = 0; k < 4; k++) { /* Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas */
+
+                    if (cardExists(gameState.hands[k], i, j)) {
+
+                        if (k == 0) {
+
+                            /* Se a carta for do utilizador e estiver selecionada, imprime-se mais acima */
+                            if (cardExists(gameState.selection, i, j)) {
+
+                                printCard(path, handx[k], (handy[k] - 20), i, j, gameState, 2);
+
+                            } else {
+
+                                printCard(path, handx[k], handy[k], i, j, gameState, 2);
+                            }
+
+                            handx[k] += spaceBetweenCards; /* Incrementar o x para a próxima carta na mão de baixo */
+
+                        } else if (k == 1) {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, 1);
+
+                            handy[k] -= spaceBetweenCards;
+
+                        } else if (k == 2) {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, 0);
+
+                            handx[k] -= spaceBetweenCards; /* Decrementar o x para a próxima carta na mão de cima */
+
+                        } else if (k == 3) {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, 3);
+
+                            handy[k] += spaceBetweenCards;
+                        }
+
+                    } else if (hasPlayed[k] && !hasPassed[k] && cardExists(gameState.lastPlays[k], i, j)) {
+
+                        printCard(path, playx[k], playy[k], i, j, gameState, 2);
+
+                        if (k == 0) {
+
+                            playx[k] += spaceBetweenCards;
+
+                        } else if (k == 1) {
+
+                            playx[k] += spaceBetweenCards;
+
+                        } else if (k == 2) {
+
+                            playx[k] += spaceBetweenCards;
+
+                        } else if (k == 3) {
+
+                            playx[k] += spaceBetweenCards;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    else { /* para o caso de o jogador ter mudado a ordenação, tornando o valor do sort=1, que vai meter ordem por naipes @@@@@@@@@@@ VITOR */
+
+        int i, j, k;
+
+        for (i = 0; i < 4; i++) { /* Percorrer naipes */ // FOI TROCADA A ORDEM - VITOR
+
+            for (j = 0; j < 13; j++) { /* Percorrer valores */ // FOI TROCADA A ORDEM - VITOR
+
+                for (k = 0; k < 4; k++) { /* Percorrer todas as mãos / últimas jogadas e descobrir se a carta pertence a uma delas */
+
+                    if (cardExists(gameState.hands[k], i, j)) {
+
+                        if (k == 0) {
+
+                            /* Se a carta for do utilizador e estiver selecionada, imprime-se mais acima */
+                            if (cardExists(gameState.selection, i, j)) {
+
+                                printCard(path, handx[k], (handy[k] - 20), i, j, gameState, 2);
+
+                            } else {
+
+                                printCard(path, handx[k], handy[k], i, j, gameState, 2);
+                            }
+
+                            handx[k] += spaceBetweenCards; /* Incrementar o x para a próxima carta na mão de baixo */
+
+                        } else if (k == 1) {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, 1);
+
+                            handy[k] -= spaceBetweenCards;
+
+                        } else if (k == 2) {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, 0);
+
+                            handx[k] -= spaceBetweenCards; /* Decrementar o x para a próxima carta na mão de cima */
+
+                        } else if (k == 3) {
+
+                            printCard(path, handx[k], handy[k], i, j, gameState, 3);
+
+                            handy[k] += spaceBetweenCards;
+                        }
+
+                    } else if (hasPlayed[k] && !hasPassed[k] && cardExists(gameState.lastPlays[k], i, j)) {
+
+                        printCard(path, playx[k], playy[k], i, j, gameState, 2);
+
+                        if (k == 0) {
+
+                            playx[k] += spaceBetweenCards;
+
+                        } else if (k == 1) {
+
+                            playx[k] += spaceBetweenCards;
+
+                        } else if (k == 2) {
+
+                            playx[k] += spaceBetweenCards;
+
+                        } else if (k == 3) {
+
+                            playx[k] += spaceBetweenCards;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /* Imprimir os textos "Passou" nos jogadores que passaram nesta jogada */
+    int p;
+    for (p = 0; p < 4; p++) {
+
+        if (hasPassed[p] == true) {
+            printPass(playx[p], playy[p]);
+        }
+    }
+
+    /* Imprimir botões */
+
+    printf("<div id=\"button-container\">");
+
+    /* Botão de jogar */
+
+    char playStateString[10240];
+
+    /* Se a seleção atual for jogável */
+    if (isSelectionPlayable(gameState)) {
+
+        state stateAfterPlay = gameState;
+
+        stateAfterPlay.play = true;
+
+        sprintf(playStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPlay));
+
+        printf("<a href=\"%s\" class=\"btn green\">Jogar</a>", playStateString);
+
+    } else {
+
+        printf("<a href=\"#\" class=\"btn green disabled\">Jogar</a>");
+    }
+
+    /* Botão de passar */
+
+    state stateAfterPass = gameState;
+
+    stateAfterPass.pass = true;
+
+    char passStateString[10240];
+
+    sprintf(passStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterPass));
+
+    printf("<a href=\"%s\" class=\"btn orange\">Passar</a>", passStateString);
+
+    /* Botão de limpar */
+
+    state stateAfterClear = gameState;
+
+    stateAfterClear.selection = 0;
+
+    char clearStateString[10240];
+
+    sprintf(clearStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterClear));
+
+    printf("<a href=\"%s\" class=\"btn purple\">Limpar</a>", clearStateString);
+
+    /* Botão de recomeçar */
+
+    printf("<a href=\"%s\" class=\"btn red\">Recomeçar</a>", SCRIPT);
+
+    printf("</div>");
+
+    /* Botão de ordenar */
+
+    char sortStateString[10240];
+
+    state stateAfterSort = gameState;
+
+    stateAfterSort.sort = !(stateAfterSort.sort);
+
+    sprintf(sortStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterSort));
+
+    printf("<a href=\"%s\" class=\"btn blue\">Ordem</a>", sortStateString);
+
+    /* Botão de dica */
+
+    state stateAfterTip = gameState;
+
+    stateAfterTip.selection = chooseAIPlay(stateAfterTip, 0); // @@@@@@@@@@ alterei aqui e agora vou meter no chooseAIPlay a opção do index ser = 0
+
+    char tipStateString[10240];
+
+    sprintf(tipStateString, "%s?q=%s", SCRIPT, stateToString(stateAfterTip));
+
+    printf("<a href=\"%s\" class=\"btn yellow\">Dica</a>", tipStateString);
+
+}
+
 
 /** \brief Trata os argumentos da CGI
 
