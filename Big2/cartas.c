@@ -730,7 +730,7 @@ long long int chooseAIPlay (state gameState, int index) {
     int l = getHandLength(hand);
 
     int handArray[l][2]; /* Array da mão no formato [[naipe, valor]] */
-    long long int fiveCardHands[1024] = {0}; /* Permutações de 5 cartas */
+    long long int fiveCardHands[160000] = {0}; /* Permutações de 5 cartas */
 
     /* Preencher handArray */
 
@@ -750,20 +750,28 @@ long long int chooseAIPlay (state gameState, int index) {
 
     /* Percorrer todas as combinações possíveis de 5 cartas desta mão */
 
-    int counters[5] = {0, 1, 2, 3, 4};
+    int counters[5] = {0};
     counter = 0;
     l -= 1;
 
-    while (counters[0] != l && counters[1] != l && counters[2] != l && counters[3] != l && counters[4] != l) {
+    while (!(counters[0] == l && counters[1] == l && counters[2] == l && counters[3] == l && counters[4] == l)) {
 
-        /* Adicionar esta carta às combinações */
+        /* Não podemos adicionar a mesma carta duas vezes */
+        if (!(
+            (counters[0] == counters[1] || counters[0] == counters[2] || counters[0] == counters[3] || counters[0] == counters[4]) ||
+            (counters[1] == counters[2] || counters[1] == counters[3] || counters[1] == counters[4]) ||
+            (counters[2] == counters[3] || counters[2] == counters[4]) ||
+            (counters[3] == counters[4])
+        )) {
 
-        for (i = 0; i < 5; i++) {
+            /* Adicionar esta carta às permutações */
+            for (i = 0; i < 5; i++) {
 
-            fiveCardHands[counter] = addCard(fiveCardHands[counter], handArray[counters[i]][0], handArray[counters[i]][1]);
+                fiveCardHands[counter] = addCard(fiveCardHands[counter], handArray[counters[i]][0], handArray[counters[i]][1]);
+            }
+
+            counter++;
         }
-
-        printf("<!-- %d %d %d %d %d max: %d -->", counters[0], counters[1], counters[2], counters[3], counters[4], l);
 
         /* Incrementar os contadores */
 
@@ -797,22 +805,26 @@ long long int chooseAIPlay (state gameState, int index) {
             counters[3] = 0;
             counters[4] = 0;
         }
-
-        counter++;
     }
 
     /* Finalmente, decidir que jogada fazer */
 
+    /* Descobrir se se tem de jogar o 3 de ouros */
+    bool mustPlay3OfDiamonds = cardExists(gameState.hands[index], 0, 0);
+
     if (mostRecentPlay == 0) { /* Se não houve uma jogada na última ronda */
 
+        int fiveCardHandsLength = (sizeof(fiveCardHands) / sizeof(fiveCardHands[0]));
+
         /* Tentar jogar uma combinação */
-        for (i = 0; i < (sizeof(fiveCardHands) / sizeof(fiveCardHands[0])); i++) {
+        for (i = 0; i < fiveCardHandsLength; i++) {
 
             if (
-                isStraight(fiveCardHands[i])  ||
-                isFlush(fiveCardHands[i])     ||
-                isFullHouse(fiveCardHands[i]) ||
-                is4OfAKind(fiveCardHands[i])
+                (isStraight(fiveCardHands[i])  || /* Verificar se esta combinação é uma mão válida */
+                 isFlush(fiveCardHands[i])     ||
+                 isFullHouse(fiveCardHands[i]) ||
+                 is4OfAKind(fiveCardHands[i])) &&
+                (!mustPlay3OfDiamonds || cardExists(fiveCardHands[i], 0, 0)) /* Verificar que se se tem o 3 de ouros, ele está na mão que se vai jogar */
             ) {
                 return fiveCardHands[i];
             }
@@ -1075,9 +1087,9 @@ void render (state gameState) {
 
     char *path = DECK;
 
-    printf("<svg width = \"800\" height = \"800\">\n");
+    printf("<svg width = \"1200\" height = \"800\">\n");
 
-    printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"800\" style = \"fill:#007700\"/>\n");
+    printf("<rect x = \"0\" y = \"0\" height = \"800\" width = \"1200\" style = \"fill:#007700\"/>\n");
 
     printf("</svg>\n");
 
@@ -1110,15 +1122,15 @@ void render (state gameState) {
     /*              mão 3              */
     /*       mão 4        mão 2        */
     /*              mão 1              */
-    int hand1x = 180, hand1y = 650;
-    int hand2x = 685, hand2y = 520;
-    int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 20;
-    int hand4x = 35, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
+    int hand1x = 400, hand1y = 650;
+    int hand2x = 1065, hand2y = 520;
+    int hand3x = (hand1x + (spaceBetweenCards * 12)), hand3y = 50;
+    int hand4x = 85, hand4y = (hand2y - (spaceBetweenCards * 12)); /* As duas mãos laterais são imprimidas na vertical uma ao contrário da outra */
 
     int play1x = hand1x + 170, play1y = hand1y - 150;
-    int play2x = hand2x - 210, play2y = hand2y - 190;
+    int play2x = hand2x - 250, play2y = hand2y - 190;
     int play3x = play1x, play3y = hand3y + 130;
-    int play4x = play2x - 270, play4y = play2y;
+    int play4x = play2x - 490, play4y = play2y;
 
     int handx[4] = {hand1x, hand2x, hand3x, hand4x};
     int handy[4] = {hand1y, hand2y, hand3y, hand4y};
@@ -1318,7 +1330,7 @@ void render (state gameState) {
     for (p = 0; p < 4; p++) {
 
         if (hasPassed[p] == true) {
-            printPass(playx[p], playy[p]);
+            printPass(playx[p], playy[p] - 20);
         }
     }
 
@@ -1374,8 +1386,6 @@ void render (state gameState) {
 
     printf("<a href=\"%s\" class=\"btn red\">Recomeçar</a>", SCRIPT);
 
-    printf("</div>");
-
     /* Botão de ordenar */
 
     char sortStateString[10240];
@@ -1400,17 +1410,18 @@ void render (state gameState) {
 
     printf("<a href=\"%s\" class=\"btn yellow\">Dica</a>", tipStateString);
 
-/*
+    printf("</div>");
 
-int scorePlayer0 = (getHandLenght(gameState.hands[0] * (-1));
-int scorePlayer1 = (getHandLenght(gameState.hands[1] * (-1));
-int scorePlayer2 = (getHandLenght(gameState.hands[2] * (-1));
-int scorePlayer3 = (getHandLenght(gameState.hands[3] * (-1));
+    /*
+    int scorePlayer0 = (getHandLenght(gameState.hands[0] * (-1));
+    int scorePlayer1 = (getHandLenght(gameState.hands[1] * (-1));
+    int scorePlayer2 = (getHandLenght(gameState.hands[2] * (-1));
+    int scorePlayer3 = (getHandLenght(gameState.hands[3] * (-1));
 
-printf("<a href=\"%d\" class=\"btn yellow\">%s - %d, %s - %d, %s - %d, %s - %d</a>", Score, "Player 0", scorePlayer0, "Player 1", scorePlayer1, "Player 2", scorePlayer2, "Player 3", scorePlayer3);
+    printf("<a href=\"%d\" class=\"btn yellow\">%s - %d, %s - %d, %s - %d, %s - %d</a>", Score, "Player 0", scorePlayer0, "Player 1", scorePlayer1, "Player 2", scorePlayer2, "Player 3", scorePlayer3);
 
-*/
-/*    printf para dar score. */
+    printf para dar score.
+    */
 
 }
 
