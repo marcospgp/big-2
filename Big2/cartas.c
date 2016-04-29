@@ -325,19 +325,19 @@ bool isStraight (long long int hand) {
     /* Indice do valor do 2: 12 ("3456789TJQKA2") */
 
     int j, k, cardsFound = 0;
-    bool cardFoundOfThisValue = false;
+    bool cardsFoundOfThisValue = 0;
 
     for (j = 0; j < 13; j++) { /* Percorrer valores */
 
-            /* Contar o 2 como carta menor */
-            if (j == 0) {
+        /* Contar o 2 como carta menor */
+        if (j == 0) {
 
-                j = 12; /* Começar pelo 2 */
+            j = 12; /* Começar pelo 2 */
 
-            } else {
+        } else {
 
-                j -= 1;
-            }
+            j -= 1;
+        }
 
         for (k = 0; k < 4; k++) { /* Percorrer naipes */
 
@@ -345,17 +345,17 @@ bool isStraight (long long int hand) {
 
                 cardsFound++;
 
-                cardFoundOfThisValue = true;
+                cardsFoundOfThisValue++;
             }
         }
 
-        if (cardsFound > 0 && !cardFoundOfThisValue) { /* Se não foi encontrada uma carta nesta iteração e já tinham sido encontradas cartas */
+        if (cardsFound > 0 && cardsFoundOfThisValue != 1) { /* Se não foi encontrada uma carta nesta iteração (ou foi encontrada mais que uma carta deste valor) e já tinham sido encontradas cartas */
 
             return false;
 
         } else {
 
-            cardFoundOfThisValue = false; /* Dar reset ao valor */
+            cardsFoundOfThisValue = 0; /* Dar reset ao valor */
         }
     }
 
@@ -367,23 +367,23 @@ bool isStraight (long long int hand) {
     /* Verificar o caso em que o às conta como carta menor */
 
     cardsFound = 0;
-    cardFoundOfThisValue = false;
+    cardsFoundOfThisValue = 0;
 
     for (j = 0; j < 13; j++) { /* Percorrer valores */
 
-            /* Contar o 2 e o às como cartas menores */
-            if (j == 0) {
+        /* Contar o 2 e o às como cartas menores */
+        if (j == 0) {
 
-                j = 11; /* Começar pelo às */
+            j = 11; /* Começar pelo às */
 
-            } else if (j == 1) {
+        } else if (j == 1) {
 
-                j = 12; /* De seguida o 2 */
+            j = 12; /* De seguida o 2 */
 
-            } else {
+        } else {
 
-                j -= 2;
-            }
+            j -= 2;
+        }
 
         for (k = 0; k < 4; k++) { /* Percorrer naipes */
 
@@ -391,19 +391,21 @@ bool isStraight (long long int hand) {
 
                 cardsFound++;
 
-                cardFoundOfThisValue = true;
+                cardsFoundOfThisValue++;
             }
         }
 
-        if (cardsFound > 0 && !cardFoundOfThisValue) { /* Se não foi encontrada uma carta nesta iteração e já tinham sido encontradas cartas */
+        if (cardsFound > 0 && cardsFoundOfThisValue != 1) { /* Se não foi encontrada uma carta nesta iteração (ou foi encontrada mais que uma carta deste valor) e já tinham sido encontradas cartas */
 
             return false;
 
         } else {
 
-            cardFoundOfThisValue = false; /* Dar reset ao valor */
+            cardsFoundOfThisValue = 0; /* Dar reset ao valor */
         }
     }
+
+    printf("<!-- isStraight: %d -->", (cardsFound == 5));
 
     return (cardsFound == 5);
 }
@@ -431,6 +433,8 @@ bool isFlush (long long int hand) {
             return false;
         }
     }
+
+    printf("<!-- isFlush: %d -->", (cardsFound == 5));
 
     return (cardsFound == 5);
 }
@@ -467,6 +471,8 @@ bool isFullHouse (long long int hand) {
         sameValueCardCount = 0;
     }
 
+    printf("<!-- isFullHouse: %d -->", (cardCount == 5 && has3Cards && has2Cards));
+
     return (cardCount == 5 && has3Cards && has2Cards);
 }
 
@@ -497,6 +503,8 @@ bool is4OfAKind (long long int hand) {
 
         sameValueCardCount = 0;
     }
+
+    printf("<!-- is4OfaKind: %d -->", (cardCount == 5 && has4Cards));
 
     return (cardCount == 5 && has4Cards);
 }
