@@ -573,15 +573,20 @@ bool isSelectionPlayable (state gameState) {
             }
         }
 
+        int mostRecentPlayLength = getHandLength(mostRecentPlay);
+        int selectionLength = getHandLength(gameState.selection);
+
+        /* A jogada não é válida se não tiver tamanho igual à jogada mais recente */
+        if (mostRecentPlayLength != selectionLength && mostRecentPlay != 0) {
+            return false;
+        }
+
         /* Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar */
 
         if (cardExists(gameState.hands[0], 0, 0) && !cardExists(gameState.selection, 0, 0)) {
 
             return false;
         }
-
-        int mostRecentPlayLength = getHandLength(mostRecentPlay);
-        int selectionLength = getHandLength(gameState.selection);
 
         /* Verificar que a seleção é uma combinação válida */
 
@@ -606,15 +611,11 @@ bool isSelectionPlayable (state gameState) {
                 }
 
                 /* Se foram encontradas cartas, verificar que foram encontradas todas (dado que já percorremos o naipe todo) */
-                if (cardsFound > 0) {
+                if (cardsFound > 0 && cardsFound != selectionLength) {
 
-                    return (cardsFound == selectionLength); /* Retornar true se encontramos todas as cartas no mesmo valor */
+                    return false;
                 }
             }
-
-            /* Não é esperado que a execução chegue aqui */
-            printf("<!-- Supposedly unreachable code has been executed in isSelectionPlayable -->");
-            return false;
 
         } else if (selectionLength == 5) {
 
@@ -626,18 +627,6 @@ bool isSelectionPlayable (state gameState) {
             )) {
 
                 return false;
-
-            } else {
-
-                /* TODO - REMOVER; APENAS SERVE PARA DEBUGAR AS FUNÇOES ISSTRAIGHT, ETC. */
-
-
-
-                /*   / \   */
-                /*  / ! \  */
-                /* /_____\ */
-
-                return true;
             }
         }
 
@@ -647,14 +636,10 @@ bool isSelectionPlayable (state gameState) {
 
            return true;
 
-        } else if (mostRecentPlayLength == selectionLength) { /* Se ambas as mãos têm o mesmo tamanho */
+        } else {
 
             /* Retornar true se a seleção é maior que a jogada do bot que jogou anteriormente */
             return isPlayBigger(gameState.selection, mostRecentPlay);
-
-        } else { /* Se a seleção não for válida */
-
-            return false;
         }
     }
 }
@@ -725,7 +710,6 @@ long long int chooseAIPlay (state gameState, int index) {
 
     int i;
     for (i = 0; i < 3; i++) {
-        printf("<!-- i: %d -->", i);
 
         /* Se:
             - Esta jogada foi uma jogada válida ((~(long long int) 0) significa que o jogador ainda não fez nada)
@@ -739,11 +723,6 @@ long long int chooseAIPlay (state gameState, int index) {
             break;
         }
     }
-
-    printf("<!-- lastPlays[0]: %d -->", lastPlays[0]);
-    printf("<!-- lastPlays[1]: %d -->", lastPlays[1]);
-    printf("<!-- lastPlays[2]: %d -->", lastPlays[2]);
-    printf("<!-- mostRecentPlay: %d -->", mostRecentPlay);
 
     /* Descobrir que combinações de 5 cartas temos e podemos jogar */
 
@@ -784,7 +763,7 @@ long long int chooseAIPlay (state gameState, int index) {
             fiveCardHands[counter] = addCard(fiveCardHands[counter], handArray[counters[i]][0], handArray[counters[i]][1]);
         }
 
-        /*printf("<!-- %d %d %d %d %d max: %d -->", counters[0], counters[1], counters[2], counters[3], counters[4], l);*/
+        printf("<!-- %d %d %d %d %d max: %d -->", counters[0], counters[1], counters[2], counters[3], counters[4], l);
 
         /* Incrementar os contadores */
 
@@ -856,9 +835,6 @@ long long int chooseAIPlay (state gameState, int index) {
 
         /* Descobrir o número de cartas que temos de jogar */
         int numberOfCardsPlayed = getHandLength(mostRecentPlay);
-
-        printf("<!-- mostRecentPlay: %d -->", mostRecentPlay);
-        printf("<!-- numberOfCardsPlayed: %d -->", numberOfCardsPlayed);
 
         if (numberOfCardsPlayed == 1) {
 
