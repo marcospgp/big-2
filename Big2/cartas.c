@@ -574,6 +574,7 @@ bool isSelectionPlayable (state gameState) {
         }
 
         /* Verificar que, se o utilizador tem o 3 de ouros na mão, tem de o jogar */
+
         if (cardExists(gameState.hands[0], 0, 0) && !cardExists(gameState.selection, 0, 0)) {
 
             return false;
@@ -686,31 +687,31 @@ long long int chooseAIPlay (state gameState, int index) {
 
     /* Descobrir quais foram as jogadas anteriores */
 
-    long long int lastPlays[3]; /* Array das últimas jogadas ordenadas da mais recente para a mais antiga */
+    long long int lastPlays[3] = {0}; /* Array das últimas jogadas ordenadas da mais recente para a mais antiga */
 
     if (index == 0) {
 
-        lastPlays[0] = gameState.lastPlays[1]; /* para dar a dica (Vitor) */
+        lastPlays[0] = gameState.lastPlays[1]; /* Para dar a dica (Vitor) */
         lastPlays[1] = gameState.lastPlays[2];
         lastPlays[2] = gameState.lastPlays[3];
 
     } else if (index == 1) {
 
-        lastPlays[0] = gameState.lastPlays[2]; /* para que seja possivel jogar com sentido horario (Vitor) */
+        lastPlays[0] = gameState.lastPlays[2]; /* Para que seja possivel jogar com sentido horário (Vitor) */
         lastPlays[1] = gameState.lastPlays[3];
         lastPlays[2] = gameState.lastPlays[0];
 
     } else if (index == 2) {
 
         lastPlays[0] = gameState.lastPlays[3];
-        lastPlays[1] = gameState.lastPlays[0]; /* em todo este conjunto de instruções */
+        lastPlays[1] = gameState.lastPlays[0]; /* Em todo este conjunto de instruções */
         lastPlays[2] = gameState.lastPlays[1];
 
     } else if (index == 3) {
 
         lastPlays[0] = gameState.lastPlays[0];
         lastPlays[1] = gameState.lastPlays[1];
-        lastPlays[2] = gameState.lastPlays[2]; /* para que seja possivel jogar com sentido horario (Vitor) */
+        lastPlays[2] = gameState.lastPlays[2]; /* Para que seja possivel jogar com sentido horário (Vitor) */
 
     } else {
 
@@ -724,6 +725,7 @@ long long int chooseAIPlay (state gameState, int index) {
 
     int i;
     for (i = 0; i < 3; i++) {
+        printf("<!-- i: %d -->", i);
 
         /* Se:
             - Esta jogada foi uma jogada válida ((~(long long int) 0) significa que o jogador ainda não fez nada)
@@ -738,16 +740,111 @@ long long int chooseAIPlay (state gameState, int index) {
         }
     }
 
+    printf("<!-- lastPlays[0]: %d -->", lastPlays[0]);
+    printf("<!-- lastPlays[1]: %d -->", lastPlays[1]);
+    printf("<!-- lastPlays[2]: %d -->", lastPlays[2]);
+    printf("<!-- mostRecentPlay: %d -->", mostRecentPlay);
+
+    /* Descobrir que combinações de 5 cartas temos e podemos jogar */
+
+    long long int hand = gameState.hands[index];
+    int l = getHandLength(hand);
+
+    int handArray[l][2]; /* Array da mão no formato [[naipe, valor]] */
+    long long int fiveCardHands[1024] = {0}; /* Permutações de 5 cartas */
+
+    /* Preencher handArray */
+
+    int o, counter = 0;
+    for (i = 0; i < 4; i++) { /* Percorrer naipes */
+        for (o = 0; o < 13; o++) { /* Percorrer valores */
+
+            if (cardExists(hand, i, o)) {
+
+                handArray[counter][0] = i;
+                handArray[counter][1] = o;
+
+                counter++;
+            }
+        }
+    }
+
+    /* Percorrer todas as combinações possíveis de 5 cartas desta mão */
+
+    int counters[5] = {0, 1, 2, 3, 4};
+    counter = 0;
+    l -= 1;
+
+    while (counters[0] != l && counters[1] != l && counters[2] != l && counters[3] != l && counters[4] != l) {
+
+        /* Adicionar esta carta às combinações */
+
+        for (i = 0; i < 5; i++) {
+
+            fiveCardHands[counter] = addCard(fiveCardHands[counter], handArray[counters[i]][0], handArray[counters[i]][1]);
+        }
+
+        /*printf("<!-- %d %d %d %d %d max: %d -->", counters[0], counters[1], counters[2], counters[3], counters[4], l);*/
+
+        /* Incrementar os contadores */
+
+        if (counters[4] < l) {
+
+            counters[4]++;
+
+        } else if (counters[3] < l) {
+
+            counters[3]++;
+            counters[4] = 0;
+
+        } else if (counters [2] < l) {
+
+            counters[2]++;
+            counters[3] = 0;
+            counters[4] = 0;
+
+        } else if (counters [1] < l) {
+
+            counters[1]++;
+            counters[2] = 0;
+            counters[3] = 0;
+            counters[4] = 0;
+
+        } else if (counters [0] < l) {
+
+            counters[0]++;
+            counters[1] = 0;
+            counters[2] = 0;
+            counters[3] = 0;
+            counters[4] = 0;
+        }
+
+        counter++;
+    }
+
     /* Finalmente, decidir que jogada fazer */
 
     if (mostRecentPlay == 0) { /* Se não houve uma jogada na última ronda */
+
+        /* Tentar jogar uma combinação */
+        for (i = 0; i < (sizeof(fiveCardHands) / sizeof(fiveCardHands[0])); i++) {
+
+            if (
+                isStraight(fiveCardHands[i])  ||
+                isFlush(fiveCardHands[i])     ||
+                isFullHouse(fiveCardHands[i]) ||
+                is4OfAKind(fiveCardHands[i])
+            ) {
+                return fiveCardHands[i];
+            }
+        }
 
         /* Jogar a carta mais baixa do baralho */
         int j, k;
         for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
             for (k = 0; k < 4; k++) { /* Percorrer naipes */
 
-                if (cardExists(gameState.hands[index], k, j)) { /* Se o bot que tem de jogar tem esta carta */
+                if (cardExists(hand, k, j)) { /* Se o bot que tem de jogar tem esta carta */
 
                     /* Retornar a carta mais baixa */
                     return addCard((long long int) 0, k, j);
@@ -760,6 +857,9 @@ long long int chooseAIPlay (state gameState, int index) {
         /* Descobrir o número de cartas que temos de jogar */
         int numberOfCardsPlayed = getHandLength(mostRecentPlay);
 
+        printf("<!-- mostRecentPlay: %d -->", mostRecentPlay);
+        printf("<!-- numberOfCardsPlayed: %d -->", numberOfCardsPlayed);
+
         if (numberOfCardsPlayed == 1) {
 
             /* Jogar a carta válida mais baixa do baralho */
@@ -767,7 +867,7 @@ long long int chooseAIPlay (state gameState, int index) {
             for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
                 for (k = 0; k < 4; k++) { /* Percorrer naipes */
 
-                    if (cardExists(gameState.hands[index], k, j)) { /* Se o bot tem esta carta */
+                    if (cardExists(hand, k, j)) { /* Se o bot tem esta carta */
 
                         long long int possiblePlay = addCard((long long int) 0, k, j);
 
@@ -790,13 +890,13 @@ long long int chooseAIPlay (state gameState, int index) {
             for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
                 for (k = 0; k < 4; k++) { /* Percorrer naipes */
 
-                    if (cardExists(gameState.hands[index], k, j)) { /* Se o bot tem esta carta */
+                    if (cardExists(hand, k, j)) { /* Se o bot tem esta carta */
 
                         for (l = 0; l < 4; l++) { /* Tentar encontrar um par (percorrer naipes) */
 
                             if (l != k) { /* Se não estamos no mesmo naipe da carta pela qual estamos a passar */
 
-                                if (cardExists(gameState.hands[index], l, j)) { /* Se o bot tem esta carta */
+                                if (cardExists(hand, l, j)) { /* Se o bot tem esta carta */
 
                                     long long int possiblePlay = addCard((long long int) 0, k, j);
 
@@ -823,19 +923,19 @@ long long int chooseAIPlay (state gameState, int index) {
             for (j = 0; j < 13; j++) { /* Percorrer valores primeiro (queremos a carta mais baixa) */
                 for (k = 0; k < 4; k++) { /* Percorrer naipes */
 
-                    if (cardExists(gameState.hands[index], k, j)) { /* Se o bot tem esta carta */
+                    if (cardExists(hand, k, j)) { /* Se o bot tem esta carta */
 
                         for (l = 0; l < 4; l++) { /* Tentar encontrar um par (percorrer naipes) */
 
                             if (l != k) { /* Se não estamos no mesmo naipe da carta pela qual estamos a passar */
 
-                                if (cardExists(gameState.hands[index], l, j)) { /* Se o bot tem esta carta */
+                                if (cardExists(hand, l, j)) { /* Se o bot tem esta carta */
 
                                     for (m = 0; m < 4; m++) { /* Tentar encontrar um trio (percorrer naipes) */
 
                                         if (m != k && m != l) { /* Se não estamos no mesmo naipe das cartas do par que encontramos */
 
-                                            if (cardExists(gameState.hands[index], m, j)) { /* Se o bot tem esta carta */
+                                            if (cardExists(hand, m, j)) { /* Se o bot tem esta carta */
 
                                                 long long int possiblePlay = addCard((long long int) 0, k, j);
 
@@ -1324,7 +1424,7 @@ void render (state gameState) {
 
     printf("<a href=\"%s\" class=\"btn yellow\">Dica</a>", tipStateString);
 
-/*    
+/*
 
 int scorePlayer0 = (getHandLenght(gameState.hands[0] * (-1));
 int scorePlayer1 = (getHandLenght(gameState.hands[1] * (-1));
@@ -1379,11 +1479,11 @@ void parse (char *query) {
                 if (i == 3) {
 
                     index = 0;
-                
+
                 } else if (i == 2) {
 
                     index = 3;
-                
+
                 } else if (i == 1) {
 
                     index = 2;
