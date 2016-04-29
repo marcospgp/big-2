@@ -949,11 +949,7 @@ long long int chooseAIPlay (state gameState, int index) {
             /* Não encontramos uma jogada válida, logo passamos */
             return (long long int) 0;
 
-        } else if (numberOfCardsPlayed == 4 || numberOfCardsPlayed > 5) {
-
-            printf("<!-- Warning: A bot was asked to play against a hand of invalid size (in chooseAIPlay) -->");
-            return (long long int) 0;
-        } else {
+        } else if (numberOfCardsPlayed == 5) {
 
             /* Tentar jogar uma combinação de 5 cartas */
             for (i = 0; i < fiveCardHandsLength; i++) {
@@ -969,6 +965,18 @@ long long int chooseAIPlay (state gameState, int index) {
                     return fiveCardHands[i];
                 }
             }
+
+            return (long long int) 0; /* Se não se encontrou nenhuma combinação válida, passar */
+
+        } else if (numberOfCardsPlayed == 4 || numberOfCardsPlayed > 5) {
+
+            printf("<!-- Warning 01: A bot was asked to play against a hand of invalid size (in chooseAIPlay) -->");
+            return (long long int) 0;
+
+        } else {
+
+            printf("<!-- Warning 02: A bot was asked to play against a hand of invalid size (in chooseAIPlay) -->");
+            return (long long int) 0;
         }
     }
 }
