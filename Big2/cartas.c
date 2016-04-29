@@ -405,8 +405,6 @@ bool isStraight (long long int hand) {
         }
     }
 
-    printf("<!-- isStraight: %d -->", (cardsFound == 5));
-
     return (cardsFound == 5);
 }
 
@@ -433,8 +431,6 @@ bool isFlush (long long int hand) {
             return false;
         }
     }
-
-    printf("<!-- isFlush: %d -->", (cardsFound == 5));
 
     return (cardsFound == 5);
 }
@@ -471,8 +467,6 @@ bool isFullHouse (long long int hand) {
         sameValueCardCount = 0;
     }
 
-    printf("<!-- isFullHouse: %d -->", (cardCount == 5 && has3Cards && has2Cards));
-
     return (cardCount == 5 && has3Cards && has2Cards);
 }
 
@@ -503,8 +497,6 @@ bool is4OfAKind (long long int hand) {
 
         sameValueCardCount = 0;
     }
-
-    printf("<!-- is4OfaKind: %d -->", (cardCount == 5 && has4Cards));
 
     return (cardCount == 5 && has4Cards);
 }
@@ -820,9 +812,10 @@ long long int chooseAIPlay (state gameState, int index) {
     /* Descobrir se se tem de jogar o 3 de ouros */
     bool mustPlay3OfDiamonds = cardExists(gameState.hands[index], 0, 0);
 
-    if (mostRecentPlay == 0) { /* Se não houve uma jogada na última ronda */
+    /* Descobrir o tamanho do array fiveCardHands para quando o tivermos de percorrer*/
+    int fiveCardHandsLength = (sizeof(fiveCardHands) / sizeof(fiveCardHands[0]));
 
-        int fiveCardHandsLength = (sizeof(fiveCardHands) / sizeof(fiveCardHands[0]));
+    if (mostRecentPlay == 0) { /* Se não houve uma jogada na última ronda */
 
         /* Tentar jogar uma combinação */
         for (i = 0; i < fiveCardHandsLength; i++) {
@@ -956,11 +949,26 @@ long long int chooseAIPlay (state gameState, int index) {
             /* Não encontramos uma jogada válida, logo passamos */
             return (long long int) 0;
 
+        } else if (numberOfCardsPlayed == 4 || numberOfCardsPlayed > 5) {
+
+            printf("<!-- Warning: A bot was asked to play against a hand of invalid size (in chooseAIPlay) -->");
+            return (long long int) 0;
         } else {
 
-            /* O bot não sabe jogar mais que 3 cartas iguais por agora */
-            printf("<!-- An AI play was requested of more than 3 cards, and the bot didn't know what to do so it passed. -->");
-            return (long long int) 0;
+            /* Tentar jogar uma combinação de 5 cartas */
+            for (i = 0; i < fiveCardHandsLength; i++) {
+
+                if (
+                    (isStraight(fiveCardHands[i])  || /* Verificar se esta combinação é uma mão válida */
+                     isFlush(fiveCardHands[i])     ||
+                     isFullHouse(fiveCardHands[i]) ||
+                     is4OfAKind(fiveCardHands[i])) &&
+                     isPlayBigger(fiveCardHands[i], mostRecentPlay) && /* Verificar que esta possível jogada é maior que a anterior */
+                    (!mustPlay3OfDiamonds || cardExists(fiveCardHands[i], 0, 0)) /* Verificar que se se tem o 3 de ouros, ele está na mão que se vai jogar (o que supostamente nunca vai acontecer aqui, mas sabe-se lá) */
+                ) {
+                    return fiveCardHands[i];
+                }
+            }
         }
     }
 }
