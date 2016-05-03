@@ -324,13 +324,13 @@ bool isStraight (long long int hand) {
 
     /* Indice do valor do 2: 12 ("3456789TJQKA2") */
 
-    int j, k, cardsFound = 0;
+    int j, k, l, cardsFound = 0;
     bool cardsFoundOfThisValue = 0;
 
-    for (j = 0; j < 13; j++) { /* Percorrer valores */
+    for (l = 0; l < 13; l++) { /* Percorrer valores */
 
         /* Contar o 2 como carta menor */
-        if (j == 0) {
+        if (l == 0) {
 
             j = 12; /* Começar pelo 2 */
 
@@ -369,10 +369,10 @@ bool isStraight (long long int hand) {
     cardsFound = 0;
     cardsFoundOfThisValue = 0;
 
-    for (j = 0; j < 13; j++) { /* Percorrer valores */
+    for (l = 0; l < 13; l++) { /* Percorrer valores */
 
         /* Contar o 2 e o às como cartas menores */
-        if (j == 0) {
+        if (l == 0) {
 
             j = 11; /* Começar pelo às */
 
