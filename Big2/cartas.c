@@ -501,6 +501,189 @@ bool is4OfAKind (long long int hand) {
     return (cardCount == 5 && has4Cards);
 }
 
+
+/** \brief Avalia o poder de um straight
+
+    @param play1   A jogada da qual se quer obter a maior carta
+    @return        Index (j) da carta de maior valor
+*/
+int straightValue (long long int jogada) {
+
+    int j, k, cardCount = 0;
+
+    for (j = 0; j < 11; j++) { /* so vai até ao 11 porque as únicas cartas que mantém o seu valor são do 3 ao K */
+        
+        for (k = 0; k < 4; k++) {
+
+            if (cardExists(jogada, k, j)) {
+
+                cardCount++;
+
+            }
+        
+        }
+
+        if ((j == 3) && (cardCount == 3)) { /* para o caso em que é "A 2 3 4 5" */
+
+            return 2; /* index do 5 */
+
+        }
+
+        if ((j == 4) && (cardCount == 4)) { /* para o caso em que é "2 3 4 5 6" */
+
+            return 3; /* index do 6 */
+
+        }
+
+        if ((j == 10) && (cardCount == 4)) { /* para o caso em que é "10 J Q K A" */
+
+            return 11; /* index do Ás */
+
+        }
+
+        if (cardCount == 5) {
+
+            return j;
+
+        }
+    }
+}
+
+
+/** \brief Avalia o suit de um straight que empatou
+
+    @param play1   A jogada da qual se quer obter o maior suit
+    @return        Valoração (k) - que vai de 0 a 3 - da carta de maior suit
+*/
+int straightSuit (long long int jogada, int j) {
+
+    /* vai aumentando o k até encontrar a carta que existe na mao e dá o suit de 0 a 3, que quanto maior mais forte é */
+    int k;
+        
+    for (k = 0; k < 4; k++) {
+
+        if (cardExists(jogada, k, j)) {
+
+            return k;
+
+        }
+    }
+}
+
+
+/** \brief Avalia o suit de um flush
+
+    @param play1   A jogada da qual se quer obter o suit
+    @return        0, 1, 2, 3 dependendo de suit
+*/
+int flushSuit (long long int jogada) {
+
+    /* vai andar até encontrar uma quarta qualquer e dá o suit dela, porque são todas do mesmo suit */
+    int j, k;
+    
+    for (j = 0; j < 13; j++) {   
+        for (k = 0; k < 4; k++) {
+
+            if (cardExists(jogada, k, j)) {
+
+                return k;
+
+            }
+        }
+    }
+}
+
+
+/** \brief Avalia o maior valor de um flush
+
+    @param play1   A jogada da qual se quer obter o maior valor
+    @return        0 até 12 dependendo do valor
+*/
+int flushValue (long long int jogada) {
+
+    /* vai percorrer todas as cartas. quando encontrar a última, ou seja, cardCount = 5, dá o valor (j) dela */
+    int j, k, cardCount = 0;
+
+    for (j = 0; j < 13; j++) {
+        
+        for (k = 0; k < 4; k++) {
+
+            if (cardExists(jogada, k, j)) {
+
+                cardCount++;
+
+            }
+        }
+
+        if (cardCount == 5) {
+
+            return j;
+
+        }
+    }
+}
+
+
+/** \brief Avalia o maior valor do trio do full house
+
+    @param play1   A jogada da qual se quer obter o maior valor
+    @return        0 até 12 dependendo do valor
+*/
+int fullHouseValue (long long int jogada) {
+
+    /* vai percorrer todas as cartas, até encontrar um valor com 3 cartas */
+    int j, k, trio;
+
+    for (j = 0; j < 13; j++) {
+        
+        for (k = 0, trio = 0; k < 4; k++) { /* reinicia trio sempre a 0, para procurar o valor (j) em que há 3 cartas */
+
+            if (cardExists(jogada, k, j)) {
+
+                trio++;
+
+            }
+
+            if (trio == 3) {
+
+                return j;
+
+            }
+        }
+    }
+}
+
+
+/** \brief Avalia o maior valor do quad do 4OfAKind
+
+    @param play1   A jogada da qual se quer obter o maior valor
+    @return        0 até 12 dependendo do valor
+*/
+int fourOfAKindValue (long long int jogada) {
+
+    /* vai percorrer todas as cartas, até encontrar um valor com 4 cartas */
+    int j, k, quad;
+
+    for (j = 0; j < 13; j++) {
+        
+        for (k = 0, quad = 0; k < 4; k++) { /* reinicia quad sempre a 0, para procurar o valor (j) em que há 4 cartas */
+
+            if (cardExists(jogada, k, j)) {
+
+                quad++;
+
+            }
+
+            if (quad == 4) {
+
+                return j;
+
+            }
+        }
+    }
+}
+
+
 /** \brief Avalia se uma jogada é maior que outra
 
     Não é garantido que esta função avalie se ambas as jogadas são válidas. Essa verificação deve ser feita noutro lugar.
@@ -537,9 +720,180 @@ bool isPlayBigger (long long int play1, long long int play2) {
 
     } else {
 
-        /* TODO
-           Comparar jogadas de mais que 3 cartas
-        */
+
+        if (isStraight(play2) & !isFlush(play2)) { /* verifica se é straight mas não é straight flush */
+
+            if (isFlush(play1) || isFullHouse(play1) || is4OfAKind(play1)) { /* verifica se há maiores. se for straight flush, já entra no flush */
+                return true;
+            }
+
+            else {
+                
+                if (straightValue(play1) > straightValue(play2)) { /* se o valor do straight da nova mao é maior que a anterior, então true */
+
+                    return true;
+
+                }
+
+                else if (straightValue(play1) < straightValue(play2)) { /* se o valor do straight da nova mao é menor que a anterior, então false */
+
+                    return false;
+
+                }
+
+                else { /* no caso de serem straights com cartas do mesmo valor */
+
+                    if (straightSuit(play1, straightValue(play1)) > straightSuit(play2, straightValue(play2))) { /* se o naipe do straight novo é maior, dá true */
+
+                        return true;
+
+                    }
+
+                    else { /* sendo menor, dá falso */
+
+                        return false;
+
+                    }
+
+                }
+            }
+        }
+
+
+        else if (isFlush(play2) && !isStraight(play2)) { /* verifica se é flush mas não é straight flush */
+
+                if (isStraight(play1) && !isFlush(play1)) { /* verifica se é straight mas não é straight flush */
+                    return false;
+                }
+
+                if (isFullHouse(play1) || is4OfAKind(play1) || (isStraight(play1) && isFlush(play1))) {
+                    return true;
+                }
+
+                else {
+                    
+                    if (flushSuit(play1) > flushSuit(play2)) {
+
+                        return true;
+
+                    }
+
+                    if (flushSuit(play1) < flushSuit(play2)) {
+
+                        return false;
+
+                    }
+
+                    else {
+
+                        if (flushValue(play1) > flushValue(play2)) {
+
+                            return true;
+
+                        }
+
+                        else {
+
+                            return false;
+
+                        }
+
+
+                    }
+                }
+            }
+
+
+        else if (isFullHouse(play2)) {
+
+                if ((isStraight(play1) && !isFlush(play1)) || (!isStraight(play1) && isFlush(play1))) {
+                    return false;
+                }
+
+                if (is4OfAKind(play1) || (isStraight(play1) && isFlush(play1))) {
+                    return true;
+                }
+
+                else {
+                    
+                    if (fullHouseValue(play1) > fullHouseValue(play2)) { /* se o valor das 3 cartas novas for maior */
+
+                        return true;
+
+                    }
+
+                    else {
+
+                        return false;
+
+                    }
+                }
+            }
+
+
+        else if (is4OfAKind(play2)) {
+
+                if ((isStraight(play1) && !isFlush(play1)) || (!isStraight(play1) && isFlush(play1)) || isFullHouse(play1)) {
+                    return false;
+                }
+
+                if (isStraight(play1) && isFlush(play1)) {
+                    return true;
+                }
+
+                else {
+
+                    if (fourOfAKindValue(play1) > fourOfAKindValue(play2)) { /* se o valor das 4 cartas novas for maior */
+
+                        return true;
+
+                    }
+
+                    else {
+
+                        return false;
+
+                    }
+                }
+        }
+
+        else if (isStraight(play2) && isFlush(play2)) {
+
+                if (isStraight(play1) && isFlush(play1)) {
+                    
+                    if (straightValue(play1) > straightValue(play2)) {
+
+                        return true;
+
+                    }
+
+                    if (straightValue(play1) < straightValue(play2)) {
+
+                        return false;
+
+                    }
+
+                    else { /* caso as cartas todas do mesmo valor */
+
+                        if (flushSuit(play1) > flushSuit(play2)) {
+
+                            return true;
+
+                        }
+
+                        else {
+
+                            return false;
+
+                        }
+                    }
+                }
+
+                else {
+                    return false;
+                }
+            }
+
         printf("<!-- Tried to use undeveloped functionality (play comparison). -->");
         return false;
     }
