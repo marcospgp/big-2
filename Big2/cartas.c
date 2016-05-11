@@ -1005,7 +1005,7 @@ bool isSelectionPlayable (state gameState) {
     }
 }
 
-/** \brief Descobre quem tem o 3 de ouros (e por isso, joga primeiro)
+/** \brief Descobre quem tem o 3 de ouros (e por isso, joga primeiro). Deve retornar 0 quando ninguém tem o 3 de ouros
 
     @param gameState    O estado de jogo atual
     @return             O índice da mão do jogador com o 3 de ouros
@@ -1021,6 +1021,8 @@ int whoGoesFirst (state gameState) {
             return i;
         }
     }
+
+    return 0;
 }
 
 /** \brief Decide que jogada um bot deve fazer baseando-se no estado de jogo atual
@@ -1819,6 +1821,18 @@ void parse (char *query) {
 	if(sscanf(query, "q=%s", stateString) == 1) {
 
         state gameState = stringToState(stateString);
+
+        /* Verificar quem joga primeiro na mesma para permitir testar jogadas */
+
+        int i = whoGoesFirst(gameState); /* Retorna 0 se ninguém tem o 3 de ouros */
+
+        /* Processar jogadas dos bots até ser a vez do utilizador */
+        while (i > 0 && i < 4) {
+
+            gameState = processBotAction(gameState, i);
+
+            i--; /* para que seja possivel jogar com sentido horario (Vitor) */
+        }
 
         if (!gameState.play && !gameState.pass) {
 
