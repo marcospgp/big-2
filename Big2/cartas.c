@@ -350,7 +350,7 @@ bool isStraight (long long int hand) {
 
         if (cardsFound > 0 && cardsFoundOfThisValue != 1) { /* Se não foi encontrada uma carta nesta iteração (ou foi encontrada mais que uma carta deste valor) e já tinham sido encontradas cartas */
 
-            return false;
+            break; /* Prosseguir para o próximo caso */
 
         } else if (cardsFound == 5) {
 
@@ -361,6 +361,8 @@ bool isStraight (long long int hand) {
             cardsFoundOfThisValue = 0; /* Dar reset ao valor */
         }
     }
+
+    if (hand == (long long int) 299067162755601) { printf("<!-- 1 -->"); }
 
     /* Verificar o caso em que o às conta como carta menor */
 
@@ -387,6 +389,8 @@ bool isStraight (long long int hand) {
 
             if (cardExists(hand, k, j)) {
 
+
+
                 cardsFound++;
 
                 cardsFoundOfThisValue++;
@@ -397,11 +401,17 @@ bool isStraight (long long int hand) {
 
             return false;
 
+        } else if (cardsFound == 5) {
+
+                return true;
+
         } else {
 
             cardsFoundOfThisValue = 0; /* Dar reset ao valor */
         }
     }
+
+    printf("<!-- Warning: Expectedly unreachable code reached in isStraight -->");
 
     return (cardsFound == 5);
 }
