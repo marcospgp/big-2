@@ -512,7 +512,7 @@ int straightValue (long long int jogada) {
     int j, k, cardCount = 0;
 
     for (j = 0; j < 11; j++) { /* so vai até ao 11 porque as únicas cartas que mantém o seu valor são do 3 ao K */
-        
+
         for (k = 0; k < 4; k++) {
 
             if (cardExists(jogada, k, j)) {
@@ -520,7 +520,7 @@ int straightValue (long long int jogada) {
                 cardCount++;
 
             }
-        
+
         }
 
         if ((j == 3) && (cardCount == 3)) { /* para o caso em que é "A 2 3 4 5" */
@@ -559,7 +559,7 @@ int straightSuit (long long int jogada, int j) {
 
     /* vai aumentando o k até encontrar a carta que existe na mao e dá o suit de 0 a 3, que quanto maior mais forte é */
     int k;
-        
+
     for (k = 0; k < 4; k++) {
 
         if (cardExists(jogada, k, j)) {
@@ -580,8 +580,8 @@ int flushSuit (long long int jogada) {
 
     /* vai andar até encontrar uma quarta qualquer e dá o suit dela, porque são todas do mesmo suit */
     int j, k;
-    
-    for (j = 0; j < 13; j++) {   
+
+    for (j = 0; j < 13; j++) {
         for (k = 0; k < 4; k++) {
 
             if (cardExists(jogada, k, j)) {
@@ -605,7 +605,7 @@ int flushValue (long long int jogada) {
     int j, k, cardCount = 0;
 
     for (j = 0; j < 13; j++) {
-        
+
         for (k = 0; k < 4; k++) {
 
             if (cardExists(jogada, k, j)) {
@@ -635,7 +635,7 @@ int fullHouseValue (long long int jogada) {
     int j, k, trio;
 
     for (j = 0; j < 13; j++) {
-        
+
         for (k = 0, trio = 0; k < 4; k++) { /* reinicia trio sempre a 0, para procurar o valor (j) em que há 3 cartas */
 
             if (cardExists(jogada, k, j)) {
@@ -665,7 +665,7 @@ int fourOfAKindValue (long long int jogada) {
     int j, k, quad;
 
     for (j = 0; j < 13; j++) {
-        
+
         for (k = 0, quad = 0; k < 4; k++) { /* reinicia quad sempre a 0, para procurar o valor (j) em que há 4 cartas */
 
             if (cardExists(jogada, k, j)) {
@@ -720,15 +720,14 @@ bool isPlayBigger (long long int play1, long long int play2) {
 
     } else {
 
-
-        if (isStraight(play2) & !isFlush(play2)) { /* verifica se é straight mas não é straight flush */
+        if (isStraight(play2) && !isFlush(play2)) { /* verifica se é straight mas não é straight flush */
 
             if (isFlush(play1) || isFullHouse(play1) || is4OfAKind(play1)) { /* verifica se há maiores. se for straight flush, já entra no flush */
                 return true;
             }
 
             else {
-                
+
                 if (straightValue(play1) > straightValue(play2)) { /* se o valor do straight da nova mao é maior que a anterior, então true */
 
                     return true;
@@ -771,7 +770,7 @@ bool isPlayBigger (long long int play1, long long int play2) {
                 }
 
                 else {
-                    
+
                     if (flushSuit(play1) > flushSuit(play2)) {
 
                         return true;
@@ -815,7 +814,7 @@ bool isPlayBigger (long long int play1, long long int play2) {
                 }
 
                 else {
-                    
+
                     if (fullHouseValue(play1) > fullHouseValue(play2)) { /* se o valor das 3 cartas novas for maior */
 
                         return true;
@@ -860,7 +859,7 @@ bool isPlayBigger (long long int play1, long long int play2) {
         else if (isStraight(play2) && isFlush(play2)) {
 
                 if (isStraight(play1) && isFlush(play1)) {
-                    
+
                     if (straightValue(play1) > straightValue(play2)) {
 
                         return true;
