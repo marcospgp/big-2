@@ -1458,10 +1458,6 @@ state getInitialGameState () {
 */
 void render (state gameState) {
 
-/* TODO
-    - METER APRESENTAÇÃO DE SCORE NO FINAL DO JOGO. vai ser preciso verificar se alguém tem 0 cartas e calcular o score no momento
-*/
-
     char *path = DECK;
 
     printf("<svg width = \"1200\" height = \"800\">\n");
