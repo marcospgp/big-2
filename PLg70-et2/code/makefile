@@ -9,6 +9,5 @@ limpar:
 	rm $(EXEC) *.o
 
 install: $(EXEC)
-	sudo cp -r card-images /var/www/html/big-2
-	sudo cp style.css /var/www/html/big-2
+	sudo cp style.css /var/www/html
 	sudo cp cartas /usr/lib/cgi-bin

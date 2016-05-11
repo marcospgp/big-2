@@ -11,7 +11,7 @@
 /**
     URL da pasta com as cartas
 */
-#define DECK		"http://127.0.0.1/big-2/card-images"
+#define DECK		"http://127.0.0.1/cards"
 
 /**
     Ordem dos naipes
@@ -1899,7 +1899,7 @@ int main () {
      * Cabeçalhos necessários numa CGI
      */
 	printf("Content-Type: text/html; charset=utf-8\n\n");
-	printf("<head><title>Exemplo</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../big-2/style.css\">\n</head>\n");
+	printf("<head><title>Exemplo</title>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"../style.css\">\n</head>\n");
 	printf("<body>\n");
 
     /*
