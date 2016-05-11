@@ -759,7 +759,7 @@ bool isPlayBigger (long long int play1, long long int play2) {
         }
 
 
-        else if (isFlush(play2) && !isStraight(play2)) { /* verifica se é flush mas não é straight flush */
+        if (isFlush(play2) && !isStraight(play2)) { /* verifica se é flush mas não é straight flush */
 
                 if (isStraight(play1) && !isFlush(play1)) { /* verifica se é straight mas não é straight flush */
                     return false;
@@ -800,10 +800,10 @@ bool isPlayBigger (long long int play1, long long int play2) {
 
                     }
                 }
-            }
+        }
 
 
-        else if (isFullHouse(play2)) {
+        if (isFullHouse(play2)) {
 
                 if ((isStraight(play1) && !isFlush(play1)) || (!isStraight(play1) && isFlush(play1))) {
                     return false;
@@ -827,10 +827,10 @@ bool isPlayBigger (long long int play1, long long int play2) {
 
                     }
                 }
-            }
+        }
 
 
-        else if (is4OfAKind(play2)) {
+        if (is4OfAKind(play2)) {
 
                 if ((isStraight(play1) && !isFlush(play1)) || (!isStraight(play1) && isFlush(play1)) || isFullHouse(play1)) {
                     return false;
@@ -856,7 +856,7 @@ bool isPlayBigger (long long int play1, long long int play2) {
                 }
         }
 
-        else if (isStraight(play2) && isFlush(play2)) {
+        if (isStraight(play2) && isFlush(play2)) {
 
                 if (isStraight(play1) && isFlush(play1)) {
 
@@ -891,7 +891,7 @@ bool isPlayBigger (long long int play1, long long int play2) {
                 else {
                     return false;
                 }
-            }
+        }
 
         printf("<!-- Tried to use undeveloped functionality (play comparison). -->");
         return false;
