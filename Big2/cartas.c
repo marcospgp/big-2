@@ -336,7 +336,7 @@ bool isStraight (long long int hand) {
 
         } else {
 
-            j -= 1;
+            j = l - 1;
         }
 
         for (k = 0; k < 4; k++) { /* Percorrer naipes */
@@ -376,13 +376,13 @@ bool isStraight (long long int hand) {
 
             j = 11; /* Começar pelo às */
 
-        } else if (j == 1) {
+        } else if (l == 1) {
 
             j = 12; /* De seguida o 2 */
 
         } else {
 
-            j -= 2;
+            j = l - 2;
         }
 
         for (k = 0; k < 4; k++) { /* Percorrer naipes */
