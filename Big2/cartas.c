@@ -1816,52 +1816,75 @@ void parse (char *query) {
 
         state gameState = stringToState(stateString);
 
-        if (!gameState.play && !gameState.pass) {
+        /* Para podermos meter as nossas próprias jogadas */
+        if ((gameState.lastPlays[0] == (-1)) &&
+            (gameState.lastPlays[1] == (-1)) &&
+            (gameState.lastPlays[2] == (-1)) &&
+            (gameState.lastPlays[3] == (-1))) {
 
-            /* Se há uma string de parâmetros mas o utilizador não fez nada, imprimir o estado atual */
-            /* (o jogador provavelmente apenas selecionou uma carta) */
-            render(gameState);
+        /* Descobrir quem joga primeiro (quem tem o 3 de ouros) */
+        int i = whoGoesFirst(gameState);
+
+        /* Processar jogadas dos bots até ser a vez do utilizador */
+        while (i > 0 && i < 4) {
+
+            gameState = processBotAction(gameState, i);
+
+            i--; /* para que seja possivel jogar com sentido horario (Vitor) */
+        }
+
+        render(gameState);
 
         } else {
 
-            if (getHandLength(gameState.hands[1]) != 0) { /* vê se o player 1 não ficou sem cartas. se ficou sem cartas, não deixa user jogar e faz render */
 
-                /* Processar a jogada do utilizador */
-                gameState = processUserAction(gameState);
+            if (!gameState.play && !gameState.pass) {
+
+                /* Se há uma string de parâmetros mas o utilizador não fez nada, imprimir o estado atual */
+                /* (o jogador provavelmente apenas selecionou uma carta) */
+                render(gameState);
+
+            } else {
+
+                if (getHandLength(gameState.hands[1]) != 0) { /* vê se o player 1 não ficou sem cartas. se ficou sem cartas, não deixa user jogar e faz render */
+
+                    /* Processar a jogada do utilizador */
+                    gameState = processUserAction(gameState);
 
 
-                /* Processar a jogada dos bots */
-            int i;
-            for (i = 3; i > 0; i--) { /* para que seja possivel jogar com sentido horario (Vitor) */
+                    /* Processar a jogada dos bots */
+                int i;
+                for (i = 3; i > 0; i--) { /* para que seja possivel jogar com sentido horario (Vitor) */
 
-                /* Este bloco define as mãos que vão ser analisadas, mediante o bot que estiver a jogar.
-                   As mãos devem ser analisadas para o caso de alguma anterior ao bot que vai jogar tenha acabado o jogo.
-                   Nesse caso, não se deixa alterar o gameState, fazendo o break e indo logo render.
-                */
-                int index;
+                    /* Este bloco define as mãos que vão ser analisadas, mediante o bot que estiver a jogar.
+                       As mãos devem ser analisadas para o caso de alguma anterior ao bot que vai jogar tenha acabado o jogo.
+                       Nesse caso, não se deixa alterar o gameState, fazendo o break e indo logo render.
+                    */
+                    int index;
 
-                if (i == 3) {
+                    if (i == 3) {
 
-                    index = 0;
+                        index = 0;
 
-                } else if (i == 2) {
+                    } else if (i == 2) {
 
-                    index = 3;
+                        index = 3;
 
-                } else if (i == 1) {
+                    } else if (i == 1) {
 
-                    index = 2;
+                        index = 2;
+                    }
+
+                    if (getHandLength(gameState.hands[index]) != 0) {
+                        gameState = processBotAction(gameState, i); /* ve se player 0, 3 ou 2 ficou sem cartas. se ficou da break e vai logo render */
+                    } else {
+                        break;
+                    }
+                }
                 }
 
-                if (getHandLength(gameState.hands[index]) != 0) {
-                    gameState = processBotAction(gameState, i); /* ve se player 0, 3 ou 2 ficou sem cartas. se ficou da break e vai logo render */
-                } else {
-                    break;
-                }
+                render(gameState);
             }
-            }
-
-            render(gameState);
         }
 
 	} else {
