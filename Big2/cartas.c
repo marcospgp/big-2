@@ -1849,34 +1849,34 @@ void parse (char *query) {
 
 
                     /* Processar a jogada dos bots */
-                int i;
-                for (i = 3; i > 0; i--) { /* para que seja possivel jogar com sentido horario (Vitor) */
+                    int i;
+                    for (i = 3; i > 0; i--) { /* para que seja possivel jogar com sentido horario (Vitor) */
 
-                    /* Este bloco define as mãos que vão ser analisadas, mediante o bot que estiver a jogar.
-                       As mãos devem ser analisadas para o caso de alguma anterior ao bot que vai jogar tenha acabado o jogo.
-                       Nesse caso, não se deixa alterar o gameState, fazendo o break e indo logo render.
-                    */
-                    int index;
+                        /* Este bloco define as mãos que vão ser analisadas, mediante o bot que estiver a jogar.
+                           As mãos devem ser analisadas para o caso de alguma anterior ao bot que vai jogar tenha acabado o jogo.
+                           Nesse caso, não se deixa alterar o gameState, fazendo o break e indo logo render.
+                        */
+                        int index;
 
-                    if (i == 3) {
+                        if (i == 3) {
 
-                        index = 0;
+                            index = 0;
 
-                    } else if (i == 2) {
+                        } else if (i == 2) {
 
-                        index = 3;
+                            index = 3;
 
-                    } else if (i == 1) {
+                        } else if (i == 1) {
 
-                        index = 2;
+                            index = 2;
+                        }
+
+                        if (getHandLength(gameState.hands[index]) != 0) {
+                            gameState = processBotAction(gameState, i); /* ve se player 0, 3 ou 2 ficou sem cartas. se ficou da break e vai logo render */
+                        } else {
+                            break;
+                        }
                     }
-
-                    if (getHandLength(gameState.hands[index]) != 0) {
-                        gameState = processBotAction(gameState, i); /* ve se player 0, 3 ou 2 ficou sem cartas. se ficou da break e vai logo render */
-                    } else {
-                        break;
-                    }
-                }
                 }
 
                 render(gameState);
