@@ -324,8 +324,7 @@ bool isStraight (long long int hand) {
 
     /* Indice do valor do 2: 12 ("3456789TJQKA2") */
 
-    int j, k, l, cardsFound = 0;
-    bool cardsFoundOfThisValue = 0;
+    int j, k, l, cardsFound = 0, cardsFoundOfThisValue = 0;
 
     for (l = 0; l < 13; l++) { /* Percorrer valores */
 
@@ -353,15 +352,14 @@ bool isStraight (long long int hand) {
 
             return false;
 
+        } else if (cardsFound == 5) {
+
+            return true;
+
         } else {
 
             cardsFoundOfThisValue = 0; /* Dar reset ao valor */
         }
-    }
-
-    if (cardsFound == 5) {
-
-        return true;
     }
 
     /* Verificar o caso em que o às conta como carta menor */
