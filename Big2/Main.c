@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include "Logic.h"
+#include "View.h"
 
 /**
     URL da CGI
