@@ -1,0 +1,535 @@
+\section{Logic.\+h File Reference}
+\label{_logic_8h}\index{Logic.\+h@{Logic.\+h}}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int {\bf get\+Card\+Index} (int suit, int value)
+\begin{DoxyCompactList}\small\item\em Devolve o índice da carta. \end{DoxyCompactList}\item 
+int {\bf get\+Hand\+Length} (long long int hand)
+\begin{DoxyCompactList}\small\item\em Devolve o número de cartas numa mão. \end{DoxyCompactList}\item 
+long long int {\bf add\+Card} (long long int hand, int suit, int value)
+\begin{DoxyCompactList}\small\item\em Adiciona uma carta ao estado. \end{DoxyCompactList}\item 
+long long int {\bf remove\+Card} (long long int hand, int suit, int value)
+\begin{DoxyCompactList}\small\item\em Remove uma carta do estado. \end{DoxyCompactList}\item 
+int {\bf card\+Exists} (long long int hand, int suit, int value)
+\begin{DoxyCompactList}\small\item\em Verifica se uma carta pertence ao estado. \end{DoxyCompactList}\item 
+void {\bf distribute\+Cards} (long long int $\ast$hands)
+\begin{DoxyCompactList}\small\item\em Distribui cartas por 4 mãos aleatoriamente. \end{DoxyCompactList}\item 
+{\bf bool} {\bf is\+Straight} (long long int hand)
+\begin{DoxyCompactList}\small\item\em Avalia se uma seleção é um straight. \end{DoxyCompactList}\item 
+{\bf bool} {\bf is\+Flush} (long long int hand)
+\begin{DoxyCompactList}\small\item\em Avalia se uma seleção é um flush. \end{DoxyCompactList}\item 
+{\bf bool} {\bf is\+Full\+House} (long long int hand)
+\begin{DoxyCompactList}\small\item\em Avalia se uma seleção é um full house. \end{DoxyCompactList}\item 
+{\bf bool} {\bf is4\+Of\+A\+Kind} (long long int hand)
+\begin{DoxyCompactList}\small\item\em Avalia se uma seleção é um 4 of a kind. \end{DoxyCompactList}\item 
+int {\bf straight\+Value} (long long int jogada)
+\begin{DoxyCompactList}\small\item\em Avalia o poder de um straight. \end{DoxyCompactList}\item 
+int {\bf straight\+Suit} (long long int jogada, int j)
+\begin{DoxyCompactList}\small\item\em Avalia o suit de um straight que empatou. \end{DoxyCompactList}\item 
+int {\bf flush\+Suit} (long long int jogada)
+\begin{DoxyCompactList}\small\item\em Avalia o suit de um flush. \end{DoxyCompactList}\item 
+int {\bf flush\+Value} (long long int jogada)
+\begin{DoxyCompactList}\small\item\em Avalia o maior valor de um flush. \end{DoxyCompactList}\item 
+int {\bf full\+House\+Value} (long long int jogada)
+\begin{DoxyCompactList}\small\item\em Avalia o maior valor do trio do full house. \end{DoxyCompactList}\item 
+int {\bf four\+Of\+A\+Kind\+Value} (long long int jogada)
+\begin{DoxyCompactList}\small\item\em Avalia o maior valor do quad do 4\+Of\+A\+Kind. \end{DoxyCompactList}\item 
+{\bf bool} {\bf is\+Play\+Bigger} (long long int play1, long long int play2)
+\begin{DoxyCompactList}\small\item\em Avalia se uma jogada é maior que outra. \end{DoxyCompactList}\item 
+{\bf bool} {\bf is\+Selection\+Playable} ({\bf state} game\+State)
+\begin{DoxyCompactList}\small\item\em Decide se a seleção atual do jogador é jogável. \end{DoxyCompactList}\item 
+int {\bf who\+Goes\+First} ({\bf state} game\+State)
+\begin{DoxyCompactList}\small\item\em Descobre quem tem o 3 de ouros (e por isso, joga primeiro). Deve retornar 0 quando ninguém tem o 3 de ouros. \end{DoxyCompactList}\item 
+long long int {\bf choose\+A\+I\+Play} ({\bf state} game\+State, int index)
+\begin{DoxyCompactList}\small\item\em Decide que jogada um bot deve fazer baseando-\/se no estado de jogo atual. \end{DoxyCompactList}\item 
+{\bf state} {\bf process\+Bot\+Action} ({\bf state} game\+State, int index)
+\begin{DoxyCompactList}\small\item\em Processa uma jogada do computador. \end{DoxyCompactList}\item 
+{\bf state} {\bf process\+User\+Action} ({\bf state} game\+State)
+\begin{DoxyCompactList}\small\item\em Processa uma jogada do utilizador. \end{DoxyCompactList}\item 
+{\bf state} {\bf get\+Initial\+Game\+State} ()
+\begin{DoxyCompactList}\small\item\em Cria um estado de jogo inicial e retorna-\/o. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\index{Logic.\+h@{Logic.\+h}!F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED@{F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED}}
+\index{F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED@{F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED}]{\setlength{\rightskip}{0pt plus 5cm}\#define F\+U\+N\+C\+T\+I\+O\+N\+S\+\_\+\+H\+\_\+\+I\+N\+C\+L\+U\+D\+ED}\label{_logic_8h_a0cb1ce350a6ce7c926a63393b9b80692}
+
+
+\subsection{Function Documentation}
+\index{Logic.\+h@{Logic.\+h}!add\+Card@{add\+Card}}
+\index{add\+Card@{add\+Card}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{add\+Card(long long int hand, int suit, int value)}]{\setlength{\rightskip}{0pt plus 5cm}long long int add\+Card (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand, }
+\item[{int}]{suit, }
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a7aabdd7543feed7212851b4a9708d348}
+
+
+Adiciona uma carta ao estado. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A mão a ser modificada \\
+\hline
+{\em suit} & O naipe da carta (inteiro entre 0 e 3) \\
+\hline
+{\em value} & O valor da carta (inteiro entre 0 e 12) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A mão modificada 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!card\+Exists@{card\+Exists}}
+\index{card\+Exists@{card\+Exists}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{card\+Exists(long long int hand, int suit, int value)}]{\setlength{\rightskip}{0pt plus 5cm}int card\+Exists (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand, }
+\item[{int}]{suit, }
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_adb7a6203821e6f8ca548a033e8e44a3e}
+
+
+Verifica se uma carta pertence ao estado. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A mão a ser verificada \\
+\hline
+{\em suit} & O naipe da carta (inteiro entre 0 e 3) \\
+\hline
+{\em value} & O valor da carta (inteiro entre 0 e 12) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+1 se a carta existe e 0 caso contrário 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!choose\+A\+I\+Play@{choose\+A\+I\+Play}}
+\index{choose\+A\+I\+Play@{choose\+A\+I\+Play}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{choose\+A\+I\+Play(state game\+State, int index)}]{\setlength{\rightskip}{0pt plus 5cm}long long int choose\+A\+I\+Play (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{game\+State, }
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a4c61c2ce0b6b81312fe871dec0c91097}
+
+
+Decide que jogada um bot deve fazer baseando-\/se no estado de jogo atual. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & O estado de jogo atual \\
+\hline
+{\em index} & O índice da mão do bot que está a jogar (no array hands do estado de jogo) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Uma mão que representa as cartas que devem ser jogadas. 0 significa um passe 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!distribute\+Cards@{distribute\+Cards}}
+\index{distribute\+Cards@{distribute\+Cards}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{distribute\+Cards(long long int $\ast$hands)}]{\setlength{\rightskip}{0pt plus 5cm}void distribute\+Cards (
+\begin{DoxyParamCaption}
+\item[{long long int $\ast$}]{hands}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a55cce472835f7b958b48a20b6516b92b}
+
+
+Distribui cartas por 4 mãos aleatoriamente. 
+
+Esta função preenche um array com mãos selecionadas aleatoriamente
+
+
+\begin{DoxyParams}{Parameters}
+{\em hands} & Array que vai ser preenchido com as mãos geradas aleatoriamente \\
+\hline
+\end{DoxyParams}
+\index{Logic.\+h@{Logic.\+h}!flush\+Suit@{flush\+Suit}}
+\index{flush\+Suit@{flush\+Suit}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{flush\+Suit(long long int jogada)}]{\setlength{\rightskip}{0pt plus 5cm}int flush\+Suit (
+\begin{DoxyParamCaption}
+\item[{long long int}]{jogada}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a3ed86a9bcd7d01d42329c638e6721b27}
+
+
+Avalia o suit de um flush. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada da qual se quer obter o suit \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0, 1, 2, 3 dependendo de suit 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!flush\+Value@{flush\+Value}}
+\index{flush\+Value@{flush\+Value}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{flush\+Value(long long int jogada)}]{\setlength{\rightskip}{0pt plus 5cm}int flush\+Value (
+\begin{DoxyParamCaption}
+\item[{long long int}]{jogada}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a8559bd84b58358e8c8e71451eb6ba1f3}
+
+
+Avalia o maior valor de um flush. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada da qual se quer obter o maior valor \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 até 12 dependendo do valor 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!four\+Of\+A\+Kind\+Value@{four\+Of\+A\+Kind\+Value}}
+\index{four\+Of\+A\+Kind\+Value@{four\+Of\+A\+Kind\+Value}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{four\+Of\+A\+Kind\+Value(long long int jogada)}]{\setlength{\rightskip}{0pt plus 5cm}int four\+Of\+A\+Kind\+Value (
+\begin{DoxyParamCaption}
+\item[{long long int}]{jogada}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a21440cb8b13561377e3653f7072780e4}
+
+
+Avalia o maior valor do quad do 4\+Of\+A\+Kind. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada da qual se quer obter o maior valor \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 até 12 dependendo do valor 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!full\+House\+Value@{full\+House\+Value}}
+\index{full\+House\+Value@{full\+House\+Value}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{full\+House\+Value(long long int jogada)}]{\setlength{\rightskip}{0pt plus 5cm}int full\+House\+Value (
+\begin{DoxyParamCaption}
+\item[{long long int}]{jogada}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a267c5545a1ada744bb35bc8f5e0b09b3}
+
+
+Avalia o maior valor do trio do full house. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada da qual se quer obter o maior valor \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+0 até 12 dependendo do valor 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!get\+Card\+Index@{get\+Card\+Index}}
+\index{get\+Card\+Index@{get\+Card\+Index}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{get\+Card\+Index(int suit, int value)}]{\setlength{\rightskip}{0pt plus 5cm}int get\+Card\+Index (
+\begin{DoxyParamCaption}
+\item[{int}]{suit, }
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a0300a4f1bfdb1c96490ec5b79eb86956}
+
+
+Devolve o índice da carta. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em suit} & O naipe da carta (inteiro entre 0 e 3) \\
+\hline
+{\em value} & O valor da carta (inteiro entre 0 e 12) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+O índice correspondente à carta 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!get\+Hand\+Length@{get\+Hand\+Length}}
+\index{get\+Hand\+Length@{get\+Hand\+Length}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{get\+Hand\+Length(long long int hand)}]{\setlength{\rightskip}{0pt plus 5cm}int get\+Hand\+Length (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_ae4cad117f25b481e13d38a8179e87215}
+
+
+Devolve o número de cartas numa mão. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A mão a ser contada \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Número de cartas na mão 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!get\+Initial\+Game\+State@{get\+Initial\+Game\+State}}
+\index{get\+Initial\+Game\+State@{get\+Initial\+Game\+State}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{get\+Initial\+Game\+State()}]{\setlength{\rightskip}{0pt plus 5cm}{\bf state} get\+Initial\+Game\+State (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_af44ff56a579c8cc1326e35628abf3b9a}
+
+
+Cria um estado de jogo inicial e retorna-\/o. 
+
+Esta função é normalmente usada no início de um jogo para criar um estado inicial
+
+\begin{DoxyReturn}{Returns}
+Um estado de jogo inicial 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!is4\+Of\+A\+Kind@{is4\+Of\+A\+Kind}}
+\index{is4\+Of\+A\+Kind@{is4\+Of\+A\+Kind}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{is4\+Of\+A\+Kind(long long int hand)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bool} is4\+Of\+A\+Kind (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a017692130bfb37971d7f163b0a6862bb}
+
+
+Avalia se uma seleção é um 4 of a kind. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A seleção que se pretende avaliar \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True ou False 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!is\+Flush@{is\+Flush}}
+\index{is\+Flush@{is\+Flush}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{is\+Flush(long long int hand)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bool} is\+Flush (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a5e71a9239dac8690b3cfed671de24425}
+
+
+Avalia se uma seleção é um flush. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A seleção que se pretende avaliar \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True ou False 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!is\+Full\+House@{is\+Full\+House}}
+\index{is\+Full\+House@{is\+Full\+House}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{is\+Full\+House(long long int hand)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bool} is\+Full\+House (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_aa8086e7f25753817ad3cfbee5d4d75ed}
+
+
+Avalia se uma seleção é um full house. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A seleção que se pretende avaliar \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True ou False 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!is\+Play\+Bigger@{is\+Play\+Bigger}}
+\index{is\+Play\+Bigger@{is\+Play\+Bigger}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{is\+Play\+Bigger(long long int play1, long long int play2)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bool} is\+Play\+Bigger (
+\begin{DoxyParamCaption}
+\item[{long long int}]{play1, }
+\item[{long long int}]{play2}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_aa8a1da44d476a2df20ab11413a77ca9f}
+
+
+Avalia se uma jogada é maior que outra. 
+
+Não é garantido que esta função avalie se ambas as jogadas são válidas. Essa verificação deve ser feita noutro lugar.
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada que se quer descobrir se é maior \\
+\hline
+{\em play2} & A jogada contra a qual se quer comparar \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True se a primeira jogada for maior 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!is\+Selection\+Playable@{is\+Selection\+Playable}}
+\index{is\+Selection\+Playable@{is\+Selection\+Playable}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{is\+Selection\+Playable(state game\+State)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bool} is\+Selection\+Playable (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{game\+State}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_af39abe0aa71cd7dd6da874f213b9bfed}
+
+
+Decide se a seleção atual do jogador é jogável. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & O estado de jogo atual \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True se a seleção for jogável 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!is\+Straight@{is\+Straight}}
+\index{is\+Straight@{is\+Straight}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{is\+Straight(long long int hand)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf bool} is\+Straight (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_abe09ddf396fc3020a0f716eccbe960a2}
+
+
+Avalia se uma seleção é um straight. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A seleção que se pretende avaliar \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+True ou False 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!process\+Bot\+Action@{process\+Bot\+Action}}
+\index{process\+Bot\+Action@{process\+Bot\+Action}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{process\+Bot\+Action(state game\+State, int index)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf state} process\+Bot\+Action (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{game\+State, }
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_ab795e48205419721294728b4908e2a6c}
+
+
+Processa uma jogada do computador. 
+
+Sabendo qual é o bot que tem de jogar, decide que jogada fazer e processa-\/a
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & O estado de jogo atual \\
+\hline
+{\em index} & O índice da mão do bot que está a jogar (no array hands do estado de jogo) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+O estado de jogo imediatamente após a jogada do computador 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!process\+User\+Action@{process\+User\+Action}}
+\index{process\+User\+Action@{process\+User\+Action}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{process\+User\+Action(state game\+State)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf state} process\+User\+Action (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{game\+State}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a96a3f9aa6a506336a526c677bdcc6e29}
+
+
+Processa uma jogada do utilizador. 
+
+Normalmente chamada depois de o utilizador clicar num botão (jogar ou passar)
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & O estado de jogo atual \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+O estado de jogo imediatamente após a ação 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!remove\+Card@{remove\+Card}}
+\index{remove\+Card@{remove\+Card}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{remove\+Card(long long int hand, int suit, int value)}]{\setlength{\rightskip}{0pt plus 5cm}long long int remove\+Card (
+\begin{DoxyParamCaption}
+\item[{long long int}]{hand, }
+\item[{int}]{suit, }
+\item[{int}]{value}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a5161d77b949bdd64e42b381e9d35eaf4}
+
+
+Remove uma carta do estado. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em hand} & A mão a ser modificada \\
+\hline
+{\em suit} & O naipe da carta (inteiro entre 0 e 3) \\
+\hline
+{\em value} & O valor da carta (inteiro entre 0 e 12) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A mão modificada 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!straight\+Suit@{straight\+Suit}}
+\index{straight\+Suit@{straight\+Suit}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{straight\+Suit(long long int jogada, int j)}]{\setlength{\rightskip}{0pt plus 5cm}int straight\+Suit (
+\begin{DoxyParamCaption}
+\item[{long long int}]{jogada, }
+\item[{int}]{j}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a7bd55f6695f2ce210e539205fc6faf73}
+
+
+Avalia o suit de um straight que empatou. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada da qual se quer obter o maior suit \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Valoração (k) -\/ que vai de 0 a 3 -\/ da carta de maior suit 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!straight\+Value@{straight\+Value}}
+\index{straight\+Value@{straight\+Value}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{straight\+Value(long long int jogada)}]{\setlength{\rightskip}{0pt plus 5cm}int straight\+Value (
+\begin{DoxyParamCaption}
+\item[{long long int}]{jogada}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a3c9e2cb2ddbcb186b5e42b21400870b0}
+
+
+Avalia o poder de um straight. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em play1} & A jogada da qual se quer obter a maior carta \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Index (j) da carta de maior valor 
+\end{DoxyReturn}
+\index{Logic.\+h@{Logic.\+h}!who\+Goes\+First@{who\+Goes\+First}}
+\index{who\+Goes\+First@{who\+Goes\+First}!Logic.\+h@{Logic.\+h}}
+\subsubsection[{who\+Goes\+First(state game\+State)}]{\setlength{\rightskip}{0pt plus 5cm}int who\+Goes\+First (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{game\+State}
+\end{DoxyParamCaption}
+)}\label{_logic_8h_a8ec30b164d8eb7492536ee935eeb6c4d}
+
+
+Descobre quem tem o 3 de ouros (e por isso, joga primeiro). Deve retornar 0 quando ninguém tem o 3 de ouros. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & O estado de jogo atual \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+O índice da mão do jogador com o 3 de ouros 
+\end{DoxyReturn}

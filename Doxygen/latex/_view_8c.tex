@@ -1,0 +1,86 @@
+\section{View.\+c File Reference}
+\label{_view_8c}\index{View.\+c@{View.\+c}}
+{\ttfamily \#include \char`\"{}View.\+h\char`\"{}}\\*
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void {\bf print\+Card} (char $\ast$path, int x, int y, int suit, int value, {\bf state} game\+State, int card\+Position)
+\begin{DoxyCompactList}\small\item\em Imprime o html correspondente a uma carta. \end{DoxyCompactList}\item 
+void {\bf print\+Pass} (int x, int y)
+\begin{DoxyCompactList}\small\item\em Imprime o html correspondente a um passe. \end{DoxyCompactList}\item 
+void {\bf render} ({\bf state} game\+State)
+\begin{DoxyCompactList}\small\item\em Imprime um estado de jogo. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Function Documentation}
+\index{View.\+c@{View.\+c}!print\+Card@{print\+Card}}
+\index{print\+Card@{print\+Card}!View.\+c@{View.\+c}}
+\subsubsection[{print\+Card(char $\ast$path, int x, int y, int suit, int value, state game\+State, int card\+Position)}]{\setlength{\rightskip}{0pt plus 5cm}void print\+Card (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{path, }
+\item[{int}]{x, }
+\item[{int}]{y, }
+\item[{int}]{suit, }
+\item[{int}]{value, }
+\item[{{\bf state}}]{game\+State, }
+\item[{int}]{card\+Position}
+\end{DoxyParamCaption}
+)}\label{_view_8c_af9adf2b25d7ec566ad273a3dfc47c836}
+
+
+Imprime o html correspondente a uma carta. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em path} & O U\+RL correspondente à pasta que contém todas as cartas \\
+\hline
+{\em x} & A coordenada x da carta \\
+\hline
+{\em y} & A coordenada y da carta \\
+\hline
+{\em suit} & O naipe da carta (inteiro entre 0 e 3) \\
+\hline
+{\em value} & O valor da carta (inteiro entre 0 e 12) \\
+\hline
+{\em game\+State} & O estado de jogo atual (para determinar urls após cliques nas cartas) \\
+\hline
+{\em card\+Position} & Usado para a rotação. 0 -\/ cima, 1 -\/ direita, 2 -\/ baixo, 3 -\/ esquerda \\
+\hline
+\end{DoxyParams}
+\index{View.\+c@{View.\+c}!print\+Pass@{print\+Pass}}
+\index{print\+Pass@{print\+Pass}!View.\+c@{View.\+c}}
+\subsubsection[{print\+Pass(int x, int y)}]{\setlength{\rightskip}{0pt plus 5cm}void print\+Pass (
+\begin{DoxyParamCaption}
+\item[{int}]{x, }
+\item[{int}]{y}
+\end{DoxyParamCaption}
+)}\label{_view_8c_ac8686b0a60da1d78b00b861efc71e49b}
+
+
+Imprime o html correspondente a um passe. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em x} & A coordenada x de onde deve ser imprimido o html \\
+\hline
+{\em y} & A coordenada y de onde deve ser imprimido o html \\
+\hline
+\end{DoxyParams}
+\index{View.\+c@{View.\+c}!render@{render}}
+\index{render@{render}!View.\+c@{View.\+c}}
+\subsubsection[{render(state game\+State)}]{\setlength{\rightskip}{0pt plus 5cm}void render (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{game\+State}
+\end{DoxyParamCaption}
+)}\label{_view_8c_ab492bec2af752ff3b8901b23a48a9e40}
+
+
+Imprime um estado de jogo. 
+
+Esta função imprime o estado atual do jogo no browser
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & estado atual do jogo \\
+\hline
+\end{DoxyParams}

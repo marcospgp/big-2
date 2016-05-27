@@ -1,0 +1,151 @@
+\section{Main.\+c File Reference}
+\label{_main_8c}\index{Main.\+c@{Main.\+c}}
+{\ttfamily \#include $<$stdio.\+h$>$}\\*
+{\ttfamily \#include $<$stdlib.\+h$>$}\\*
+{\ttfamily \#include $<$string.\+h$>$}\\*
+{\ttfamily \#include $<$time.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}Logic.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}View.\+h\char`\"{}}\\*
+\subsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct {\bf State}
+\end{DoxyCompactItemize}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define {\bf S\+C\+R\+I\+PT}~\char`\"{}http\+://127.\+0.\+0.\+1/cgi-\/bin/big2.\+exe\char`\"{}
+\item 
+\#define {\bf D\+E\+CK}~\char`\"{}http\+://127.\+0.\+0.\+1/big-\/2/card-\/images\char`\"{}
+\item 
+\#define {\bf S\+U\+I\+TS}~\char`\"{}D\+C\+HS\char`\"{}
+\item 
+\#define {\bf V\+A\+L\+U\+ES}~\char`\"{}3456789\+T\+J\+Q\+K\+A2\char`\"{}
+\item 
+\#define {\bf P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT}~\char`\"{}\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%d\+\_\+\%d\+\_\+\%d\char`\"{}
+\item 
+\#define {\bf true}~1
+\item 
+\#define {\bf false}~0
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef int {\bf bool}
+\item 
+typedef struct {\bf State} {\bf state}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+{\bf state} {\bf string\+To\+State} (char $\ast$str)
+\begin{DoxyCompactList}\small\item\em Processa a string recebida como parâmetro e retorna o estado atual do jogo. \end{DoxyCompactList}\item 
+char $\ast$ {\bf state\+To\+String} ({\bf state} e)
+\begin{DoxyCompactList}\small\item\em Codifica o estado atual do jogo numa string. \end{DoxyCompactList}\item 
+void {\bf parse} (char $\ast$query)
+\begin{DoxyCompactList}\small\item\em Trata os argumentos da C\+GI. \end{DoxyCompactList}\item 
+int {\bf main} ()
+\begin{DoxyCompactList}\small\item\em Função principal. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\index{Main.\+c@{Main.\+c}!D\+E\+CK@{D\+E\+CK}}
+\index{D\+E\+CK@{D\+E\+CK}!Main.\+c@{Main.\+c}}
+\subsubsection[{D\+E\+CK}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+E\+CK~\char`\"{}http\+://127.\+0.\+0.\+1/big-\/2/card-\/images\char`\"{}}\label{_main_8c_ac662f6935027ccbb88b890f88344b9b0}
+U\+RL da pasta com as cartas \index{Main.\+c@{Main.\+c}!false@{false}}
+\index{false@{false}!Main.\+c@{Main.\+c}}
+\subsubsection[{false}]{\setlength{\rightskip}{0pt plus 5cm}\#define false~0}\label{_main_8c_a65e9886d74aaee76545e83dd09011727}
+\index{Main.\+c@{Main.\+c}!P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT@{P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT}}
+\index{P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT@{P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT}!Main.\+c@{Main.\+c}}
+\subsubsection[{P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT}]{\setlength{\rightskip}{0pt plus 5cm}\#define P\+A\+R\+A\+M\+E\+T\+E\+R\+\_\+\+S\+T\+R\+I\+N\+G\+\_\+\+F\+O\+R\+M\+AT~\char`\"{}\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%lld\+\_\+\%d\+\_\+\%d\+\_\+\%d\char`\"{}}\label{_main_8c_ae3534b1edafbb19c5ca46b1687069c60}
+Formato da string passada como parâmetro entre jogadas \index{Main.\+c@{Main.\+c}!S\+C\+R\+I\+PT@{S\+C\+R\+I\+PT}}
+\index{S\+C\+R\+I\+PT@{S\+C\+R\+I\+PT}!Main.\+c@{Main.\+c}}
+\subsubsection[{S\+C\+R\+I\+PT}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+C\+R\+I\+PT~\char`\"{}http\+://127.\+0.\+0.\+1/cgi-\/bin/big2.\+exe\char`\"{}}\label{_main_8c_a8b953c0e577c049a57c981b7eeb6fa37}
+U\+RL da C\+GI \index{Main.\+c@{Main.\+c}!S\+U\+I\+TS@{S\+U\+I\+TS}}
+\index{S\+U\+I\+TS@{S\+U\+I\+TS}!Main.\+c@{Main.\+c}}
+\subsubsection[{S\+U\+I\+TS}]{\setlength{\rightskip}{0pt plus 5cm}\#define S\+U\+I\+TS~\char`\"{}D\+C\+HS\char`\"{}}\label{_main_8c_a0c33b306c165fbae505ec5b3544c7d5d}
+Ordem dos naipes \index{Main.\+c@{Main.\+c}!true@{true}}
+\index{true@{true}!Main.\+c@{Main.\+c}}
+\subsubsection[{true}]{\setlength{\rightskip}{0pt plus 5cm}\#define true~1}\label{_main_8c_a41f9c5fb8b08eb5dc3edce4dcb37fee7}
+\index{Main.\+c@{Main.\+c}!V\+A\+L\+U\+ES@{V\+A\+L\+U\+ES}}
+\index{V\+A\+L\+U\+ES@{V\+A\+L\+U\+ES}!Main.\+c@{Main.\+c}}
+\subsubsection[{V\+A\+L\+U\+ES}]{\setlength{\rightskip}{0pt plus 5cm}\#define V\+A\+L\+U\+ES~\char`\"{}3456789\+T\+J\+Q\+K\+A2\char`\"{}}\label{_main_8c_a4b61441e73c1f41f6e5bfa9e3c3e8580}
+Ordem das cartas 
+
+\subsection{Typedef Documentation}
+\index{Main.\+c@{Main.\+c}!bool@{bool}}
+\index{bool@{bool}!Main.\+c@{Main.\+c}}
+\subsubsection[{bool}]{\setlength{\rightskip}{0pt plus 5cm}typedef int {\bf bool}}\label{_main_8c_a1062901a7428fdd9c7f180f5e01ea056}
+Definir o tipo bool \index{Main.\+c@{Main.\+c}!state@{state}}
+\index{state@{state}!Main.\+c@{Main.\+c}}
+\subsubsection[{state}]{\setlength{\rightskip}{0pt plus 5cm}typedef struct {\bf State}  {\bf state}}\label{_main_8c_af075609b61d0bc9a09799d0c822537e3}
+Estrutura que contém o estado do jogo num dado momento 
+
+\subsection{Function Documentation}
+\index{Main.\+c@{Main.\+c}!main@{main}}
+\index{main@{main}!Main.\+c@{Main.\+c}}
+\subsubsection[{main()}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{_main_8c_ae66f6b31b5ad750f1fe042a706a4e3d4}
+
+
+Função principal. 
+
+Função principal do programa que imprime os cabeçalhos necessários e de seguida invoca a função que imprime o código html para desenhar as cartas \index{Main.\+c@{Main.\+c}!parse@{parse}}
+\index{parse@{parse}!Main.\+c@{Main.\+c}}
+\subsubsection[{parse(char $\ast$query)}]{\setlength{\rightskip}{0pt plus 5cm}void parse (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{query}
+\end{DoxyParamCaption}
+)}\label{_main_8c_af22742568b531d69c62aacf16b7c301e}
+
+
+Trata os argumentos da C\+GI. 
+
+Esta função recebe a query que é passada à cgi-\/bin e trata-\/a.
+
+
+\begin{DoxyParams}{Parameters}
+{\em query} & A query que é passada à cgi-\/bin \\
+\hline
+\end{DoxyParams}
+\index{Main.\+c@{Main.\+c}!state\+To\+String@{state\+To\+String}}
+\index{state\+To\+String@{state\+To\+String}!Main.\+c@{Main.\+c}}
+\subsubsection[{state\+To\+String(state e)}]{\setlength{\rightskip}{0pt plus 5cm}char$\ast$ state\+To\+String (
+\begin{DoxyParamCaption}
+\item[{{\bf state}}]{e}
+\end{DoxyParamCaption}
+)}\label{_main_8c_a42515421e8c3a5298fafa7ffddeaa16f}
+
+
+Codifica o estado atual do jogo numa string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em game\+State} & O estado de jogo atual \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Uma string que contém toda a informação do estado atual do jogo, pronta a ser usada como parâmetro 
+\end{DoxyReturn}
+\index{Main.\+c@{Main.\+c}!string\+To\+State@{string\+To\+State}}
+\index{string\+To\+State@{string\+To\+State}!Main.\+c@{Main.\+c}}
+\subsubsection[{string\+To\+State(char $\ast$str)}]{\setlength{\rightskip}{0pt plus 5cm}{\bf state} string\+To\+State (
+\begin{DoxyParamCaption}
+\item[{char $\ast$}]{str}
+\end{DoxyParamCaption}
+)}\label{_main_8c_adfbaa3280b15d8e5ab813f06e67f449c}
+
+
+Processa a string recebida como parâmetro e retorna o estado atual do jogo. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em state\+String} & A string que contém a informação sobre o atual estado de jgoo \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A informação contida na string recebida num formato utilizável em código 
+\end{DoxyReturn}
