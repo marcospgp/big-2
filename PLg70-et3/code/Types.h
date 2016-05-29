@@ -4,7 +4,7 @@
 /**
     URL da CGI
 */
-#define SCRIPT		"http://127.0.0.1/cgi-bin/big2.exe"
+#define SCRIPT		"http://127.0.0.1/cgi-bin/cartas"
 
 /**
     URL da pasta com as cartas
