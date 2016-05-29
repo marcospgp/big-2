@@ -1,3 +1,4 @@
+#include "Types.h"
 #include "View.h"
 
 /** \brief Imprime o html correspondente a uma carta

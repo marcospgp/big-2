@@ -1,3 +1,4 @@
+#include "Types.h"
 #include "Logic.h"
 
 /** \brief Devolve o índice da carta
